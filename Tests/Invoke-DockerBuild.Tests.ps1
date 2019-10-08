@@ -1,5 +1,5 @@
-Import-Module -Force -Name (Get-ChildItem $PSScriptRoot\..\*.psm1 | Select-Object -first 1).FullName
-Import-Module -Force -Name .\MockReg.psm1
+Import-Module $PSScriptRoot/../Docker.Build.psm1
+Import-Module $PSScriptRoot/MockReg.psm1
 . "$PSScriptRoot\..\Private\Invoke-Commands.ps1"
 
 Describe 'Build docker images' {
@@ -19,8 +19,7 @@ Describe 'Build docker images' {
                 $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
             }
             $code = {
-                $here = Get-Location;
-                $modulePath = Join-Path $here "MockReg.psm1" ;
+                $modulePath = (Get-ChildItem -Recurse "MockReg.psm1" | Select-Object -First 1).FullName;
                 Write-Debug $modulePath
                 Import-Module $modulePath
                 StoreMockValue @{"mock" = $Commands}
