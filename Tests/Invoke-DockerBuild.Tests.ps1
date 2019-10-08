@@ -15,6 +15,8 @@ Describe 'Build docker images' {
         It 'creates correct docker build command' {
             if ($IsWindows) {
                 $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
+            } elseif ($IsLinux) {
+                $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
             }
             $code = {
                 $here = Get-Location;
