@@ -1,4 +1,6 @@
-function Parse-ImageName {
+#Requires -PSEdition Core -Version 6
+
+function Find-ImageName {
     [CmdletBinding()]
     param (
         [ValidateNotNullOrEmpty()]
@@ -15,6 +17,6 @@ function Parse-ImageName {
 
     $gitCommand = @("git config --file $gitConfigPath --get remote.origin.url")
 
-    $fullReposUrl = Run-Commands -Commands $gitCommand
-    Get-RepositoryName -FullRepositoryName $fullReposUrl
+    $fullReposUrl = Invoke-Commands -Commands $gitCommand
+    Find-RepositoryName -RepositoryPath $fullReposUrl
 }

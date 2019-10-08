@@ -1,0 +1,35 @@
+language: csharp
+dotnet: 2.1
+mono: none
+
+services:
+  - docker
+
+dist: trusty
+addons:
+    apt:
+        sources:
+        - sourceline: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/14.04/prod trusty main"
+          key_url: "https://packages.microsoft.com/keys/microsoft.asc"
+        packages:
+            - powershell
+
+before_install:
+  - ./travis/setup_repo.sh
+
+install:
+  - cd $TRAVIS_BUILD_DIR
+  - pwsh -f "./Install-Prerequisites.ps1"
+  - export GitVersion_Version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.0.1-linux-debian-9-netcoreapp2.2 /repo -output json -showvariable majorminorpatch)
+  - "echo \"GitVersion says: ${GitVersion_Version} \""
+
+script:
+  - pwsh -f "./Invoke-Tests.ps1"
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: pwsh -f "./Invoke-Publish.ps1"
+  on:
+    tags: true
+    branch: master

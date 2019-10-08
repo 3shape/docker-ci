@@ -5,7 +5,7 @@ Describe 'Parse context from git repository' {
 
         It 'can find a repository origin' {
             $repositoryBasePath = (Split-Path -Parent $PSScriptRoot)
-            $result = Parse-ImageName -RepositoryPath ($repositoryBasePath)
+            $result = Find-ImageName -RepositoryPath $repositoryBasePath
             $result | Should -BeExactly "dockerbuild-pwsh"
         }
     }

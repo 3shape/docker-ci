@@ -68,7 +68,7 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @("Invoke-Jenkins", "Invoke-JenkinsForm", "Invoke-JenkinsRequest", "Remove-JenkinsJob", "New-JenkinsJob", "Initialize-Jenkins")
+    FunctionsToExport = @("Build-DockerImage", "Parse-ImageName")
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

@@ -1,6 +1,6 @@
 #Requires -PSEdition Core -Version 6
 
-function Build-DockerImage {
+function Run-DockerTests {
     [CmdletBinding()]
     param (
         [ValidateNotNullOrEmpty()]
@@ -8,8 +8,5 @@ function Build-DockerImage {
         [ValidateNotNullOrEmpty()]
         [String] $Tag
     )
-
-    Ensure-DockerInstalled
-    Ensure-GitInstalled
 
 }
