@@ -68,7 +68,7 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @("Build-DockerImage", "Parse-ImageName")
+    FunctionsToExport = @("Invoke-DockerBuild")
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

@@ -3,7 +3,7 @@
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
-        [ValidateNotNullOrEmpty()]
+        [Parameter(mandatory=$true)]
         [String]
         $Image,
         [ValidateNotNullOrEmpty()]
