@@ -1,5 +1,6 @@
 . "$PSScriptRoot\..\Private\Test-GitInstalled.ps1"
-. "$PSScriptRoot\..\Private\Invoke-Commands.ps1"
+. "$PSScriptRoot\..\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Private\CommandResult.ps1"
 
 Describe 'Verify git tool installed' {
 

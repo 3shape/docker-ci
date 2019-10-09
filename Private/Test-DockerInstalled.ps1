@@ -7,6 +7,5 @@ function Test-DockerInstalled {
         [String] $DockerCommand = 'docker'
     )
 
-    $dockerCommand = @($DockerCommand)
-    Invoke-Commands $dockerCommand
+    Invoke-Command $DockerCommand
 }

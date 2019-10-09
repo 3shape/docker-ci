@@ -15,8 +15,6 @@ function Find-ImageName {
         throw "No such git config: $gitConfigExists"
     }
 
-    $gitCommand = @("git config --file $gitConfigPath --get remote.origin.url")
-
-    $fullReposUrl = Invoke-Commands -Commands $gitCommand
-    Find-RepositoryName -RepositoryPath $fullReposUrl
+    $result = Invoke-Command "git config --file $gitConfigPath --get remote.origin.url"
+    Find-RepositoryName -RepositoryPath $result.Output
 }

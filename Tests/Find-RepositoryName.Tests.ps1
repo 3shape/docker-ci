@@ -1,4 +1,4 @@
-Import-Module -Verbose -Force -Name (Get-ChildItem $PSScriptRoot\..\*.psm1 | Select-Object -first 1).FullName
+Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 . "$PSScriptRoot\..\Private\Find-RepositoryName.ps1"
 
 Describe 'Parse repos name from full git repository' {
@@ -12,7 +12,6 @@ Describe 'Parse repos name from full git repository' {
     }
 
     Context 'When full https scheme URL is specified' {
-
         It 'The repository name can be deduced' {
             $result = Find-RepositoryName -RepositoryPath "https://github.com/3shapeAS/dockerbuild-pwsh.git"
             $result | Should -BeExactly "dockerbuild-pwsh"
