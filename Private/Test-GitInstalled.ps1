@@ -7,6 +7,5 @@ function Test-GitInstalled {
         [String] $GitCommand = 'git --version'
     )
 
-    $gitCommand = @($GitCommand)
-    Invoke-Commands $gitCommand
+    Invoke-Command $GitCommand
 }
