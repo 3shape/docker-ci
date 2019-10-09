@@ -1,9 +1,7 @@
-#Requires -PSEdition Core -Version 6
-
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
-        [Parameter(mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Image,
         [ValidateNotNullOrEmpty()]
