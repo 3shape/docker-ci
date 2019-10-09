@@ -4,6 +4,14 @@ Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 
 Describe 'Run external tools as commands' {
 
+    BeforeAll {
+        $ErrorActionPreference = 'Continue' #Necessary because otherwise test runners might unwrap exceptions in undesirable ways.
+    }
+
+    AfterAll {
+        $ErrorActionPreference = 'Stop'
+    }
+
     Context 'Run a simple external command'  {
         if ($IsWindows) {
             $commandName = "find /?"
@@ -11,18 +19,25 @@ Describe 'Run external tools as commands' {
             $commandName = "grep --help"
         }
 
-        It 'returns correct result information' {
-           [CommandResult] $result = Invoke-Command $commandName
+        It 'returns correct output and error information' {
+           $result = Invoke-Command $commandName
            $result.ExitCode | Should -Be 0
            $result.Output | Should -Not -BeNullOrEmpty
+           $result.Error | Should -Be $null
+        }
+
+        It 'Returns the error output for failing commands' {
+
+            $result = Invoke-Command "find ---nope-this-is-clearly-wrong"
+            $result.Output | Should -Not -BeNullOrEmpty
+            $result.ExitCode | Should -Not -Be 0
         }
     }
 
     Context 'Run a PS CmdLet' {
         It 'returns correct result information' {
             $commandName = 'Get-Verb'
-            [CommandResult] $result = Invoke-Command $commandName
-            $result.ExitCode | Should -Be 0
+            $result = Invoke-Command $commandName
             $result.Success | Should -Be $true
             $result.Output | Should -Not -BeNullOrEmpty
          }
@@ -31,7 +46,7 @@ Describe 'Run external tools as commands' {
     Context 'Run a nonexisting command' {
         It 'throws an exception' {
             $theCode = {
-             Invoke-Command 'GibberishGoo'
+                Invoke-Command 'GibberishGoo'
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.CommandNotFoundException]) -PassThru
          }
