@@ -5,7 +5,13 @@ Describe 'Parse context from git repository' {
     Context 'When git is installed' {
 
         It 'can find a repository origin' {
-            $repositoryBasePath = (Split-Path -Parent $PSScriptRoot)
+            $repositoryBasePath = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data/Repositories/NoSpace"
+            $result = Find-ImageName -RepositoryPath $repositoryBasePath
+            $result | Should -BeExactly "dockerbuild-pwsh"
+        }
+
+        It 'can find a repository origin with folder with space' {
+            $repositoryBasePath = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data/Repositories/With Space"
             $result = Find-ImageName -RepositoryPath $repositoryBasePath
             $result | Should -BeExactly "dockerbuild-pwsh"
         }
