@@ -17,5 +17,5 @@ function Invoke-DockerBuild {
         $File = "Dockerfile"
 
     )
-    Invoke-Command "docker build ${Context} -t ${Image}:${Tag} -f ${File}"
+    Invoke-Command "docker build `"${Context}`" -t ${Image}:${Tag} -f `"${File}`""
 }

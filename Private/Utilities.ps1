@@ -10,8 +10,7 @@ function Get-TempPath {
 
 function New-RandomFolder {
     do {
-        $randomString = New-Guid
-        $randomPath = Join-Path $(Get-TempPath) $randomString
+        $randomPath = Join-Path $(Get-TempPath) $(New-Guid)
     } while (Test-Path -Path $randomPath -PathType Container)
     New-Item -Path $randomPath -ItemType Directory | Out-Null
     return $randomPath
