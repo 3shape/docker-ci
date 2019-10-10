@@ -16,8 +16,5 @@ function Invoke-DockerTag {
         [String]
         $TargetTag = 'latest'
     )
-
-    $dockerCommand = @("docker tag ${SourceImage}:${SourceTag} ${TargetImage}:${TargetTag}")
-    Invoke-Commands -Commands $dockerCommand
-
+    Invoke-Command "docker tag ${SourceImage}:${SourceTag} ${TargetImage}:${TargetTag}"
 }
