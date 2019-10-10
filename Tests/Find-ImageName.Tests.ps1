@@ -1,12 +1,20 @@
 Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 
+function Get-TempPath {
+    if ($IsWindows) {
+        [system.io.path]::GetTempPath()
+    } elseif ($IsLinux) {
+        '/tmp'
+    }
+}
+
 function New-RandomFolder {
     param (
         [int]$FolderLength = 8
     )
     do {
         $randomString = ( -join ((0x30..0x39) + ( 0x41..0x5A) + ( 0x61..0x7A) | Get-Random -Count $FolderLength | % {[char]$_}) )
-        $randomPath = Join-Path $Env:TEMP $randomString
+        $randomPath = Join-Path $(Get-TempPath) $randomString
     } while (Test-Path -Path $randomPath -PathType Container)
     New-Item -Path $randomPath -ItemType Directory | Out-Null
     return $randomPath
@@ -36,16 +44,25 @@ Describe 'Parse context from git repository' {
 
     Context 'Validating support functions for - When git is installed' {
 
-        It 'can create random folder in TEMP' {
-            $pathInTemp = New-RandomFolder -FolderLength 4
+        It 'can get TEMP path' {
+            $tempPath = Get-TempPath
 
-            $pathInTemp.IndexOf($Env:TEMP) | Should -Be 0
+            if ($IsWindows) {
+                $tempPath.IndexOf($Env:TEMP) | Should -Be 0
+            } elseif ($IsLinux) {
+                $tempPath.IndexOf('/tmp') | Should -Be 0
+            }
+        }
+
+        It 'can create random folder in TEMP folder' {
+            $pathInTemp = New-RandomFolder
+
             Test-Path -Path $pathInTemp | Should -Be $true
 
             Remove-Item $pathInTemp -Recurse -Force | Out-Null
         }
 
-        It 'can create temp git repository for testing' {
+        It 'can create fake git repository for testing' {
             $pathInTemp = New-RandomFolder
             Fake-GitRepository -Path $pathInTemp
 
