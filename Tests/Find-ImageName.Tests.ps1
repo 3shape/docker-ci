@@ -34,7 +34,7 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 
 Describe 'Parse context from git repository' {
 
-    Context 'When git is installed' {
+    Context 'Validating support functions for - When git is installed' {
 
         It 'can create random folder in TEMP' {
             $pathInTemp = New-RandomFolder -FolderLength 4
@@ -54,6 +54,10 @@ Describe 'Parse context from git repository' {
 
             Remove-Item $pathInTemp -Recurse -Force | Out-Null
         }
+
+    }
+
+    Context 'When git is installed' {
 
         It 'can find a repository origin' {
             $tempFolder = New-RandomFolder
