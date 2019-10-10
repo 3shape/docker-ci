@@ -37,7 +37,7 @@ Describe 'Build docker images' {
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
 
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build ${dockerTestData} -t leeandrasmus:latest -f ${dockerFile}"
+            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
     }
 }
