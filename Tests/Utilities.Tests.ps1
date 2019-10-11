@@ -41,5 +41,10 @@ Describe 'Validate various support functions for testing' {
             $postfixed = Ensure-Postfix -Data 'lalaland'
             $postfixed | Should -BeLikeExactly 'lalaland/'
         }
+
+        It 'can postfix a string to a string' {
+            $postfixed = Ensure-Postfix -Data 'lala' -Postfix 'land'
+            $postfixed | Should -BeLikeExactly 'lalaland'
+        }
     }
 }

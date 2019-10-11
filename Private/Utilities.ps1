@@ -40,7 +40,6 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 function Ensure-Postfix {
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
         [String] $Data,
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
