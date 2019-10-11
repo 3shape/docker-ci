@@ -9,7 +9,7 @@ Describe 'Validate various support functions for testing' {
             $tempPath = Get-TempPath
 
             if ($IsWindows) {
-                $tempPath.IndexOf($Env:TEMP) | Should -Be 0
+                $tempPath.IndexOf((Get-Item -LiteralPath $Env:TEMP).FullName) | Should -Be 0
             } elseif ($IsLinux) {
                 $tempPath.IndexOf('/tmp') | Should -Be 0
             }
