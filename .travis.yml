@@ -2,6 +2,11 @@ language: csharp
 dotnet: 2.1
 mono: none
 
+if: |
+  repo != 3shapeAS/dockerbuild-pwsh OR \
+  type = pull_request OR \
+  branch = master
+
 services:
   - docker
 
