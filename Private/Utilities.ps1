@@ -36,3 +36,21 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 
     $configData | Out-File -FilePath "$dotGitPath/config" -Encoding ascii
 }
+
+function Ensure-Postfix {
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Data,
+        [ValidateNotNullOrEmpty()]
+        [String] $Postfix = '/'
+    )
+
+    if (-Not ([String]::IsNullOrEmpty($Data.Trim()))) {
+        $Data = $Data.Trim()
+        if ( $Data.LastIndexOf($Postfix) -ne ($Data.Length - 1) ) {
+            $Data += $Postfix
+        }
+    }
+    $Data
+}

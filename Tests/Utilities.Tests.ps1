@@ -34,4 +34,12 @@ Describe 'Validate various support functions for testing' {
         }
 
     }
+
+    Context 'Various other functions' {
+
+        It 'can postfix default / to a string' {
+            $postfixed = Ensure-Postfix -Data 'lalaland'
+            $postfixed | Should -BeLikeExactly 'lalaland/'
+        }
+    }
 }
