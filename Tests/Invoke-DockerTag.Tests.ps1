@@ -31,16 +31,16 @@ Describe 'Tag docker images' {
             $result | Should -BeLikeExactly "docker tag lalaland:latest lololand:latest"
         }
 
-        It 'tags docker image with image name with latest tag' {
+        It 'tags docker image with image name with pester tag' {
 
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
 
-            Invoke-DockerTag -SourceImage 'lalaland' -SourceTag 'latest' -TargetImage 'lololand' -TargetTag 'latest'
+            Invoke-DockerTag -SourceImage 'lalaland' -SourceTag 'pester' -TargetImage 'lololand' -TargetTag 'pester'
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag lalaland:latest lololand:latest"
+            $result | Should -BeLikeExactly "docker tag lalaland:pester lololand:pester"
         }
 
         It 'tags docker image with image name with source tag' {
