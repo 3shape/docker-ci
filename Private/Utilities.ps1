@@ -19,7 +19,6 @@ function New-RandomFolder {
 function New-FakeGitRepository {
     param (
         [Parameter(mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
         [String]$Path
     )
 
@@ -37,7 +36,7 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
     $configData | Out-File -FilePath "$dotGitPath/config" -Encoding ascii
 }
 
-function Ensure-Postfix {
+function Add-Postfix {
     param (
         [Parameter(Mandatory=$true)]
         [String] $Data,
@@ -45,11 +44,9 @@ function Ensure-Postfix {
         [String] $Postfix = '/'
     )
 
-    if (-Not ([String]::IsNullOrEmpty($Data.Trim()))) {
-        $Data = $Data.Trim()
-        if ( $Data.LastIndexOf($Postfix) -ne ($Data.Length - 1) ) {
-            $Data += $Postfix
-        }
+    $trimmedData = $Data.Trim()
+    if ( -Not $trimmedData.EndsWith($Postfix) ) {
+            $trimmedData += $Postfix
     }
-    $Data
+    $trimmedData
 }
