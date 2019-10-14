@@ -1,18 +1,17 @@
 #Requires -Version 6
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.9.0" }
 
-$Public  = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
+$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
-Foreach($import in @($Public + $Private))
-{
+Foreach ($import in @($Public + $Private)) {
     Try
     {
-        . $import.fullname
+        Write-Debug "Importing ${import}"
+        . $import.fullname # Rewrite to bundle all in scriptblock so types do don't go out of scope.
     }
-    Catch
-    {
+    Catch {
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
-
 Export-ModuleMember -Function $Public.Basename
