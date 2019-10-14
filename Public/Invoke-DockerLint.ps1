@@ -2,17 +2,18 @@
 . "$PSScriptRoot\..\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Private\Format-AsAbsolutePath.ps1"
 
-function Invoke-DockerLinting {
+function Invoke-DockerLint {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
-        $DockerFile
+        $DockerFile = 'Dockerfile'
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
     if (!$dockerFileExists) {
-        throw [System.IO.FileNotFoundException]::new("No such file: $pathToDockerFile")
+        $mesage = "No such file: ${pathToDockerFile}"
+        throw [System.IO.FileNotFoundException]::new($mesage)
     }
     $hadoLintImage = 'hadolint/hadolint:v1.17.2'
     [string[]] $code = Get-Content -Path $DockerFile

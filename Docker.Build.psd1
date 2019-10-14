@@ -68,7 +68,7 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @("Invoke-DockerBuild, Invoke-DockerTag", "Invoke-DockerLinting")
+    FunctionsToExport = @("Invoke-DockerBuild, Invoke-DockerTag", "Invoke-DockerLint")
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'
