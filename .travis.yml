@@ -5,7 +5,8 @@ mono: none
 if: |
   repo != 3shapeAS/dockerbuild-pwsh OR \
   type = pull_request OR \
-  branch = master
+  branch = master OR \
+  tag IS present
 
 services:
   - docker
