@@ -8,63 +8,49 @@ Describe 'Pull docker images' {
         $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
     }
 
-    Context 'Pull docker images' {
+    $code = {
+        Write-Debug $Command
+        StoreMockValue -Key "pull" -Value $Command
+    }
 
-        BeforeEach {
-            Initialize-MockReg
-        }
+    BeforeEach {
+        Initialize-MockReg
+        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+    }
 
-        $code = {
-            Write-Debug $Command
-            StoreMockValue -Key "mock" -Value $Command
-        }
+    AfterEach {
+        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+    }
 
-        It 'pulls docker image with image name only' {
+    Context 'Docker pulls docker images' {
 
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-
-            Invoke-DockerTag -SourceImage 'lalaland' -TargetImage 'lololand'
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
-
-            $result = GetMockValue -Key "mock"
+        It 'pulls public docker image with image name only' {
+            # This test will most likely fail IRL because there isn't any latest tag available for this image
+            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore'
+            $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag lalaland:latest lololand:latest"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:latest"
         }
 
-        It 'pulls docker image with image name with random tag' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-
-            Invoke-DockerTag -SourceImage 'lalaland' -SourceTag 'latest' -TargetImage 'lololand' -TargetTag 'latest'
-
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
-            $result = GetMockValue -Key "mock"
+        It 'pulls public docker image with image name and tag' {
+            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019'
+            $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag lalaland:latest lololand:latest"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:ltsc2019"
         }
 
-        It 'pulls docker image with ID' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-
-            Invoke-DockerTag -SourceImage 'lalaland' -SourceTag 'source' -TargetImage 'lololand'
-
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
-            $result = GetMockValue -Key "mock"
+        It 'pulls public docker image with image name and digest' {
+            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
+            $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag lalaland:source lololand:latest"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore@sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840"
         }
 
-        It 'fails to pull docker image with both image name and ID' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-
-            Invoke-DockerTag -SourceImage 'lalaland' -TargetImage 'lololand' -TargetTag 'target'
-
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
-            $result = GetMockValue -Key "mock"
+        It 'pulls public docker image with image name, tag and digest; digest overrides tag' {
+            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
+            $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag lalaland:latest lololand:target"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore@sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840"
         }
     }
 }

@@ -1,8 +1,9 @@
-#Requires -PSEdition Core -Version 6
-
 function Invoke-DockerPull {
     [CmdletBinding()]
     param (
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Registry,
         [Parameter(mandatory=$true)]
         [String]
         $Image,
@@ -11,13 +12,21 @@ function Invoke-DockerPull {
         $Tag = 'latest',
         [ValidateNotNullOrEmpty()]
         [String]
-        $ID = ''
+        $Digest = ''
     )
 
-    # It is possible to pull by digest / sha, ID. ID supersedes image:tag.
-    #   So if ID is present, use ID. If not, pull image:tag
-    if ( [string]::IsNullOrEmpty($ID) ) {
-        $ID = "${Image}:${Tag}"
+    $RegistryPostfixed = Add-RegistryPostfix -Registry $Registry
+
+    # Pulls by tag by default
+    $ImageToPull = "${RegistryPostfixed}${Image}:${Tag}"
+
+    # Digest overrides tag however
+    if (-Not [String]::IsNullOrEmpty($Digest)) {
+        $validDigest = Test-DockerDigest -Digest $Digest
+        if (-Not $validDigest) {
+            throw "Invalid digest provided."
+        }
+        $ImageToPull = "${RegistryPostfixed}${Image}@${Digest}"
     }
-    Invoke-Command "docker pull ${ID}"
+    Invoke-Command "docker pull ${ImageToPull}"
 }

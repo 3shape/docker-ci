@@ -34,17 +34,31 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
     $configData | Out-File -FilePath "$dotGitPath/config" -Encoding ascii
 }
 
-function Add-Postfix {
+function Add-RegistryPostfix {
     param (
-        [Parameter(Mandatory=$true)]
-        [String] $Data,
+        [String] $Registry,
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
 
-    $trimmedData = $Data.Trim()
-    if ( -Not $trimmedData.EndsWith($Postfix) ) {
-            $trimmedData += $Postfix
+    # Do nothing if $Data is empty / writespace
+    if ([String]::IsNullOrWhiteSpace($Registry)) {
+        return ''
     }
-    $trimmedData
+
+    $trimmedRegistry = $Registry.Trim()
+    if ( -Not $trimmedRegistry.EndsWith($Postfix) ) {
+            $trimmedRegistry += $Postfix
+    }
+    $trimmedRegistry
+}
+
+function Test-DockerDigest {
+    param (
+        [Parameter(Mandatory=$true)]
+        [String] $Digest
+    )
+
+    $shaPrefix = 'sha256:'
+    return $Digest.StartsWith($shaPrefix) -and $Digest.Length -eq ($shaPrefix.Length + 64)
 }
