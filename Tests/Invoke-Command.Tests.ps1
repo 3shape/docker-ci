@@ -4,14 +4,6 @@ Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 
 Describe 'Run external tools as commands' {
 
-    BeforeAll {
-        $ErrorActionPreference = 'Continue' #Necessary because otherwise test runners might unwrap exceptions in undesirable ways.
-    }
-
-    AfterAll {
-        $ErrorActionPreference = 'Stop'
-    }
-
     Context 'Run a simple external command'  {
         if ($IsWindows) {
             $commandName = "find /?"
@@ -23,13 +15,10 @@ Describe 'Run external tools as commands' {
            $result = Invoke-Command $commandName
            $result.ExitCode | Should -Be 0
            $result.Output | Should -Not -BeNullOrEmpty
-           $result.Error | Should -Be $null
         }
 
         It 'Returns the error output for failing commands' {
-
             $result = Invoke-Command "find ---nope-this-is-clearly-wrong"
-            $result.Output | Should -Not -BeNullOrEmpty
             $result.ExitCode | Should -Not -Be 0
         }
     }
@@ -55,14 +44,14 @@ Describe 'Run external tools as commands' {
     Context 'Run a null or empty command' {
         It 'throws an exception if a null command is passed' {
             $theCode = {
-             Invoke-Command $null
+                Invoke-Command $null
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
          }
 
          It 'throws an exception if an empty command is passed' {
             $theCode = {
-             Invoke-Command ""
+                Invoke-Command ""
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
          }
