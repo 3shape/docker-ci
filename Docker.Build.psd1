@@ -91,7 +91,7 @@
             LicenseUri = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/3shapeAS/jenkinsapi-powershell'
+            ProjectUri = 'https://github.com/3shapeAS/dockerbuild-pwsh'
 
             # A URL to an icon representing this module.
             # IconUri = ''
