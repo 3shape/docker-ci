@@ -1,5 +1,3 @@
-#Requires -PSEdition Core -Version 6
-
 function Invoke-DockerTag {
     [CmdletBinding()]
     param (

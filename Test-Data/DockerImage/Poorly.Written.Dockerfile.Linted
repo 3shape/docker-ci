@@ -1,0 +1,16 @@
+DL3006 Always tag the version of an image explicitly
+1: FROM debian
+SC2154 node_verion is referenced but not assigned (did you mean 'node_version'?).
+DL3009 Delete the apt-get lists after installing something
+DL3015 Avoid additional packages by specifying `--no-install-recommends`
+2: RUN export node_version="0.10" \
+3: && apt-get update && apt-get -y install nodejs="$node_verion"
+4: COPY package.json usr/src/app
+DL3003 Use WORKDIR to switch to a directory
+DL3016 Pin versions in npm. Instead of `npm install <package>` use `npm install <package>@<version>`
+5: RUN cd /usr/src/app \
+6: && npm install node-static
+DL3011 Valid UNIX ports range from 0 to 65535
+7: EXPOSE 80000
+8:
+9: CMD ["npm", "start"]

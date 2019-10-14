@@ -1,0 +1,2 @@
+DL3007 Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag
+1: FROM ubuntu:latest

@@ -10,8 +10,8 @@
     # Script module or binary module file associated with this manifest.
     RootModule = 'Docker.Build.psm1'
 
-    # Version number of this module.
-    ModuleVersion = '0.0.18'
+    # Version number of this module. Will be updated by CI/CD but included here so it's possible to source the module locally.
+    ModuleVersion = '0.0.1'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Core'
@@ -68,7 +68,7 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @("Invoke-DockerBuild, Invoke-DockerTag")
+    FunctionsToExport = @("Invoke-DockerBuild, Invoke-DockerTag", "Invoke-DockerLint")
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

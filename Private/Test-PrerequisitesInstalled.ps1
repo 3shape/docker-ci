@@ -1,5 +1,3 @@
-#Requires -PSEdition Core -Version 6
-
 function Test-PrerequisitesInstalled {
     [CmdletBinding()]
     param (
@@ -8,7 +6,6 @@ function Test-PrerequisitesInstalled {
         [ValidateNotNullOrEmpty()]
         [String] $DockerCommand = 'docker'
     )
-
     Test-GitInstalled -GitCommand $GitCommand
     Test-DockerInstalled -DockerCommand $DockerCommand
 }

@@ -1,5 +1,3 @@
-#Requires -PSEdition Core -Version 6
-
 function Get-TempPath {
     if ($IsWindows) {
         [system.io.path]::GetTempPath()
