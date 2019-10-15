@@ -34,16 +34,15 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
     $configData | Out-File -FilePath "$dotGitPath/config" -Encoding ascii
 }
 
-function Add-RegistryPostfix {
+function Add-Postfix {
     param (
         [String] $Registry,
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
 
-    # Do nothing if $Data is empty / writespace
     if ([String]::IsNullOrWhiteSpace($Registry)) {
-        return ''
+        return $Registry
     }
 
     $trimmedRegistry = $Registry.Trim()

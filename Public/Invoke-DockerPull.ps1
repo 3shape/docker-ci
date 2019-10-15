@@ -23,7 +23,7 @@ function Invoke-DockerPull {
         $Digest = ''
     )
 
-    $registryPostfixed = Add-RegistryPostfix -Registry $Registry
+    $registryPostfixed = Add-Postfix -Registry $Registry
 
     # Pulls by tag by default
     $imageToPull = "${registryPostfixed}${Image}:${Tag}"

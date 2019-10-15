@@ -24,8 +24,8 @@ function Invoke-DockerTag {
         $TargetTag = 'latest'
     )
 
-    $SourceRegistryPostfixed = Add-RegistryPostfix -Registry $SourceRegistry
-    $TargetRegistryPostfixed = Add-RegistryPostfix -Registry $TargetRegistry
+    $SourceRegistryPostfixed = Add-Postfix -Registry $SourceRegistry
+    $TargetRegistryPostfixed = Add-Postfix -Registry $TargetRegistry
     $source = "${SourceRegistryPostfixed}${SourceImage}:${SourceTag}"
     $target = "${TargetRegistryPostfixed}${TargetImage}:${TargetTag}"
 
