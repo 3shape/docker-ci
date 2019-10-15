@@ -96,9 +96,9 @@ Task Clean -depends Init -requiredVariables PublishDir {
 }
 
 Task Init -requiredVariables PublishDir {
-   if (!(Test-Path $PublishDir)) {
-       $null = New-Item $PublishDir -ItemType Directory
-   }
+    if (!(Test-Path $PublishDir)) {
+        $null = New-Item $PublishDir -ItemType Directory
+    }
 }
 
 Task ? -description 'Lists the available tasks' {
