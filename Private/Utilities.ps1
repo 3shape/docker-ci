@@ -52,13 +52,3 @@ function Add-RegistryPostfix {
     }
     $trimmedRegistry
 }
-
-function Test-DockerDigest {
-    param (
-        [Parameter(Mandatory=$true)]
-        [String] $Digest
-    )
-
-    $shaPrefix = 'sha256:'
-    return $Digest.StartsWith($shaPrefix) -and $Digest.Length -eq ($shaPrefix.Length + 64)
-}

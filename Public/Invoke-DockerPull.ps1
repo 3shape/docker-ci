@@ -4,21 +4,29 @@ function Invoke-DockerPull {
         [ValidateNotNullOrEmpty()]
         [String]
         $Registry,
-        [Parameter(mandatory=$true)]
+
+        # Pull by name, by name + tag, by name + digest
+        [Parameter(mandatory = $true,ParameterSetName = 'WithImageOnly')]
+        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest')]
+        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag')]
         [String]
         $Image,
+
         [ValidateNotNullOrEmpty()]
+        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag')]
         [String]
         $Tag = 'latest',
+
         [ValidateNotNullOrEmpty()]
+        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest')]
         [String]
         $Digest = ''
     )
 
-    $RegistryPostfixed = Add-RegistryPostfix -Registry $Registry
+    $registryPostfixed = Add-RegistryPostfix -Registry $Registry
 
     # Pulls by tag by default
-    $ImageToPull = "${RegistryPostfixed}${Image}:${Tag}"
+    $imageToPull = "${registryPostfixed}${Image}:${Tag}"
 
     # Digest overrides tag however
     if (-Not [String]::IsNullOrEmpty($Digest)) {
@@ -26,7 +34,7 @@ function Invoke-DockerPull {
         if (-Not $validDigest) {
             throw "Invalid digest provided."
         }
-        $ImageToPull = "${RegistryPostfixed}${Image}@${Digest}"
+        $imageToPull = "${registryPostfixed}${Image}@${Digest}"
     }
-    Invoke-Command "docker pull ${ImageToPull}"
+    Invoke-Command "docker pull ${imageToPull}"
 }

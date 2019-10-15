@@ -3,17 +3,22 @@ function Invoke-DockerTag {
     param (
         [String]
         $SourceRegistry = '',
+
         [Parameter(mandatory=$true)]
         [String]
         $SourceImage,
+
         [ValidateNotNullOrEmpty()]
         [String]
         $SourceTag = 'latest',
+
         [String]
         $TargetRegistry = '',
+
         [Parameter(mandatory=$true)]
         [String]
         $TargetImage,
+
         [ValidateNotNullOrEmpty()]
         [String]
         $TargetTag = 'latest'

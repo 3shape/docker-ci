@@ -24,7 +24,7 @@ Describe 'Pull docker images' {
 
     Context 'Docker pulls docker images' {
 
-        It 'pulls public docker image with image name only' {
+        It 'pulls public docker image by image name only' {
             # This test will most likely fail IRL because there isn't any latest tag available for this image
             Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore'
             $result = GetMockValue -Key "pull"
@@ -32,25 +32,54 @@ Describe 'Pull docker images' {
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:latest"
         }
 
-        It 'pulls public docker image with image name and tag' {
+        It 'pulls public docker image by registry and image name' {
+            # This test will most likely fail IRL because there isn't any latest tag available for this image
+            Invoke-DockerPull -Registry 'mcr.microsoft.com/windows' -Image 'servercore'
+            $result = GetMockValue -Key "pull"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:latest"
+        }
+
+        It 'pulls public docker image by image name and tag' {
             Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:ltsc2019"
         }
 
-        It 'pulls public docker image with image name and digest' {
+        It 'pulls public docker image by image name and digest' {
             Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore@sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840"
         }
 
-        It 'pulls public docker image with image name, tag and digest; digest overrides tag' {
-            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
-            $result = GetMockValue -Key "pull"
-            Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore@sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840"
+        It 'pulls public docker image by image name, with both tag and digest; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+
+        It 'pulls public docker image by tag only; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Tag 'mcr.microsoft.com/windows/servercore' -Passthrough
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+
+        It 'pulls public docker image by digest only; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+
+        It 'pulls public docker image by registry and digest only; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Registry 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
     }
 }
