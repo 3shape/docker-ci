@@ -67,7 +67,7 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
 
 Task Test -depends Build {
     Import-Module Pester
-    $testResult = Invoke-Pester $PSScriptRoot/Tests -PassThru
+    $testResult = Invoke-Pester $PSScriptRoot/Tests -CodeCoverage @("Public/*.ps1","Private/*.ps1") -PassThru
 
     if ($TestResult.FailedCount -gt 0) {
         $TestResult | Format-List
@@ -96,9 +96,9 @@ Task Clean -depends Init -requiredVariables PublishDir {
 }
 
 Task Init -requiredVariables PublishDir {
-   if (!(Test-Path $PublishDir)) {
-       $null = New-Item $PublishDir -ItemType Directory
-   }
+    if (!(Test-Path $PublishDir)) {
+        $null = New-Item $PublishDir -ItemType Directory
+    }
 }
 
 Task ? -description 'Lists the available tasks' {
