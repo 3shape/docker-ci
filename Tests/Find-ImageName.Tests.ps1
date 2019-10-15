@@ -1,12 +1,18 @@
 Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 . "$PSScriptRoot\..\Private\Utilities.ps1"
 
 Describe 'Parse context from git repository' {
 
     Context 'When git is installed' {
 
+        BeforeEach {
+            Initialize-MockReg
+        }
+
         BeforeAll {
             $tempFolder = New-RandomFolder
+            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
         }
 
         AfterAll {
@@ -25,6 +31,22 @@ Describe 'Parse context from git repository' {
             New-FakeGitRepository -Path $gitRepoWithSpace
             $result = Find-ImageName -RepositoryPath $gitRepoWithSpace
             $result | Should -BeExactly "dockerbuild-pwsh"
+        }
+
+        It 'lowercases the repository names' {
+            $gitReposWithUppercase = Join-Path $tempFolder 'ThisIsNotUsefulAsAnImageName'
+            New-FakeGitRepository -Path $gitReposWithUppercase
+            $mockCode = {
+                $invocationResult = [CommandResult]::new();
+                $invocationResult.Output = "https://github.com/3shapeAS/DOCKERBUILD-pwsh.git"
+                $invocationResult
+            }
+            Mock -CommandName "Invoke-Command" $mockCode -Verifiable -ModuleName $script:moduleName
+
+            $result = Find-ImageName -RepositoryPath $gitReposWithUppercase
+
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName -Exactly 1
+            $result | Should -BeExactly 'dockerbuild-pwsh'
         }
     }
 }
