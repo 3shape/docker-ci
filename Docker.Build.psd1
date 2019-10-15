@@ -6,33 +6,32 @@
 # Generated on: 04/10/2019
 #
 @{
-
     # Script module or binary module file associated with this manifest.
-    RootModule = 'Docker.Build.psm1'
+    RootModule           = 'Docker.Build.psm1'
 
     # Version number of this module. Will be updated by CI/CD but included here so it's possible to source the module locally.
-    ModuleVersion = '0.0.1'
+    ModuleVersion        = '0.0.1'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Core'
 
     # ID used to uniquely identify this module
-    GUID = '006752EA-7AEB-40BE-9B64-A7396F8EA242'
+    GUID                 = '006752EA-7AEB-40BE-9B64-A7396F8EA242'
 
     # Author of this module
-    Author = '3Shape A/S'
+    Author               = '3Shape A/S'
 
     # Company or vendor of this module
-    CompanyName = '3Shape'
+    CompanyName          = '3Shape'
 
     # Copyright statement for this module
-    Copyright = '(c) 2019 3Shape, licensed under the Apache 2.0 license.'
+    Copyright            = '(c) 2019 3Shape, licensed under the Apache 2.0 license.'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module to build and test docker images.'
+    Description          = 'PowerShell module to build, test and publish docker images.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion = '6.0'
+    PowerShellVersion    = '6.0'
 
     # Name of the Windows PowerShell host required by this module
     # PowerShellHostName = ''
@@ -68,24 +67,35 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @("Invoke-DockerBuild, Invoke-DockerTag", "Invoke-DockerLint")
+    FunctionsToExport    = @("Invoke-DockerBuild, Invoke-DockerTag", "Invoke-DockerLint")
 
     # Cmdlets to export from this module
-    CmdletsToExport = '*'
+    CmdletsToExport      = '*'
 
     # Variables to export from this module
-    VariablesToExport = '*'
+    VariablesToExport    = '*'
 
     # Aliases to export from this module
-    AliasesToExport = '*'
+    AliasesToExport      = '*'
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData = @{
+    PrivateData          = @{
 
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('powershell', 'core', 'jenkins', 'hudson', 'api', 'PSEdition_Core', 'Windows', 'Linux')
+            Tags       = @('powershell',
+                'core',
+                'docker',
+                'build',
+                'pipeline',
+                'test',
+                'lint', '
+                    linter',
+                'integration',
+                'PSEdition_Core',
+                'Windows',
+                'Linux')
 
             # A URL to the license for this module.
             LicenseUri = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
@@ -108,5 +118,4 @@
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
-
-    }
+}
