@@ -32,7 +32,7 @@ function Invoke-DockerPull {
     if (-Not [String]::IsNullOrEmpty($Digest)) {
         $validDigest = Test-DockerDigest -Digest $Digest
         if (-Not $validDigest) {
-            throw "Invalid digest provided."
+            throw "Invalid digest provided, digest: ${Digest}"
         }
         $imageToPull = "${registryPostfixed}${Image}@${Digest}"
     }

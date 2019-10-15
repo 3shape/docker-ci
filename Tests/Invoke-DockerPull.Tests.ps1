@@ -25,19 +25,17 @@ Describe 'Pull docker images' {
     Context 'Docker pulls docker images' {
 
         It 'pulls public docker image by image name only' {
-            # This test will most likely fail IRL because there isn't any latest tag available for this image
-            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore'
+            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore/iis'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:latest"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore/iis:latest"
         }
 
         It 'pulls public docker image by registry and image name' {
-            # This test will most likely fail IRL because there isn't any latest tag available for this image
-            Invoke-DockerPull -Registry 'mcr.microsoft.com/windows' -Image 'servercore'
+            Invoke-DockerPull -Registry 'mcr.microsoft.com/windows/servercore' -Image 'iis'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:latest"
+            $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore/iis:latest"
         }
 
         It 'pulls public docker image by image name and tag' {
@@ -81,5 +79,19 @@ Describe 'Pull docker images' {
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
-    }
+
+        It 'pulls public docker image by image name with invalid digest, missing sha256: prefix; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Image 'lalaland' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+
+        It 'pulls public docker image by image name with invalid digest, wrong digest length; and fails' {
+            $theCode = {
+                Invoke-DockerPull -Image 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' -Passthrough
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+   }
 }
