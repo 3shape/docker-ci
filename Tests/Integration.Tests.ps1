@@ -15,7 +15,7 @@ Describe 'Use cases for this module' {
         It 'can build and test my image' {
             $dockerFile = Join-Path $dockerImages 'Dockerfile'
             Invoke-DockerLint -DockerFile $dockerFile
-            Invoke-DockerBuild -Image 'integrationtest'
+            Invoke-DockerBuild -Image 'integrationtest' | Invoke-DockerTag | Invoke-DockerPush
 
         }
     }
