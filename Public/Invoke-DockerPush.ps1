@@ -6,12 +6,15 @@ function Invoke-DockerPush {
         [ValidateNotNull()]
         [string]
         $Registry = '',
+
         [ValidateNotNull()]
         [string]
         $Repository = '',
+
         [Parameter(Mandatory = $true)]
         [string]
         $ImageName,
+
         [ValidateNotNullOrEmpty()]
         [string]
         $Tag = 'latest'
