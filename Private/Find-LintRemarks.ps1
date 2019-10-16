@@ -4,13 +4,13 @@ function Find-LintRemarks {
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [string]
-        $text
+        $Text
     )
     $lineNumber = "\B\/dev\/stdin:\d+\b"
     $lintRule = "\w{2}\d{4}"
     $lintRemark = ".*)"
     $splitExpression = "(.+?(?=\/dev\/stdin:\d+?))"
-    $lines = ($text -split $splitExpression | Where-Object { $_ })
+    $lines = ($Text -split $splitExpression | Where-Object { $_ })
     $pattern = "^(?<linenumbergroup>${lineNumber}) (?<lintrule>${lintRule}) (?<lintremark>${lintRemark}"
 
     [LintRemark[]] $lintRemarks = @()

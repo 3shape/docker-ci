@@ -7,6 +7,7 @@ function Merge-CodeAndLintRemarks {
         [AllowEmptyString()]
         [string[]]
         $CodeLines,
+
         [LintRemark[]]
         $LintRemarks
     )
