@@ -1,4 +1,4 @@
-Import-Module $PSScriptRoot/../Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 . "$PSScriptRoot\..\Private\Invoke-Command.ps1"
 
