@@ -31,6 +31,10 @@ Task PrePublish {
     $functionScriptFiles  = @(Get-ChildItem -Path $PublishDir\Public\*.ps1 -ErrorAction SilentlyContinue)
     [string[]]$functionNames = @($functionScriptFiles.BaseName)
 
+    if (!$env:GitVersion_Version) {
+        throw 'Version not found in env:GitVersion_Version where it was expected. Bailing.'
+    }
+
     Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 `
         -ModuleVersion "$env:GitVersion_Version" `
         -FunctionsToExport $functionNames

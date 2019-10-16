@@ -29,7 +29,7 @@
     Copyright = '(c) 2019 3Shape, licensed under the Apache 2.0 license.'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module to build and test docker images.'
+    Description = 'PowerShell module to build, test and publish docker images.'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '6.0'
@@ -85,7 +85,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('powershell', 'core', 'jenkins', 'hudson', 'api', 'PSEdition_Core', 'Windows', 'Linux')
+            Tags = @('powershell', 'core', 'docker', 'build', 'test', 'lint', 'pipeline', 'structure', 'container', 'Windows', 'Linux')
 
             # A URL to the license for this module.
             LicenseUri = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
