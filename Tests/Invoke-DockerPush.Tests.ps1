@@ -54,7 +54,7 @@ Describe 'docker push' {
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:latest"
         }
 
-        It 'produces the correct command to invoke with image name, registry and repository provided' {
+        It 'produces the correct command to invoke with image name, registry, repository and tag provided' {
             $code = {
                 StoreMockValue -Key "Invoke-Command" -Value $Command
             }
