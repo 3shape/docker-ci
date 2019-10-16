@@ -3,6 +3,7 @@ function Test-PrerequisitesInstalled {
     param (
         [ValidateNotNullOrEmpty()]
         [String] $GitCommand = 'git --version',
+
         [ValidateNotNullOrEmpty()]
         [String] $DockerCommand = 'docker'
     )

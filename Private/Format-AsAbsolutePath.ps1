@@ -3,13 +3,13 @@ function Format-AsAbsolutePath {
     param (
         [Parameter(Mandatory=$true)]
         [string]
-        $path
+        $Path
     )
-    if ([System.IO.Path]::IsPathRooted($path)) {
-        return $path
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return $Path
     }
 
     $here = Get-Location
-    $combinedPath = Join-Path $here $path
+    $combinedPath = Join-Path $here $Path
     return [System.IO.Path]::GetFullPath($combinedPath)
 }

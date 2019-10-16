@@ -4,11 +4,13 @@ function Invoke-DockerLogin {
         [Parameter(Mandatory = $true)]
         [string]
         $Username,
+
         [Parameter(Mandatory = $true)]
         [securestring]
         $Password,
-        [string]
+
         [ValidateNotNullOrEmpty()]
+        [string]
         $Registry
     )
     [string] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password

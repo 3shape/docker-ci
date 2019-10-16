@@ -37,6 +37,7 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 function Add-Postfix {
     param (
         [String] $Registry,
+
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
