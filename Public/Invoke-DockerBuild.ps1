@@ -19,7 +19,8 @@ function Invoke-DockerBuild {
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $File = "Dockerfile"
+        $Dockerfile = "Dockerfile"
+
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
     $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${File}`""
