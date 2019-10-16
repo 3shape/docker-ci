@@ -1,8 +1,13 @@
 function Invoke-DockerTag {
     [CmdletBinding()]
     param (
+        [ValidateNotNullOrEmpty()]
         [String]
-        $SourceRegistry = '',
+        $SourceRegistry,
+
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $SourceRepository,
 
         [Parameter(mandatory=$true)]
         [String]
@@ -12,8 +17,13 @@ function Invoke-DockerTag {
         [String]
         $SourceTag = 'latest',
 
+        [ValidateNotNullOrEmpty()]
         [String]
-        $TargetRegistry = '',
+        $TargetRegistry,
+
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $TargetRepository,
 
         [Parameter(mandatory=$true)]
         [String]
@@ -24,10 +34,12 @@ function Invoke-DockerTag {
         $TargetTag = 'latest'
     )
 
-    $SourceRegistryPostfixed = Add-Postfix -Registry $SourceRegistry
-    $TargetRegistryPostfixed = Add-Postfix -Registry $TargetRegistry
-    $source = "${SourceRegistryPostfixed}${SourceImage}:${SourceTag}"
-    $target = "${TargetRegistryPostfixed}${TargetImage}:${TargetTag}"
+    $postfixedSourceRegistry = Add-Postfix -Value $SourceRegistry
+    $postfixedTargetRegistry = Add-Postfix -Value $TargetRegistry
+    $postfixedSourceRepository = Add-Postfix -Value $SourceRepository
+    $postfixedTargetRepository = Add-Postfix -Value $TargetRepository
+    $source = "${postfixedSourceRegistry}${postfixedSourceRepository}${SourceImage}:${SourceTag}"
+    $target = "${postfixedTargetRegistry}${postfixedTargetRepository}${TargetImage}:${TargetTag}"
 
     Invoke-Command "docker tag ${source} ${target}"
 }

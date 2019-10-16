@@ -36,19 +36,19 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 
 function Add-Postfix {
     param (
-        [String] $Registry,
+        [String] $Value,
 
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
 
-    if ([String]::IsNullOrWhiteSpace($Registry)) {
-        return $Registry
+    if ([String]::IsNullOrWhiteSpace($Value)) {
+        return $Value
     }
 
-    $trimmedRegistry = $Registry.Trim()
-    if ( -Not $trimmedRegistry.EndsWith($Postfix) ) {
-            $trimmedRegistry += $Postfix
+    $trimmedValue = $Value.Trim()
+    if ( -Not $trimmedValue.EndsWith($Postfix) ) {
+            $trimmedValue += $Postfix
     }
-    $trimmedRegistry
+    $trimmedValue
 }

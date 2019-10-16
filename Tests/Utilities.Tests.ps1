@@ -38,12 +38,12 @@ Describe 'Validate various support functions for testing' {
     Context 'Various other functions' {
 
         It 'can postfix default / to a string' {
-            $postfixed = Add-Postfix -Registry 'lalaland'
+            $postfixed = Add-Postfix -Value 'lalaland'
             $postfixed | Should -BeLikeExactly 'lalaland/'
         }
 
         It 'can postfix a string to a string' {
-            $postfixed = Add-Postfix -Registry 'lala' -Postfix 'land'
+            $postfixed = Add-Postfix -Value 'lala' -Postfix 'land'
             $postfixed | Should -BeLikeExactly 'lalaland'
         }
     }
