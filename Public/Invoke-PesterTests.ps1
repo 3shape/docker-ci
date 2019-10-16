@@ -1,9 +1,10 @@
 function Invoke-PesterTests {
     [CmdletBinding()]
     param (
-        [ValidateRange("NonNegative ")]
+        [ValidateRange("NonNegative")]
         [Int32]
         $Depth = 0,
+
         [ValidateNotNullOrEmpty()]
         [String]
         $TestDirectory = '.'
