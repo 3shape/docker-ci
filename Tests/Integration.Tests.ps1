@@ -7,16 +7,30 @@ Describe 'Use cases for this module' {
 
         BeforeAll {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
+            $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $dockerImages = Join-Path $testData 'DockerImage'
-            $startRegistryCommand = 'docker run -d -p 5000:5000 --restart always --name registry registry:2'
+            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v ${htpasswdPath}:/auth -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
             Invoke-Command  $startRegistryCommand
         }
 
-        It 'can build and test my image' {
-            $dockerFile = Join-Path $dockerImages 'Dockerfile'
-            Invoke-DockerLint -DockerFile $dockerFile
-            Invoke-DockerBuild -Image 'integrationtest' | Invoke-DockerTag | Invoke-DockerPush
+        AfterAll {
+            Invoke-Command 'docker container stop registry'
+            Invoke-Command 'docker container rm -v registry'
+        }
 
+        It 'can login' {
+            $result = Invoke-DockerLogin    -Registry 'localhost:5000' `
+                                            -Username 'admin' `
+                                            -Password (ConvertTo-SecureString 'password' –asplaintext –force)
+
+            $result | Should -Not -BeNullOrEmpty
+            $result.ExitCode | Should -Be 0
+        }
+
+        It "can build and push my image with 'latest' tag" {
+            $dockerFile = Join-Path $dockerImages 'Dockerfile'
+            # Invoke-DockerBuild -Image 'integrationtest'
+            # Todo pull the image afterwards.
         }
     }
 }
