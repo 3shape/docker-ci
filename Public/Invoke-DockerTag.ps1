@@ -3,33 +3,33 @@ function Invoke-DockerTag {
     param (
         [ValidateNotNullOrEmpty()]
         [String]
-        $SourceRegistry,
+        $Registry,
 
         [Parameter(mandatory=$true)]
         [String]
-        $SourceImageName,
+        $ImageName,
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $SourceTag = 'latest',
+        $Tag = 'latest',
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TargetRegistry,
+        $NewRegistry,
 
         [Parameter(mandatory=$true)]
         [String]
-        $TargetImageName,
+        $NewImageName,
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TargetTag = 'latest'
+        $NewTag = 'latest'
     )
 
-    $postfixedSourceRegistry = Add-Postfix -Value $SourceRegistry
-    $postfixedTargetRegistry = Add-Postfix -Value $TargetRegistry
-    $source = "${postfixedSourceRegistry}${SourceImageName}:${SourceTag}"
-    $target = "${postfixedTargetRegistry}${TargetImageName}:${TargetTag}"
+    $postfixedRegistry = Add-Postfix -Value $Registry
+    $postfixedNewRegistry = Add-Postfix -Value $NewRegistry
+    $source = "${postfixedRegistry}${ImageName}:${Tag}"
+    $target = "${postfixedNewRegistry}${NewImageName}:${NewTag}"
 
     Invoke-Command "docker tag ${source} ${target}"
 }

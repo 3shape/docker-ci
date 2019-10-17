@@ -32,7 +32,7 @@ Describe 'Pull docker images' {
         }
 
         It 'pulls public docker image by registry and image name' {
-            Invoke-DockerPull -Registry 'mcr.microsoft.com/windows/servercore' -Image 'iis'
+            Invoke-DockerPull -Registry 'mcr.microsoft.com/windows/servercore' -ImageName 'iis'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore/iis:latest"
