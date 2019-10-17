@@ -30,7 +30,14 @@ Describe 'Use cases for this module' {
         It "can build and push my image with 'latest' tag" {
             $dockerFile = Join-Path $dockerImages 'Dockerfile'
             # Invoke-DockerBuild -Image 'integrationtest'
-            # Todo pull the image afterwards.
+            # 1. Login
+            # 2. Pull the image
+            # 3. Lint
+            # 4. Build
+            # 5. Test
+            # 6. Tag
+            # 7. Push
         }
+
     }
 }
