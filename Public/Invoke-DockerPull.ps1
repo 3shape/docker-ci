@@ -28,7 +28,7 @@ function Invoke-DockerPull {
     # Pulls by tag by default
     $imageToPull = "${postfixedRegistry}${ImageName}:${Tag}"
 
-    # Digest overrides tag however
+    # Digest cannot be used together with Tag
     if (-Not [String]::IsNullOrEmpty($Digest)) {
         $validDigest = Test-DockerDigest -Digest $Digest
         if (-Not $validDigest) {

@@ -46,7 +46,7 @@ Describe 'Pull docker images' {
         }
 
         It 'pulls public docker image by image name and digest' {
-            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
+            Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore@sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840"
@@ -54,44 +54,23 @@ Describe 'Pull docker images' {
 
         It 'pulls public docker image by image name, with both tag and digest; and fails' {
             $theCode = {
-                Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
-            }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-
-        It 'pulls public docker image by tag only; and fails' {
-            $theCode = {
-                Invoke-DockerPull -Tag 'mcr.microsoft.com/windows/servercore' -Passthrough
-            }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-
-        It 'pulls public docker image by digest only; and fails' {
-            $theCode = {
-                Invoke-DockerPull -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
-            }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-
-        It 'pulls public docker image by registry and digest only; and fails' {
-            $theCode = {
-                Invoke-DockerPull -Registry 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
+                Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
 
         It 'pulls public docker image by image name with invalid digest, missing sha256: prefix; and fails' {
             $theCode = {
-                Invoke-DockerPull -Image 'lalaland' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' -Passthrough
+                Invoke-DockerPull -ImageName 'lalaland' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
             }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
 
         It 'pulls public docker image by image name with invalid digest, wrong digest length; and fails' {
             $theCode = {
-                Invoke-DockerPull -Image 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' -Passthrough
+                Invoke-DockerPull -ImageName 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d'
             }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
    }
 }
