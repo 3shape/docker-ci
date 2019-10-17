@@ -3,6 +3,10 @@ function Format-DockerTag {
     param (
         [Parameter(Mandatory=$true)]
         [string]
+        $ContextRoot,
+
+        [Parameter(Mandatory=$true)]
+        [string]
         $Dockerfile
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
@@ -22,6 +26,5 @@ function Format-DockerTag {
     $result.Arch = Split-Path -Leaf -Path $archPath
     $result.Distro = Split-Path -Leaf -Path $distroPath
     $result.Version = Split-Path -Leaf -Path $versionPath
-    $result.Tag = $result.Version + '-' + $result.Distro + '-' + $result.Arch
     $result
 }
