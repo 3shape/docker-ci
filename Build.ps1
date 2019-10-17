@@ -64,7 +64,7 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
         $publishParams['Repository'] = $Repository
     }
 
-    Write-Host "Publishing $ModuleName version $env:GitVersion_Version"
+    Write-Output "Publishing $ModuleName version $env:GitVersion_Version"
 
     Publish-Module @publishParams
 }
