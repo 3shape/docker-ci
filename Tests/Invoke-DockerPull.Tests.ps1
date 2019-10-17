@@ -25,7 +25,7 @@ Describe 'Pull docker images' {
     Context 'Docker pulls docker images' {
 
         It 'pulls public docker image by image name only' {
-            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore/iis'
+            Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore/iis'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore/iis:latest"
@@ -39,7 +39,7 @@ Describe 'Pull docker images' {
         }
 
         It 'pulls public docker image by image name and tag' {
-            Invoke-DockerPull -Image 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019'
+            Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore' -Tag 'ltsc2019'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull mcr.microsoft.com/windows/servercore:ltsc2019"

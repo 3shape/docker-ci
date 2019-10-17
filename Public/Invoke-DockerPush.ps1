@@ -7,10 +7,6 @@ function Invoke-DockerPush {
         [string]
         $Registry = '',
 
-        [ValidateNotNull()]
-        [string]
-        $Repository = '',
-
         [Parameter(Mandatory = $true)]
         [string]
         $ImageName,
@@ -20,7 +16,6 @@ function Invoke-DockerPush {
         $Tag = 'latest'
     )
     $postfixedRegistry = Add-PostFix $Registry
-    $postfixedRepository = Add-Postfix $Repository
-    $command = "docker push ${postfixedRegistry}${postfixedRepository}${ImageName}:${Tag}"
+    $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
     Invoke-Command $command
 }

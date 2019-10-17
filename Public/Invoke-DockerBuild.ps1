@@ -5,10 +5,6 @@ function Invoke-DockerBuild {
         [String]
         $Registry,
 
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $Repository,
-
         [Parameter(Mandatory = $true)]
         [String]
         $ImageName,
@@ -26,6 +22,5 @@ function Invoke-DockerBuild {
         $File = "Dockerfile"
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
-    $postfixedRepository = Add-Postfix -Value $Repository
-    Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${postfixedRepository}${ImageName}:${Tag} -f `"${File}`""
+    Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${File}`""
 }
