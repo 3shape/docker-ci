@@ -30,6 +30,7 @@ install:
   - "echo \"GitVersion says: ${GitVersion_Version} \""
 
 script:
+  - pwsh -f "./Invoke-PSScriptAnalyzer.ps1"
   - pwsh -f "./Invoke-Tests.ps1"
 
 deploy:
