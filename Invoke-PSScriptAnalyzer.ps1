@@ -1,2 +1,5 @@
-pwsh -Command 'Invoke-ScriptAnalyzer -EnableExit -Path .'
-exit $lastexitcode
+pwsh -Command 'Invoke-ScriptAnalyzer -Recurse -EnableExit -Path ./Public'
+$resultForPublicCode = $lastexitcode
+pwsh -Command 'Invoke-ScriptAnalyzer -Recurse -EnableExit -Path ./Private'
+$resultForPrivateCode = $lastexitcode
+exit ($resultForPublicCode + $resultForPrivateCode)
