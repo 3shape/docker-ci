@@ -23,28 +23,21 @@ Describe 'docker push' {
     Context 'Push an image' {
 
         It 'produces the correct command to invoke with only image name provided' {
-            Invoke-DockerPush -Image 'cool-image'
+            Invoke-DockerPush -ImageName 'cool-image'
 
             $mockResult = GetMockValue -Key 'Invoke-Command'
             $mockResult | Should -Be "docker push cool-image:latest"
         }
 
-        It 'produces the correct command to invoke with image name and repository provided' {
-            Invoke-DockerPush -Image 'cool-image' -Repository 'thebestdockerimages'
-
-            $mockResult = GetMockValue -Key 'Invoke-Command'
-            $mockResult | Should -Be "docker push thebestdockerimages/cool-image:latest"
-        }
-
-        It 'produces the correct command to invoke with image name, registry and repository provided' {
-            Invoke-DockerPush -Image 'cool-image' -Repository 'thebestdockerimages' -Registry 'hub.docker.com:1337'
+        It 'produces the correct command to invoke with image name and registry provided' {
+            Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages'
 
             $mockResult = GetMockValue -Key 'Invoke-Command'
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:latest"
         }
 
-        It 'produces the correct command to invoke with image name, registry, repository and tag provided' {
-            Invoke-DockerPush -Image 'cool-image' -Repository 'thebestdockerimages' -Registry 'hub.docker.com:1337' -Tag 'v1.0.3'
+        It 'produces the correct command to invoke with image name, registry and tag provided' {
+            Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages' -Tag 'v1.0.3'
 
             $mockResult = GetMockValue -Key 'Invoke-Command'
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:v1.0.3"

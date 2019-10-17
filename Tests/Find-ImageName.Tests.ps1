@@ -33,6 +33,13 @@ Describe 'Parse context from git repository' {
             $result | Should -BeExactly "dockerbuild-pwsh"
         }
 
+        It 'can identify an invalid repository, .git folder without config file' {
+            $gitRepoNoConfig = Join-Path $tempFolder "NoSpace" '.git'
+            New-Item $gitRepoNoConfig -ItemType Container -Force
+            $code = { Find-ImageName -RepositoryPath $gitRepoNoConfig }
+            $code | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
+        }
+
         It 'lowercases the repository names' {
             $gitReposWithUppercase = Join-Path $tempFolder 'ThisIsNotUsefulAsAnImageName'
             New-FakeGitRepository -Path $gitReposWithUppercase

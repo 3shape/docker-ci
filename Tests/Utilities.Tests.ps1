@@ -20,7 +20,7 @@ Describe 'Validate various support functions for testing' {
 
             Test-Path -Path $pathInTemp | Should -Be $true
 
-            Remove-Item $pathInTemp -Recurse -Force | Out-Null
+            Remove-Item $pathInTemp -Recurse -Force
         }
 
         It 'can create fake git repository for testing' {
@@ -30,20 +30,30 @@ Describe 'Validate various support functions for testing' {
             Test-Path -Path (Join-Path $pathInTemp ".git") -PathType Container | Should -Be $true
             Test-Path -Path (Join-Path $pathInTemp ".git/config") -PathType Leaf | Should -Be $true
 
-            Remove-Item $pathInTemp -Recurse -Force | Out-Null
+            Remove-Item $pathInTemp -Recurse -Force
         }
 
+        It 'can remove and create fake git repository for testing' {
+            $pathInTemp = New-RandomFolder
+            New-Item (Join-Path $pathInTemp '.git') -ItemType Container -Force
+            New-FakeGitRepository -Path $pathInTemp
+
+            Test-Path -Path (Join-Path $pathInTemp ".git") -PathType Container | Should -Be $true
+            Test-Path -Path (Join-Path $pathInTemp ".git/config") -PathType Leaf | Should -Be $true
+
+            Remove-Item $pathInTemp -Recurse -Force
+        }
     }
 
     Context 'Various other functions' {
 
         It 'can postfix default / to a string' {
-            $postfixed = Add-Postfix -Registry 'lalaland'
+            $postfixed = Add-Postfix -Value 'lalaland'
             $postfixed | Should -BeLikeExactly 'lalaland/'
         }
 
         It 'can postfix a string to a string' {
-            $postfixed = Add-Postfix -Registry 'lala' -Postfix 'land'
+            $postfixed = Add-Postfix -Value 'lala' -Postfix 'land'
             $postfixed | Should -BeLikeExactly 'lalaland'
         }
     }
