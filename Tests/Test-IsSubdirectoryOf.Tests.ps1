@@ -24,11 +24,7 @@ Describe 'test if child path is a subdirectory of path' {
         }
 
         It 'fails when child path is NOT part of path' {
-            if ($IsWindows) {
-                $childPath = $Env:windir
-            } else {
-                $childPath = '/usr/bin'
-            }
+            $childPath = Split-Path -Qualifier (Get-Location)
             $result = Test-IsSubdirectoryOf -Path $parentPath -ChildPath $childPath
             $result | Should -Be $false
         }
