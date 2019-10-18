@@ -33,7 +33,7 @@ function Format-DockerTag {
     }
 
     $parentDirCount = (Split-Path -Parent $relativePathToDockerfile).Split([IO.Path]::DirectorySeparatorChar).Length - 1
-    if ($parentDirCount -lt 3) {
+    if ($parentDirCount -ne 3) {
         throw "The parent directory structure of the Dockerfile cannot be parsed into a valid docker tag, full path to Dockerfile: ${pathToDockerFile}"
     }
     $result = [DockerTagInfo]::new()

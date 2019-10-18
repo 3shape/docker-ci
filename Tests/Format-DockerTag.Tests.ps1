@@ -37,7 +37,7 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
             $code | Should -Throw -ExceptionType ([System.IO.FileNotFoundException]) -PassThru
         }
 
-        It 'throws an exception' {
+        It 'throws an exception, when folder structure is not exactly 3 levels' {
             $unsupportedPathDockerFile = Join-Path $exampleReposPath "/3.0/servercore/Unsupported.Path.Dockerfile"
             $code = { Format-DockerTag -ContextRoot $exampleReposPath -Dockerfile $unsupportedPathDockerFile }
             $code | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
