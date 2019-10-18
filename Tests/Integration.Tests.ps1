@@ -1,5 +1,6 @@
 Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 . "$PSScriptRoot\..\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Private\Utilities.ps1"
 
 Describe 'Use cases for this module' {
 
@@ -18,26 +19,60 @@ Describe 'Use cases for this module' {
             Invoke-Command 'docker container rm -v registry'
         }
 
-        It 'can login' {
-            $result = Invoke-DockerLogin    -Registry 'localhost:5000' `
-                                            -Username 'admin' `
-                                            -Password (ConvertTo-SecureString 'password' –asplaintext –force)
-
-            $result | Should -Not -BeNullOrEmpty
-            $result.ExitCode | Should -Be 0
+        BeforeEach {
+            $script:backupLocation = Get-Location
         }
 
-        It "can build and push my image with 'latest' tag" {
-            $dockerFile = Join-Path $dockerImages 'Dockerfile'
-            # Invoke-DockerBuild -Image 'integrationtest'
-            # 1. Login
-            # 2. Pull the image
-            # 3. Lint
-            # 4. Build
-            # 5. Test
-            # 6. Tag
-            # 7. Push
+        AfterEach {
+            Set-Location $script:backupLocation
         }
+
+        # It "can derive docker image name and tag in one go" {
+        #     $exampleReposPath = Join-Path $testData "ExampleRepos"
+        #     $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
+        #     Set-Location $location
+        #     New-FakeGitRepository $location
+
+        #     $result = Find-ImageName | Format-DockerTag
+
+        #     $result.Dockerfile | Should -Be -Like "*/3.0/servercore/Dockerfile"
+        #     $result.ImageName | Should -Be "dockerbuild-pwsh"
+        #     $result.Tag | Should -Be  "3.0-servercore-amd64"
+        # }
+
+        It "Test-case #2: can build and push in one go" {
+            $exampleReposPath = Join-Path $testData "ExampleRepos"
+            $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
+            Set-Location $location
+            New-FakeGitRepository $location
+
+            $result = Invoke-DockerLogin | Invoke-DockerBuild -ImageName 'integration-testcase-2' | Invoke-DockerPush -Registry 'localhost:5000'
+
+        }
+
+        # It 'can login' {
+        #     $result = Invoke-DockerLogin    -Registry 'localhost:5000' `
+        #                                     -Username 'admin' `
+        #                                     -Password (ConvertTo-SecureString 'password' –asplaintext –force)
+
+        #     $result | Should -Not -BeNullOrEmpty
+        #     $result.ExitCode | Should -Be 0
+        # }
+
+        # It "can build and push my image with 'latest' tag" {
+        #     $dockerFile = Join-Path $dockerImages 'Dockerfile'
+        #     # Invoke-DockerBuild -Image 'integrationtest'
+        #     # 1. Login
+        #     # 2. Pull the image
+        #     # 3. Lint
+        #     # 4. Build
+        #     # 5. Test
+        #     # 6. Tag
+        #     # 7. Push
+        # }
+
+        # It "can format the repos path into the name of the docker image" {
+        # }
 
     }
 }
