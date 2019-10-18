@@ -21,16 +21,20 @@ function Format-DockerTag {
     $isDockerfileInContextRoot = Test-IsSubdirectoryOf -Path $ContextRoot -ChildPath $directoryToDockerfile.FullName
     if (!$isDockerfileInContextRoot) {
         $message = "Cannot find the Dockerfile in $ContextRoot."
-        throw [System.IO.FileNotFoundException]::new($message)
+        throw [System.ArgumentException]::new($message)
     }
 
-    Push-Location -Path $ContextRoot
-    $relativePathToDockerfile = Resolve-Path -Path $pathToDockerFile -Relative
-    Pop-Location
+    try {
+        Push-Location -Path $ContextRoot
+        $relativePathToDockerfile = Resolve-Path -Path $pathToDockerFile -Relative
+    }
+    finally {
+        Pop-Location
+    }
 
     $parentDirCount = (Split-Path -Parent $relativePathToDockerfile).Split([IO.Path]::DirectorySeparatorChar).Length - 1
     if ($parentDirCount -lt 3) {
-        throw "The parent directory structure cannot be parsed into a valid docker tag, full path: ${pathToDockerFile}"
+        throw "The parent directory structure of the Dockerfile cannot be parsed into a valid docker tag, full path to Dockerfile: ${pathToDockerFile}"
     }
     $result = [DockerTagInfo]::new()
     $archPath = Split-Path -Parent -Path $pathToDockerFile
