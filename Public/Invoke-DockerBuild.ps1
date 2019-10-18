@@ -1,6 +1,7 @@
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Registry,
@@ -13,10 +14,12 @@ function Invoke-DockerBuild {
         [String]
         $Context = ".",
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Tag = "latest",
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Dockerfile = "Dockerfile"
@@ -28,6 +31,7 @@ function Invoke-DockerBuild {
         "Dockerfile" = $Dockerfile;
         "ImageName" = $ImageName;
         'Registry' = $Registry;
+        'Tag' = $Tag;
         "CommandResult" = $commandResult
     }
     $result

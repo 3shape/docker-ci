@@ -27,20 +27,22 @@ Describe 'Use cases for this module' {
             Set-Location $script:backupLocation
         }
 
-        It "can derive docker image name and tag in one go" {
+        It "Use case #1: can derive docker image name and tag in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
             Set-Location $location
             New-FakeGitRepository $location
 
-            $result = Find-ImageName | Format-DockerTag
+            $result = Find-ImageName $location
 
-            $result.Dockerfile | Should -Be -Like "*/3.0/servercore/Dockerfile"
+            $result = Format-DockerTag | Invoke-DockerBuild -ImageName $result.ImageName
+
+            $result.Dockerfile | Should -BeLike "*Dockerfile"
             $result.ImageName | Should -Be "dockerbuild-pwsh"
             $result.Tag | Should -Be  "3.0-servercore-amd64"
         }
 
-        It "Test-case #2: can build and push in one go" {
+        It "Use case #2: can build and push in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
             Set-Location $location
