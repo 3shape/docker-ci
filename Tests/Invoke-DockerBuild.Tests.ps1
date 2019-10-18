@@ -30,7 +30,7 @@ Describe 'Build docker images' {
 
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
 
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -File $dockerFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
 
