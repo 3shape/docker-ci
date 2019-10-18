@@ -5,7 +5,7 @@ function Invoke-DockerBuild {
         [String]
         $Registry,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(ValueFromPipelineByPropertyName, Mandatory = $true)]
         [String]
         $ImageName,
 
