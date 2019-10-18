@@ -20,17 +20,17 @@ Describe 'Parse context from git repository' {
         }
 
         It 'can find a repository origin' {
-            $gitRepoNoSpace = Join-Path $tempFolder "NoSpace"
-            New-FakeGitRepository -Path $gitRepoNoSpace
-            $result = Find-ImageName -RepositoryPath $gitRepoNoSpace
-            $result | Should -BeExactly "dockerbuild-pwsh"
+            $noSpacePath = Join-Path $tempFolder "NoSpace"
+            New-FakeGitRepository -Path $noSpacePath
+            $result = Find-ImageName -RepositoryPath $noSpacePath
+            $result.ImageName | Should -BeExactly "dockerbuild-pwsh"
         }
 
         It 'can find a repository origin with folder with space' {
             $gitRepoWithSpace = Join-Path $tempFolder "With Space"
             New-FakeGitRepository -Path $gitRepoWithSpace
             $result = Find-ImageName -RepositoryPath $gitRepoWithSpace
-            $result | Should -BeExactly "dockerbuild-pwsh"
+            $result.ImageName | Should -BeExactly "dockerbuild-pwsh"
         }
 
         It 'can identify an invalid repository, .git folder without config file' {
@@ -53,7 +53,31 @@ Describe 'Parse context from git repository' {
             $result = Find-ImageName -RepositoryPath $gitReposWithUppercase
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName -Exactly 1
-            $result | Should -BeExactly 'dockerbuild-pwsh'
+            $result.ImageName | Should -BeExactly 'dockerbuild-pwsh'
+        }
+    }
+
+    Context 'Pipeline execution' {
+        BeforeAll {
+            $tempFolder = New-RandomFolder
+            $location = Join-Path $tempFolder "NoSpace"
+            New-FakeGitRepository -Path $location
+
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    'RepositoryPath' = $location;
+                }
+                return $input
+            }
+        }
+
+        It 'can consume arguments from pipeline' {
+           & $pipedInput | Find-ImageName
+        }
+
+        It 'returns the expected pscustomobject' {
+            $result = & $pipedInput | Find-ImageName
+            $result.ImageName | Should -Be 'dockerbuild-pwsh'
         }
     }
 }

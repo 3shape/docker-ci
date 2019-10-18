@@ -1,6 +1,7 @@
 function Find-ImageName {
     [CmdletBinding()]
     param (
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $RepositoryPath
     )
@@ -10,6 +11,10 @@ function Find-ImageName {
     {
         throw "No such git config: $gitConfigExists"
     }
-    $result = Invoke-Command "git config --file `"$gitConfigPath`" --get remote.origin.url"
-    (Find-RepositoryName -RepositoryPath $result.Output).ToLower()
+    $commandResult = Invoke-Command "git config --file `"$gitConfigPath`" --get remote.origin.url"
+    $imageName = (Find-RepositoryName -RepositoryPath $commandResult.Output).ToLower()
+    $result = [PSCustomObject]@{
+        'ImageName' = $imageName
+    }
+    return $result
 }
