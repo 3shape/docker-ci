@@ -42,18 +42,22 @@ Describe 'Build docker images' {
     Context 'Pipeline execution' {
 
         BeforeAll {
-            $input = [PSCustomObject]@{
-                "ImageName" = "myimage";
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    "ImageName" = "myimage";
+                }
+                return $input
             }
         }
 
         It 'can consume arguments from pipeline' {
-            $input | Invoke-DockerBuild
+           & $pipedInput | Invoke-DockerBuild
         }
 
         It 'returns the expected pscustomobject' {
-            $result = $input | Invoke-DockerBuild
-            $result.
+            $result = & $pipedInput | Invoke-DockerBuild
+            $result.Dockerfile | Should -Not -BeNullOrEmpty
+            $result.ImageName | Should -Not -BeNullOrEmpty
         }
     }
 }
