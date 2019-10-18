@@ -1,9 +1,10 @@
 function Format-DockerTag {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
-        $Dockerfile
+        $Dockerfile = './Dockerfile'
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
@@ -15,13 +16,18 @@ function Format-DockerTag {
     if ($parentDirCount -lt 3) {
         throw "The parent directory structure cannot be parsed into a valid docker tag, full path: ${pathToDockerFile}"
     }
-    $result = [DockerTagInfo]::new()
+
     $archPath = Split-Path -Parent -Path $pathToDockerFile
     $distroPath = Split-Path -Parent -Path $archPath
     $versionPath = Split-Path -Parent -Path $distroPath
-    $result.Arch = Split-Path -Leaf -Path $archPath
-    $result.Distro = Split-Path -Leaf -Path $distroPath
-    $result.Version = Split-Path -Leaf -Path $versionPath
+
+    $result = [PSCustomObject]@{
+        'Dockerfile' = $pathToDockerFile
+        'Arch' = $(Split-Path -Leaf -Path $archPath)
+        'Distro' = $(Split-Path -Leaf -Path $distroPath)
+        'Version' = $(Split-Path -Leaf -Path $versionPath)
+        'Tag' = ''
+    }
     $result.Tag = $result.Version + '-' + $result.Distro + '-' + $result.Arch
     $result
 }

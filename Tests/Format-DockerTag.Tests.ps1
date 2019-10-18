@@ -6,11 +6,11 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
 
     BeforeAll {
         $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+        $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
+        $exampleReposPath = Join-Path $testData "ExampleRepos"
     }
 
     Context 'Given a well-formed directory structure' {
-        $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-        $exampleReposPath = Join-Path $testData "ExampleRepos"
 
         It 'Can parse tool version, distro and arch' {
             $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
@@ -35,11 +35,11 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
 
     Context 'Pipeline exeuction' {
         BeforeAll {
+            $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
+
             $pipedInput = {
                 $input = [PSCustomObject]@{
-                    "ContextRoot" = "myimage";
-                    "Registry" = "localhost";
-                    "Tag" = "v1.0.2"
+                    'Dockerfile' = $dockerFile;
                 }
                 return $input
             }
@@ -50,10 +50,11 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
         }
 
         It 'returns the expected pscustomobject' {
-            $result = & $pipedInput | Invoke-DockerPush
-            $result.ImageName | Should -Be 'myimage'
-            $result.Registry | Should -Be 'localhost/'
-            $result.Tag | Should -Be 'v1.0.2'
+            $result = & $pipedInput | Format-DockerTag
+            $result.Arch | Should -Be 'amd64'
+            $result.Distro | Should -Be 'servercore'
+            $result.Version | Should -Be '3.0'
+            $result.Tag | Should -Be '3.0-servercore-amd64'
         }
     }
 
