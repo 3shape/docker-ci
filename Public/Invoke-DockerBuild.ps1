@@ -27,6 +27,7 @@ function Invoke-DockerBuild {
     $result = [PSCustomObject]@{
         "Dockerfile" = $Dockerfile;
         "ImageName" = $ImageName;
+        'Registry' = $Registry;
         "CommandResult" = $commandResult
     }
     $result
