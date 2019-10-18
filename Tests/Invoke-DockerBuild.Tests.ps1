@@ -5,8 +5,6 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Build docker images' {
 
-
-
     BeforeAll {
         $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
     }
@@ -38,6 +36,28 @@ Describe 'Build docker images' {
 
             $result = GetMockValue -Key "command"
             $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
+        }
+    }
+
+    Context 'Pipeline execution' {
+
+        BeforeAll {
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    "ImageName" = "myimage";
+                }
+                return $input
+            }
+        }
+
+        It 'can consume arguments from pipeline' {
+           & $pipedInput | Invoke-DockerBuild
+        }
+
+        It 'returns the expected pscustomobject' {
+            $result = & $pipedInput | Invoke-DockerBuild
+            $result.Dockerfile | Should -Not -BeNullOrEmpty
+            $result.ImageName | Should -Not -BeNullOrEmpty
         }
     }
 }
