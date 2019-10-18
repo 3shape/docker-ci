@@ -23,9 +23,9 @@ function Invoke-DockerBuild {
 
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
-    $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${File}`""
+    $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
     $result = [PSCustomObject]@{
-        "Dockerfile" = $File;
+        "Dockerfile" = $Dockerfile;
         "ImageName" = $ImageName;
         "CommandResult" = $commandResult
     }
