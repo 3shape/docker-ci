@@ -44,4 +44,28 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
         }
     }
 
+    Context 'Pipeline exeuction' {
+        BeforeAll {
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    "ContextRoot" = "myimage";
+                    "Registry" = "localhost";
+                    "Tag" = "v1.0.2"
+                }
+                return $input
+            }
+        }
+
+        It 'can consume arguments from pipeline' {
+           & $pipedInput | Format-DockerTag
+        }
+
+        It 'returns the expected pscustomobject' {
+            $result = & $pipedInput | Invoke-DockerPush
+            $result.ImageName | Should -Be 'myimage'
+            $result.Registry | Should -Be 'localhost/'
+            $result.Tag | Should -Be 'v1.0.2'
+        }
+    }
+
 }
