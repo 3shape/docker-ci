@@ -43,6 +43,5 @@ function Invoke-DockerPull {
         Write-Debug "${message}"
         throw "${message}"
     }
-
     return $result
 }
