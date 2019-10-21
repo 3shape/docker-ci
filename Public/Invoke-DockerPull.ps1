@@ -36,14 +36,13 @@ function Invoke-DockerPull {
         }
         $imageToPull = "${postfixedRegistry}${ImageName}@${Digest}"
     }
-    try {
-        $result = Invoke-Command "docker pull ${imageToPull}"
+
+    $result = Invoke-Command "docker pull ${imageToPull}"
+    if ($result.Exitcode -ne 0) {
+        $message = "An error occured during docker pull. The error message was: ${result.Output}, the exit code was: ${result.Exitcode}"
+        Write-Debug "${message}"
+        throw "${message}"
     }
-    catch {
-        if ($result.Exitcode -ne 0) {
-            $message = "An error occured during docker pull, the error message was: $result.Output"
-            throw $message
-        }
-    }
+
     return $result
 }

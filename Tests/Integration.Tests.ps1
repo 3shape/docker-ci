@@ -20,10 +20,13 @@ Describe 'Use cases for this module' {
         }
 
         BeforeEach {
+            $script:backupDebugPref = $DebugPreference
+            $DebugPreference='Continue'
             $script:backupLocation = Get-Location
         }
 
         AfterEach {
+            $DebugPreference=$script:DebugPreference
             Set-Location $script:backupLocation
         }
 
@@ -43,6 +46,7 @@ Describe 'Use cases for this module' {
         }
 
         It "Use case #2: can build and push in one go" {
+
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
             Set-Location $location
@@ -53,6 +57,7 @@ Describe 'Use cases for this module' {
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
             $result.ExitCode | Should -Be 0
+
         }
 
         # It 'can login' {

@@ -11,6 +11,9 @@ Describe 'Pull docker images' {
     $code = {
         Write-Debug $Command
         StoreMockValue -Key "pull" -Value $Command
+        $commandResult = [CommandResult]::new()
+        $commandResult.ExitCode = 0
+        return $commandResult
     }
 
     BeforeEach {
@@ -69,6 +72,19 @@ Describe 'Pull docker images' {
         It 'pulls public docker image by image name with invalid digest, wrong digest length; and fails' {
             $theCode = {
                 Invoke-DockerPull -ImageName 'lalaland' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d'
+            }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
+        }
+
+        It 'throws exception on non-zero exit code' {
+            $returnNonZeroExitCode = {
+                $commandResult = [CommandResult]::new()
+                $commandResult.ExitCode = 1
+                return $commandResult
+            }
+            Mock -CommandName "Invoke-Command" $returnNonZeroExitCode  -Verifiable -ModuleName $script:moduleName
+            $theCode = {
+                Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore/iis'
             }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
