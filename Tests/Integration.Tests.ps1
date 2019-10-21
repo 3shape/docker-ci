@@ -52,7 +52,6 @@ Describe 'Use cases for this module' {
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
-            $result.Output | Should -Not -BeNullOrEmpty
             $result.ExitCode | Should -Be 0
         }
 
