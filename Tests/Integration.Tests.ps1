@@ -55,6 +55,8 @@ Describe 'Use cases for this module' {
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force)
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
+            Start-Sleep -Milliseconds 5000
+
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
             Write-Debug $result.Output
             $result.ExitCode | Should -Be 0
