@@ -10,8 +10,12 @@ Describe 'Use cases for this module' {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $dockerImages = Join-Path $testData 'DockerImage'
+            $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
+            $pruneImageCommand = 'docker system prune --force'
             $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v ${htpasswdPath}:/auth -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
-            Invoke-Command  $startRegistryCommand
+            Invoke-Command $removeImageCommand
+            Invoke-Command $pruneImageCommand
+            Invoke-Command $startRegistryCommand
         }
 
         AfterAll {
@@ -45,6 +49,11 @@ Describe 'Use cases for this module' {
             $result.Tag | Should -Be  "3.0-servercore-amd64"
         }
 
+        It 'supports docker login' {
+            $result = Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
+            $result.ExitCode | Should -Be 0
+        }
+
         It "Use case #2: can build and push in one go" {
 
             $exampleReposPath = Join-Path $testData "ExampleRepos"
@@ -52,15 +61,12 @@ Describe 'Use cases for this module' {
             Set-Location $location
             New-FakeGitRepository $location
 
-            Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force)
+            Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
-
-            Start-Sleep -Milliseconds 5000
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
             Write-Debug $result.Output
             $result.ExitCode | Should -Be 0
-
         }
 
         # It 'can login' {
