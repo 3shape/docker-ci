@@ -12,6 +12,7 @@ function Find-ImageName {
         throw "No such git config: $gitConfigExists"
     }
     $commandResult = Invoke-Command "git config --file `"$gitConfigPath`" --get remote.origin.url"
+    Assert-ExitCodeOK $commandResult
     $imageName = (Find-RepositoryName -RepositoryPath $commandResult.Output).ToLower()
     $result = [PSCustomObject]@{
         'ImageName' = $imageName

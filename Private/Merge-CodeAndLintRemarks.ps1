@@ -34,5 +34,5 @@ function Merge-CodeAndLintRemarks {
         $result += $line.TrimEnd()
         $codeIndex++
     }
-    $result
+    return $result
 }

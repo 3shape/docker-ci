@@ -1,14 +1,11 @@
 Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
-# . $PSScriptRoot/../Private/DockerTagInfo.ps1
 
 Describe 'Parse version, distro and arch from Dockerfile path' {
 
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
-        $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-        $exampleReposPath = Join-Path $testData "ExampleRepos"
-    }
+    $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+    $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
+    $exampleReposPath = Join-Path $testData "ExampleRepos"
 
     Context 'Given a well-formed directory structure' {
 
@@ -34,19 +31,16 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
     }
 
     Context 'Pipeline exeuction' {
-        BeforeAll {
-            $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
-
-            $pipedInput = {
-                $input = [PSCustomObject]@{
-                    'Dockerfile' = $dockerFile;
-                }
-                return $input
+        $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
+        $pipedInput = {
+            $input = [PSCustomObject]@{
+                'Dockerfile' = $dockerFile;
             }
+            return $input
         }
 
         It 'can consume arguments from pipeline' {
-           & $pipedInput | Format-DockerTag
+           & ${pipedInput} | Format-DockerTag
         }
 
         It 'returns the expected pscustomobject' {

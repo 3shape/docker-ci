@@ -7,7 +7,9 @@ function Invoke-DockerLint {
     param (
         [ValidateNotNullOrEmpty()]
         [string]
-        $DockerFile = 'Dockerfile'
+        $DockerFile = 'Dockerfile',
+        [bool]
+        $TreatLintRemarksFoundAsException = $false
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
@@ -23,12 +25,16 @@ function Invoke-DockerLint {
     elseif ($IsLinux) {
         $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
     }
-    [CommandResult] $commandResult = Invoke-Command $lintCommand
+    $commandResult = Invoke-Command $lintCommand
+    if ($TreatLintRemarksFoundAsException) {
+        Assert-ExitCodeOk $commandResult
+    }
     [LintRemark[]] $lintRemarks = Find-LintRemarks $commandResult.Output
     $lintedDockerfile = Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
     $result = [PSCustomObject]@{
         'Result' = $commandResult
         'LintOutput' = $lintedDockerfile
     }
+
     return $result
 }

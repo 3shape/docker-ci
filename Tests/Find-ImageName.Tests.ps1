@@ -4,15 +4,13 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Parse context from git repository' {
 
+    $tempFolder = New-RandomFolder
+    $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+
     Context 'When git is installed' {
 
         BeforeEach {
             Initialize-MockReg
-        }
-
-        BeforeAll {
-            $tempFolder = New-RandomFolder
-            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
         }
 
         AfterAll {
@@ -72,7 +70,7 @@ Describe 'Parse context from git repository' {
         }
 
         It 'can consume arguments from pipeline' {
-           & $pipedInput | Find-ImageName
+            & $pipedInput | Find-ImageName
         }
 
         It 'returns the expected pscustomobject' {

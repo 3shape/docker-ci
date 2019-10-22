@@ -9,6 +9,7 @@ function Invoke-Command {
     $script:ErrorActionPreference = "Continue"
     try {
         $result = [CommandResult]::new()
+        $result.Command = $Command
         Write-Debug "Executing command: ${Command}"
         $outputs = Invoke-Expression "& $Command 2>&1"
         $result.Success = $?

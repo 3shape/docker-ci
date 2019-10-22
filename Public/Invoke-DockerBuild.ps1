@@ -1,3 +1,5 @@
+. "$PSScriptRoot\..\Private\CommandResult.ps1"
+
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
@@ -27,6 +29,7 @@ function Invoke-DockerBuild {
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
     $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
+    Assert-ExitCodeOK $commandResult
     $result = [PSCustomObject]@{
         "Dockerfile" = $Dockerfile;
         "ImageName" = $ImageName;
@@ -34,5 +37,5 @@ function Invoke-DockerBuild {
         'Tag' = $Tag;
         "CommandResult" = $commandResult
     }
-    $result
+    return $result
 }

@@ -29,5 +29,5 @@ function Format-DockerTag {
         'Tag' = ''
     }
     $result.Tag = $result.Version + '-' + $result.Distro + '-' + $result.Arch
-    $result
+    return $result
 }
