@@ -23,7 +23,12 @@ function Invoke-DockerLint {
     elseif ($IsLinux) {
         $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
     }
-    [CommandResult] $result = Invoke-Command $lintCommand
-    [LintRemark[]] $lintRemarks = Find-LintRemarks $result.Output
-    return Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
+    [CommandResult] $commandResult = Invoke-Command $lintCommand
+    [LintRemark[]] $lintRemarks = Find-LintRemarks $commandResult.Output
+    $lintedDockerfile = Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
+    $result = [PSCustomObject]@{
+        'Result' = $commandResult
+        'LintOutput' = $lintedDockerfile
+    }
+    return $result
 }

@@ -4,12 +4,16 @@ Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 
 Describe 'Use cases for this module' {
 
-    Context 'With a local docker registry setup up and running' {
+    Context 'With a local docker registry with auth required' {
+
+        $localRegistryName = 'localhost:5000'
+        $dockerImageNamePrefix = 'integration-testcase'
 
         BeforeAll {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $dockerImages = Join-Path $testData 'DockerImage'
+            $exampleRepos = Join-Path $testData 'ExampleRepos'
             $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
             $pruneImageCommand = 'docker system prune --force'
             $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v ${htpasswdPath}:/auth -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
@@ -24,17 +28,14 @@ Describe 'Use cases for this module' {
         }
 
         BeforeEach {
-            $script:backupDebugPref = $DebugPreference
-            $DebugPreference='Continue'
             $script:backupLocation = Get-Location
         }
 
         AfterEach {
-            $DebugPreference=$script:DebugPreference
             Set-Location $script:backupLocation
         }
 
-        It "Use case #1: can derive docker image name and tag in one go" {
+        It "Use case #1: Can derive docker image name and tag in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
             Set-Location $location
@@ -49,49 +50,48 @@ Describe 'Use cases for this module' {
             $result.Tag | Should -Be  "3.0-servercore-amd64"
         }
 
-        It 'supports docker login' {
-            $result = Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
-            $result.ExitCode | Should -Be 0
-        }
-
-        It "Use case #2: can build and push in one go" {
-
+        It "Use case #2: Can build and push in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
             Set-Location $location
             New-FakeGitRepository $location
 
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
+
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
-            Write-Debug $result.Output
-            $result.ExitCode | Should -Be 0
+            $result.Result.ExitCode | Should -Be 0
         }
 
-        # It 'can login' {
-        #     $result = Invoke-DockerLogin    -Registry 'localhost:5000' `
-        #                                     -Username 'admin' `
-        #                                     -Password (ConvertTo-SecureString 'password' –asplaintext –force)
+        It "Use case #3: Can pull, tag and push in one go" {
+            Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry $localRegistryName
 
-        #     $result | Should -Not -BeNullOrEmpty
-        #     $result.ExitCode | Should -Be 0
-        # }
+            Invoke-DockerPull -ImageName 'ubuntu' | Invoke-DockerTag -NewImageName 'ubuntu' -NewTag 'v1.0.2' -NewRegistry $localRegistryName | Invoke-DockerPush
+            $result = Invoke-DockerPull -Registry $localRegistryName -ImageName 'ubuntu' -Tag 'v1.0.2'
 
-        # It "can build and push my image with 'latest' tag" {
-        #     $dockerFile = Join-Path $dockerImages 'Dockerfile'
-        #     # Invoke-DockerBuild -Image 'integrationtest'
-        #     # 1. Login
-        #     # 2. Pull the image
-        #     # 3. Lint
-        #     # 4. Build
-        #     # 5. Test
-        #     # 6. Tag
-        #     # 7. Push
-        # }
+            $result.Result.ExitCode | Should -Be 0
+        }
 
-        # It "can format the repos path into the name of the docker image" {
-        # }
+        It 'Use case #4: Can produce an image from scratch' {
+            $dockerFileDirectory = Join-Path  $exampleRepos '3.0/servercore/amd64'
+            Set-Location $dockerFileDirectory
+            New-FakeGitRepository $dockerFileDirectory
+            $imageName = (Find-ImageName -RepositoryPath $dockerFileDirectory).ImageName
+
+            # 1. Make sure we play by the rules
+            Invoke-DockerLint
+            Invoke-DockerTests
+
+            # 2. Build and push image to latest tag, then grab it and see it's ok
+            $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |
+                        Invoke-DockerPush |
+                            Invoke-DockerPull
+
+            $result.Result.ExitCode | Should -Be 0
+            $result.ImageName | Should -Be $imageName
+            $result.Registry | Should -Be "${localRegistryName}/"
+        }
 
     }
 }
