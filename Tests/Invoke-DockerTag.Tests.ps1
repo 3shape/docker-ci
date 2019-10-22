@@ -32,28 +32,28 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags image by image name and tag with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'pester' -NewImageName 'newimage' -NewTag 'pester'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:pester ${global:DockerPublicRegistry}/newimage:pester"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:pester ${global:DockerPublicRegistry}/newimage:pester"
         }
 
         It 'tags image by image name and tag, with new image name' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'source' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:source ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:source ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags image by image name with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'target'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest ${global:DockerPublicRegistry}/newimage:target"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:target"
         }
     }
 
@@ -105,14 +105,31 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999/docker-repo' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
         }
 
         It 'tags public docker image as private docker image with image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/newimage:newtag"
+        }
+    }
+
+    Context 'tags invalid image' {
+
+        $code = {
+            Write-Debug $Command
+            StoreMockValue -Key "mock" -Value $Command
+            $result = [PSCustomObject]@{
+                ExitCode = 1
+            }
+            return $result
+        }
+
+        It 'tags invalid image with invalid registry' {
+            $runner = { Invoke-DockerTag -ImageName 'oldname' -NewRegistry '.' -NewImageName 'newimage' -NewTag 'newtag' }
+            $runner | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
     }
 
@@ -122,7 +139,7 @@ Describe 'Tag docker images' {
             $pipedInput = {
                 $input = [PSCustomObject]@{
                     "ImageName" = "myimage";
-                    "Registry" = "localhost";
+                    "NewRegistry" = "localhost";
                     "NewImageName" = "my-new-image";
                     "NewTag" = "v1.0.2";
                 }
