@@ -129,7 +129,7 @@ Describe 'Tag docker images' {
 
         It 'tags invalid image with invalid registry' {
             $runner = { Invoke-DockerTag -ImageName 'oldname' -NewRegistry '.' -NewImageName 'newimage' -NewTag 'newtag' }
-            $runner | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
+            $runner | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
     }
 
@@ -138,17 +138,17 @@ Describe 'Tag docker images' {
         BeforeAll {
             $pipedInput = {
                 $input = [PSCustomObject]@{
-                    "ImageName" = "myimage";
-                    "NewRegistry" = "localhost";
+                    "ImageName"    = "myimage";
+                    "NewRegistry"  = "localhost";
                     "NewImageName" = "my-new-image";
-                    "NewTag" = "v1.0.2";
+                    "NewTag"       = "v1.0.2";
                 }
                 return $input
             }
         }
 
         It 'can consume arguments from pipeline' {
-           & $pipedInput | Invoke-DockerTag
+            & $pipedInput | Invoke-DockerTag
         }
 
         It 'returns the expected pscustomobject' {

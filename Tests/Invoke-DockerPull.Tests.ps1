@@ -100,7 +100,7 @@ Describe 'Pull docker images' {
             $theCode = {
                 Invoke-DockerPull -ImageName 'mcr.microsoft.com/windows/servercore/iis'
             }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
+            $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
     }
 
