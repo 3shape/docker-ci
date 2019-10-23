@@ -3,7 +3,7 @@ function Format-DockerTag {
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
-        [string]
+        [String]
         $Dockerfile = './Dockerfile'
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
@@ -23,10 +23,10 @@ function Format-DockerTag {
 
     $result = [PSCustomObject]@{
         'Dockerfile' = $pathToDockerFile
-        'Arch' = $(Split-Path -Leaf -Path $archPath)
-        'Distro' = $(Split-Path -Leaf -Path $distroPath)
-        'Version' = $(Split-Path -Leaf -Path $versionPath)
-        'Tag' = ''
+        'Arch'       = $(Split-Path -Leaf -Path $archPath)
+        'Distro'     = $(Split-Path -Leaf -Path $distroPath)
+        'Version'    = $(Split-Path -Leaf -Path $versionPath)
+        'Tag'        = ''
     }
     $result.Tag = $result.Version + '-' + $result.Distro + '-' + $result.Arch
     return $result

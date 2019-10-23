@@ -8,19 +8,19 @@ function Invoke-DockerPull {
         $Registry = $global:DockerPublicRegistry,
 
         # Pull by name, by name + tag, by name + digest
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true)]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest', ValueFromPipelineByPropertyName = $true)]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
         [String]
         $ImageName,
 
         [ValidateNotNullOrEmpty()]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
         [String]
         $Tag = 'latest',
 
         [ValidateNotNullOrEmpty()]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest')]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest')]
         [String]
         $Digest = ''
     )
@@ -50,11 +50,11 @@ function Invoke-DockerPull {
         throw "${message}"
     }
     $result = [PSCustomObject]@{
-        'Result' = $commandResult
+        'Result'    = $commandResult
         'ImageName' = $ImageName
-        'Tag' = $Tag
-        'Registry' = $postfixedRegistry
-        'Digest' = $Digest
+        'Tag'       = $Tag
+        'Registry'  = $postfixedRegistry
+        'Digest'    = $Digest
     }
     return $result
 }
