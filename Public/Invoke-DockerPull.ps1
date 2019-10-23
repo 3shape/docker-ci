@@ -44,11 +44,7 @@ function Invoke-DockerPull {
     }
 
     $commandResult = Invoke-Command "docker pull ${imageToPull}"
-    if ($commandResult.Exitcode -ne 0) {
-        $message = "An error occured during docker pull. The error message was: ${commandResult.Output}, the exit code was: ${commandResult.Exitcode}"
-        Write-Debug "${message}"
-        throw "${message}"
-    }
+    Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
         'Result'    = $commandResult
         'ImageName' = $ImageName
