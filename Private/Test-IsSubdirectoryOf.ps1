@@ -2,11 +2,11 @@
 function Test-IsSubdirectoryOf {
     [CmdletBinding()]
     param (
-        [Parameter(mandatory=$true)]
+        [Parameter(mandatory = $true)]
         [String]
         $Path,
 
-        [Parameter(mandatory=$true)]
+        [Parameter(mandatory = $true)]
         [String]
         $ChildPath
     )

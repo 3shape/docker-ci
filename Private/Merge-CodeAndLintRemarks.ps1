@@ -1,5 +1,3 @@
-. "$PSScriptRoot\LintRemark.ps1"
-
 function Merge-CodeAndLintRemarks {
     [CmdletBinding()]
     param (
@@ -11,14 +9,14 @@ function Merge-CodeAndLintRemarks {
         [LintRemark[]]
         $LintRemarks
     )
-    [string[]] $result = @()
+    [String[]] $result = @()
 
     $codeIndex = 0
     $lintIndex = 0
     while ($lintIndex -lt $LintRemarks.Length) {
         $codeLineRemarked = $LintRemarks[$lintIndex].LineNumber
         while ($codeIndex -lt ($codeLineRemarked - 1)) {
-            $line = [string] ($codeIndex + 1) + ": " + $CodeLines[$codeIndex]
+            $line = [String] ($codeIndex + 1) + ": " + $CodeLines[$codeIndex]
             $result += $line.TrimEnd()
             $codeIndex++
         }
@@ -30,7 +28,7 @@ function Merge-CodeAndLintRemarks {
     }
 
     while ($codeIndex -lt $CodeLines.Length) {
-        $line = [string] ($codeIndex + 1) + ": " + $CodeLines[$codeIndex]
+        $line = [String] ($codeIndex + 1) + ": " + $CodeLines[$codeIndex]
         $result += $line.TrimEnd()
         $codeIndex++
     }
