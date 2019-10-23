@@ -1,8 +1,8 @@
 function Get-TempPath {
     if ($IsWindows) {
-        [system.io.path]::GetTempPath()
+        return [system.io.path]::GetTempPath()
     } elseif ($IsLinux) {
-        '/tmp'
+        return '/tmp'
     }
 }
 
@@ -50,5 +50,5 @@ function Add-Postfix {
     if ( -Not $trimmedValue.EndsWith($Postfix) ) {
             $trimmedValue += $Postfix
     }
-    $trimmedValue
+    return $trimmedValue
 }

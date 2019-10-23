@@ -11,6 +11,10 @@ Describe 'Tag docker images' {
     $code = {
         Write-Debug $Command
         StoreMockValue -Key "mock" -Value $Command
+        $result = [PSCustomObject]@{
+            ExitCode = 0
+        }
+        return $result
     }
 
     BeforeEach {
@@ -28,28 +32,28 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags image by image name and tag with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'pester' -NewImageName 'newimage' -NewTag 'pester'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:pester newimage:pester"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:pester ${global:DockerPublicRegistry}/newimage:pester"
         }
 
         It 'tags image by image name and tag, with new image name' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'source' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:source newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:source ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags image by image name with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'target'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest newimage:target"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:target"
         }
     }
 
@@ -59,28 +63,28 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:latest"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags private docker image as public docker image with image name and tag' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest ${global:DockerPublicRegistry}/newimage:newtag"
         }
 
         It 'tags private docker image with tag as public docker image with image name only' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -Tag 'nomansland' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland newimage:latest"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland ${global:DockerPublicRegistry}/newimage:latest"
         }
 
         It 'tags private docker image with tag as public docker image with image name and tag' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -Tag 'nomansland' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland ${global:DockerPublicRegistry}/newimage:newtag"
         }
 
         It 'tags private docker image as private docker image with image name only' {
@@ -101,14 +105,57 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999/docker-repo' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
         }
 
         It 'tags public docker image as private docker image with image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/newimage:newtag"
+        }
+    }
+
+    Context 'tags invalid image' {
+
+        $code = {
+            Write-Debug $Command
+            StoreMockValue -Key "mock" -Value $Command
+            $result = [PSCustomObject]@{
+                ExitCode = 1
+            }
+            return $result
+        }
+
+        It 'tags invalid image with invalid registry' {
+            $runner = { Invoke-DockerTag -ImageName 'oldname' -NewRegistry '.' -NewImageName 'newimage' -NewTag 'newtag' }
+            $runner | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+        }
+    }
+
+    Context 'Pipeline execution' {
+
+        BeforeAll {
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    "ImageName"    = "myimage";
+                    "NewRegistry"  = "localhost";
+                    "NewImageName" = "my-new-image";
+                    "NewTag"       = "v1.0.2";
+                }
+                return $input
+            }
+        }
+
+        It 'can consume arguments from pipeline' {
+            & $pipedInput | Invoke-DockerTag
+        }
+
+        It 'returns the expected pscustomobject' {
+            $result = & $pipedInput | Invoke-DockerTag
+            $result.ImageName | Should -Be 'my-new-image'
+            $result.Registry | Should -Be 'localhost/'
+            $result.Tag | Should -Be 'v1.0.2'
         }
     }
 

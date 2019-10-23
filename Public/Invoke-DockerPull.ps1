@@ -1,27 +1,33 @@
 function Invoke-DockerPull {
     [CmdletBinding()]
     param (
+
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Registry,
+        $Registry = $global:DockerPublicRegistry,
 
         # Pull by name, by name + tag, by name + digest
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageOnly')]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest')]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag')]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
         [String]
         $ImageName,
 
         [ValidateNotNullOrEmpty()]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndTag')]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
         [String]
         $Tag = 'latest',
 
         [ValidateNotNullOrEmpty()]
-        [Parameter(mandatory = $true,ParameterSetName = 'WithImageAndDigest')]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest')]
         [String]
         $Digest = ''
     )
+
+    if ($ImageName.Contains(':') -or $ImageName.Contains('@')) {
+        throw [System.ArgumentException]::new('Image name cannot contain colon or at-sign.')
+    }
 
     $postfixedRegistry = Add-Postfix -Value $Registry
 
@@ -36,5 +42,15 @@ function Invoke-DockerPull {
         }
         $imageToPull = "${postfixedRegistry}${ImageName}@${Digest}"
     }
-    Invoke-Command "docker pull ${imageToPull}"
+
+    $commandResult = Invoke-Command "docker pull ${imageToPull}"
+    Assert-ExitCodeOk $commandResult
+    $result = [PSCustomObject]@{
+        'Result'    = $commandResult
+        'ImageName' = $ImageName
+        'Tag'       = $Tag
+        'Registry'  = $postfixedRegistry
+        'Digest'    = $Digest
+    }
+    return $result
 }

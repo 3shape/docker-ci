@@ -1,6 +1,9 @@
+. "$PSScriptRoot\..\Private\CommandResult.ps1"
+
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Registry,
@@ -13,20 +16,26 @@ function Invoke-DockerBuild {
         [String]
         $Context = ".",
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Tag = "latest",
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $File = "Dockerfile"
+        $Dockerfile = "Dockerfile"
+
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
-    $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${File}`""
+    $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
+    Assert-ExitCodeOK $commandResult
     $result = [PSCustomObject]@{
-        "Dockerfile" = $File;
-        "ImageName" = $ImageName;
+        "Dockerfile"    = $Dockerfile;
+        "ImageName"     = $ImageName;
+        'Registry'      = $postfixedRegistry;
+        'Tag'           = $Tag;
         "CommandResult" = $commandResult
     }
-    $result
+    return $result
 }

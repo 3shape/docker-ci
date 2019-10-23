@@ -16,31 +16,30 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
             $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Windows.Dockerfile.Linted")
 
-            [string[]] $result = Invoke-DockerLint -DockerFile $dockerFile
+            $result = Invoke-DockerLint -DockerFile $dockerFile
 
-            $lintedDockerFile | Should -Be $result
+            $lintedDockerFile | Should -Be $result.LintOutput
         }
 
         It 'can find 1 rule violation' {
             $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
             $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Linux.Dockerfile.Linted")
-
-            [string[]] $result = Invoke-DockerLint -DockerFile $dockerFile
-
-            $lintedDockerFile | Should -Be $result
+            $result = Invoke-DockerLint -DockerFile $dockerFile
+            $lintedDockerFile | Should -Be $result.LintOutput
         }
 
         It 'can find multiple rule violations' {
-
             $dockerFile = Join-Path $dockerTestData "Poorly.Written.Dockerfile"
             [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Poorly.Written.Dockerfile.Linted")
 
-            [string[]] $result = Invoke-DockerLint -DockerFile $dockerFile
-
-            for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
-                $lintedDockerFile[$i] | Should -Be $result[$i]
+            try {
+                [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
+                for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
+                    $lintedDockerFile[$i] | Should -Be $result[$i]
+                }
             }
-
+            catch {
+            }
         }
 
         It 'throws exception if docker image does not exist' {
@@ -61,6 +60,15 @@ Describe 'Execute linting on a given docker image' {
             $exception.Message | Should -BeLike "*not.here*"
         }
 
+        It 'throws exception on lint remarks if required' {
+            $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
+
+            $code = {
+                Invoke-DockerLint -DockerFile $dockerFile -TreatLintRemarksFoundAsException $true
+            }
+
+            $code | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+        }
     }
 
     Context 'When no path to docker image is specified' {
@@ -86,6 +94,16 @@ Describe 'Execute linting on a given docker image' {
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
             $result = GetMockValue -Key 'Invoke-Command'
             $result | Should -BeLike "*Dockerfile*"
+        }
+    }
+
+    Context 'Pipeline execution' {
+        It 'returns the expected pscustomobject' {
+            $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
+
+            $result = Invoke-DockerLint -DockerFile $dockerFile
+            $result.LintOutput | Should -Not -BeNullOrEmpty
+            $result.Result.ExitCode | Should -Be 0
         }
     }
 }

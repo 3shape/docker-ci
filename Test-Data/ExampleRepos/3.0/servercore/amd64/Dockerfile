@@ -1,4 +1,4 @@
+  # escape=`
 
-FROM hello-world
+FROM ubuntu:18.04
 
-RUN echo 'Hello World'

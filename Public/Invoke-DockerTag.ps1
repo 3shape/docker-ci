@@ -1,26 +1,30 @@
 function Invoke-DockerTag {
     [CmdletBinding()]
     param (
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Registry,
+        $Registry = $global:DockerPublicRegistry,
 
-        [Parameter(mandatory=$true)]
+        [Parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
         $ImageName,
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Tag = 'latest',
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $NewRegistry,
+        $NewRegistry = $global:DockerPublicRegistry,
 
-        [Parameter(mandatory=$true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
         $NewImageName,
 
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
         $NewTag = 'latest'
@@ -31,5 +35,13 @@ function Invoke-DockerTag {
     $source = "${postfixedRegistry}${ImageName}:${Tag}"
     $target = "${postfixedNewRegistry}${NewImageName}:${NewTag}"
 
-    Invoke-Command "docker tag ${source} ${target}"
+    $commandResult = Invoke-Command "docker tag ${source} ${target}"
+    Assert-ExitCodeOk $commandResult
+    $result = [PSCustomObject]@{
+        'Tag'       = $NewTag
+        'ImageName' = $NewImageName
+        'Registry'  = $postfixedNewRegistry
+        'Result'    = $commandResult
+    }
+    return $result
 }

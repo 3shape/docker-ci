@@ -1,4 +1,4 @@
-function Invoke-PesterTests {
+function Invoke-DockerTests {
     [CmdletBinding()]
     param (
         [ValidateRange("NonNegative")]
@@ -9,7 +9,7 @@ function Invoke-PesterTests {
         [String]
         $TestDirectory = '.'
     )
-    $testDirectoryPath = Format-AsAbsolutePath (Add-PostFix  $TestDirectory)
+    $testDirectoryPath = Format-AsAbsolutePath (Add-PostFix $TestDirectory)
     $testDirectoryExists = [System.IO.Directory]::Exists($testDirectoryPath)
     if (!$testDirectoryExists) {
         $mesage = "No such directory: ${testDirectoryPath}"

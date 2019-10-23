@@ -7,12 +7,22 @@ PowerShell Core script to build and test Docker images.
 The module comes with CmdLets to perform the most commonly used tasks with regards to building docker images:
 
 - Build
-- Test (not implemented yet)
+- Tests
 - Lint
+- Login
+- Pull
+- Push
 - Tag
-- Push (not implemented yet)
 
-For each tasks there is a corresponding CmdLet, for instance Invoke-DockerBuild to build an image.
+For each tasks there is a corresponding CmdLet:
+
+- Invoke-DockerBuild
+- Invoke-DockerTests
+- Invoke-DockerLint
+- Invoke-DockerLogin
+- Invoke-DockerPull
+- Invoke-DockerPush
+- Invoke-DockerTag
 
 To run, just do
 

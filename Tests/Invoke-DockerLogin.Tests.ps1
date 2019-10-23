@@ -13,6 +13,9 @@ Describe 'Docker login ' {
         $code = {
             Write-Debug $Command
             StoreMockValue -Key "Invoke-Command" -Value $Command
+            $result = [CommandResult]::new()
+            $result.ExitCode = 0
+            return $result
         }
         Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
     }

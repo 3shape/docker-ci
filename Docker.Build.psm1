@@ -1,5 +1,9 @@
 #Requires -Version 6
 #Requires -Modules @{ ModuleName="Pester"; ModuleVersion="4.9.0" }
+if (!$global:DockerPublicRegistry) {
+    Set-Variable -Name DockerPublicRegistry -Value "docker.io" -Option Constant -Scope Global -Force
+}
+
 
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )

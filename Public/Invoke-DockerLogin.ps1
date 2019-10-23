@@ -2,20 +2,21 @@ function Invoke-DockerLogin {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]
+        [String]
         $Username,
 
         [Parameter(Mandatory = $true)]
-        [securestring]
+        [Securestring]
         $Password,
 
         [ValidateNotNullOrEmpty()]
-        [string]
+        [String]
         $Registry
     )
-    [string] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password
+    [String] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password
     $command = "Write-Output `"${plainTextPassword}`" | docker login --username `"${Username}`" --password-stdin ${Registry}".TrimEnd()
     Write-Debug ($command.Replace($plaintextPassword, "*********"))
-    [CommandResult] $result = Invoke-Command $command
-    $result
+    [CommandResult] $commandResult = Invoke-Command $command
+    Assert-ExitCodeOK $commandResult
+    return $commandResult
 }

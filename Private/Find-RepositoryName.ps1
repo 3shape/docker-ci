@@ -1,11 +1,11 @@
 function Find-RepositoryName {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string] $RepositoryPath
+        [String] $RepositoryPath
     )
     $ReposNameStart = $RepositoryPath.LastIndexOf('/') + 1
     $ReposNameEnd = $RepositoryPath.LastIndexOf(".git")
     $ReposNameLength = $ReposNameEnd - $ReposNameStart
-    $RepositoryPath.Substring($ReposNameStart, $ReposNameLength)
+    return $RepositoryPath.Substring($ReposNameStart, $ReposNameLength)
 }

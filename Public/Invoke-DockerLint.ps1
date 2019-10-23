@@ -6,8 +6,10 @@ function Invoke-DockerLint {
     [CmdletBinding()]
     param (
         [ValidateNotNullOrEmpty()]
-        [string]
-        $DockerFile = 'Dockerfile'
+        [String]
+        $DockerFile = 'Dockerfile',
+        [bool]
+        $TreatLintRemarksFoundAsException = $false
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
@@ -16,14 +18,22 @@ function Invoke-DockerLint {
         throw [System.IO.FileNotFoundException]::new($mesage)
     }
     $hadoLintImage = 'hadolint/hadolint:v1.17.2'
-    [string[]] $code = Get-Content -Path $DockerFile
+    [String[]] $code = Get-Content -Path $DockerFile
     if ($IsWindows) {
         $lintCommand = "cmd /c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
     }
     elseif ($IsLinux) {
         $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
     }
-    [CommandResult] $result = Invoke-Command $lintCommand
-    [LintRemark[]] $lintRemarks = Find-LintRemarks $result.Output
-    return Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
+    $commandResult = Invoke-Command $lintCommand
+    if ($TreatLintRemarksFoundAsException) {
+        Assert-ExitCodeOk $commandResult
+    }
+    [LintRemark[]] $lintRemarks = Find-LintRemarks $commandResult.Output
+    $lintedDockerfile = Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
+    $result = [PSCustomObject]@{
+        'Result'     = $commandResult
+        'LintOutput' = $lintedDockerfile
+    }
+    return $result
 }
