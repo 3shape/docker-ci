@@ -4,7 +4,7 @@ function Format-DockerTag {
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Dockerfile = './Dockerfile'
+        $Dockerfile = 'Dockerfile'
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)

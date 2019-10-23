@@ -1,11 +1,9 @@
 function Invoke-DockerPull {
     [CmdletBinding()]
     param (
-
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
         [String]
-        $Registry = $global:DockerPublicRegistry,
+        $Registry = '',
 
         # Pull by name, by name + tag, by name + digest
         [Parameter(mandatory = $true, ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true)]

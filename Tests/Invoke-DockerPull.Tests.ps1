@@ -31,7 +31,7 @@ Describe 'Pull docker images' {
             Invoke-DockerPull -ImageName 'ubuntu'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ${global:DockerPublicRegistry}/ubuntu:latest"
+            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
         }
 
         It 'pulls public docker image by registry and image name' {
@@ -45,14 +45,21 @@ Describe 'Pull docker images' {
             Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ${global:DockerPublicRegistry}/ubuntu:bionic"
+            $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
+        }
+
+        It 'pulls explicit public docker image by image name and tag' {
+            Invoke-DockerPull -Registry '' -ImageName 'ubuntu' -Tag 'bionic'
+            $result = GetMockValue -Key "pull"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
         }
 
         It 'pulls public docker image by image name and digest' {
             Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ${global:DockerPublicRegistry}/ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
+            $result | Should -BeLikeExactly "docker pull ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
         }
 
         It 'pulls public docker image by image name, with both tag and digest; and fails' {

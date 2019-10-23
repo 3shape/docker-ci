@@ -1,12 +1,9 @@
-. "$PSScriptRoot\..\Private\CommandResult.ps1"
-
 function Invoke-DockerBuild {
     [CmdletBinding()]
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
         [String]
-        $Registry,
+        $Registry = '',
 
         [Parameter(ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
         [String]

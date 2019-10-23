@@ -2,9 +2,8 @@ function Invoke-DockerTag {
     [CmdletBinding()]
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
         [String]
-        $Registry = $global:DockerPublicRegistry,
+        $Registry = '',
 
         [Parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
@@ -16,9 +15,8 @@ function Invoke-DockerTag {
         $Tag = 'latest',
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
         [String]
-        $NewRegistry = $global:DockerPublicRegistry,
+        $NewRegistry = '',
 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
