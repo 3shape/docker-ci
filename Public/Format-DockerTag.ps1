@@ -9,8 +9,8 @@ function Format-DockerTag {
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
     if (!$dockerFileExists) {
-        $mesage = "No such file: ${pathToDockerFile}"
-        throw [System.IO.FileNotFoundException]::new($mesage)
+        $message = "No such file: ${pathToDockerFile}"
+        throw [System.IO.FileNotFoundException]::new($message)
     }
     $parentDirCount = (Split-Path -Parent $pathToDockerFile).Split([IO.Path]::DirectorySeparatorChar).Length
     if ($parentDirCount -lt 3) {
