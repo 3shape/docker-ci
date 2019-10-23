@@ -5,24 +5,27 @@ function Invoke-DockerPush {
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNull()]
-        [string]
+        [String]
         $Registry = '',
 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
-        [string]
+        [String]
         $ImageName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
-        [string]
+        [String]
         $Tag = 'latest'
     )
     $postfixedRegistry = Add-PostFix $Registry
     $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
     $commandResult = Invoke-Command $command
-    [PSCustomObject]@{
+    $result = [PSCustomObject]@{
+        'Result'    = $commandResult;
         'ImageName' = $ImageName;
-        'Registry' = $postfixedRegistry;
-        'Tag' = $Tag;
+        'Registry'  = $postfixedRegistry;
+        'Tag'       = $Tag;
     }
+    Assert-ExitCodeOk $commandResult
+    return $result
 }

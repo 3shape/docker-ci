@@ -14,6 +14,9 @@ Describe 'docker push' {
             Initialize-MockReg
             $code = {
                 StoreMockValue -Key "Invoke-Command" -Value $Command
+                $result = [CommandResult]::new()
+                $result.ExitCode = 0
+                return $result
             }
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
         }
@@ -42,23 +45,55 @@ Describe 'docker push' {
             $mockResult = GetMockValue -Key 'Invoke-Command'
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:v1.0.3"
         }
+
+        It 'throws an exception if the execution of docker push did not succeed' {
+            $errorProducingCode = {
+                $result = [CommandResult]::new()
+                $result.ExitCode = 1
+                return $result
+            }
+            Mock -CommandName "Invoke-Command" $errorProducingCode -Verifiable -ModuleName $script:moduleName
+
+            $theCode = {
+                Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages' -Tag 'v1.0.3'
+            }
+
+            $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+
+        }
     }
 
     Context 'Pipeline execution' {
+        $pipedInput = {
+            $input = [PSCustomObject]@{
+                "ImageName" = "myimage";
+                "Registry"  = "localhost";
+                "Tag"       = "v1.0.2"
+            }
+            return $input
+        }
 
         BeforeAll {
-            $pipedInput = {
-                $input = [PSCustomObject]@{
-                    "ImageName" = "myimage";
-                    "Registry" = "localhost";
-                    "Tag" = "v1.0.2"
-                }
-                return $input
+            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+        }
+
+        BeforeEach {
+            Initialize-MockReg
+            $code = {
+                StoreMockValue -Key "Invoke-Command" -Value $Command
+                $result = [CommandResult]::new()
+                $result.ExitCode = 0
+                return $result
             }
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+        }
+
+        AfterEach {
+            Assert-MockCalled -CommandName 'Invoke-Command' -ModuleName $script:moduleName
         }
 
         It 'can consume arguments from pipeline' {
-           & $pipedInput | Invoke-DockerPush
+            & $pipedInput | Invoke-DockerPush
         }
 
         It 'returns the expected pscustomobject' {
