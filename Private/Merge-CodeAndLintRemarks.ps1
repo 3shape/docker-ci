@@ -3,9 +3,9 @@
 function Merge-CodeAndLintRemarks {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string[]]
+        [String[]]
         $CodeLines,
 
         [LintRemark[]]

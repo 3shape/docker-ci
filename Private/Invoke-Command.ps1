@@ -2,7 +2,7 @@ function Invoke-Command {
     [CmdletBinding()]
     param (
         [Parameter(mandatory = $true)]
-        [string]
+        [String]
         $Command
     )
     $backupErrorActionPreference = $script:ErrorActionPreference

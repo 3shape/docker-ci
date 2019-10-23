@@ -1,5 +1,5 @@
 class LintRemark {
     [int] $LineNumber
-    [string] $LintRule
-    [string] $Explanation
+    [String] $LintRule
+    [String] $Explanation
 }
