@@ -20,12 +20,12 @@ function Invoke-DockerPush {
     $postfixedRegistry = Add-PostFix $Registry
     $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
     $commandResult = Invoke-Command $command
+    Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
         'Result'    = $commandResult;
         'ImageName' = $ImageName;
         'Registry'  = $postfixedRegistry;
         'Tag'       = $Tag;
     }
-    Assert-ExitCodeOk $commandResult
     return $result
 }
