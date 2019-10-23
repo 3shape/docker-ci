@@ -6,7 +6,7 @@ function Invoke-DockerTag {
         [String]
         $Registry = $global:DockerPublicRegistry,
 
-        [Parameter(mandatory=$true, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
         $ImageName,
 
@@ -20,7 +20,7 @@ function Invoke-DockerTag {
         [String]
         $NewRegistry = $global:DockerPublicRegistry,
 
-        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String]
         $NewImageName,
 
@@ -36,17 +36,12 @@ function Invoke-DockerTag {
     $target = "${postfixedNewRegistry}${NewImageName}:${NewTag}"
 
     $commandResult = Invoke-Command "docker tag ${source} ${target}"
-    if ($commandResult.Exitcode -ne 0) {
-        $message = "An error occured during docker tag. The error message was: ${result.Output}, the exit code was: ${result.Exitcode}"
-        Write-Debug "${message}"
-        throw "${message}"
-    }
-
+    Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
-        'Tag' = $NewTag
+        'Tag'       = $NewTag
         'ImageName' = $NewImageName
-        'Registry' = $postfixedNewRegistry
-        'Result' = $commandResult
+        'Registry'  = $postfixedNewRegistry
+        'Result'    = $commandResult
     }
     return $result
 }
