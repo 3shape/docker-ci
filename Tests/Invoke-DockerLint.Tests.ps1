@@ -3,6 +3,7 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 . "$PSScriptRoot\..\Private\LintRemark.ps1"
 
 Describe 'Execute linting on a given docker image' {
+
     BeforeAll {
         $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
     }
@@ -15,9 +16,15 @@ Describe 'Execute linting on a given docker image' {
         It 'can find 0 rule violations' {
             $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
             $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Windows.Dockerfile.Linted")
-
             $result = Invoke-DockerLint -DockerFile $dockerFile
+            $lintedDockerFile | Should -Be $result.LintOutput
+        }
 
+        It 'can find 0 rule violations, on folder with space' {
+            $folderWithSpace = Join-Path $dockerTestData "Folder with space"
+            $dockerFile = Join-Path $folderWithSpace "Windows.Dockerfile"
+            $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Windows.Dockerfile.Linted")
+            $result = Invoke-DockerLint -DockerFile $dockerFile
             $lintedDockerFile | Should -Be $result.LintOutput
         }
 

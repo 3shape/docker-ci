@@ -20,10 +20,10 @@ function Invoke-DockerLint {
     $hadoLintImage = 'hadolint/hadolint:v1.17.2'
     [String[]] $code = Get-Content -Path $DockerFile
     if ($IsWindows) {
-        $lintCommand = "cmd /c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
+        $lintCommand = "cmd /c 'docker run -i ${hadoLintImage} < `"${pathToDockerFile}`"'"
     }
     elseif ($IsLinux) {
-        $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < ${pathToDockerFile}'"
+        $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < `"${pathToDockerFile}`"'"
     }
     $commandResult = Invoke-Command $lintCommand
     if ($TreatLintRemarksFoundAsException) {
