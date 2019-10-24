@@ -7,12 +7,10 @@ Describe 'Use cases for this module' {
     Context 'With a local docker registry with auth required' {
 
         $localRegistryName = 'localhost:5000'
-        $dockerImageNamePrefix = 'integration-testcase'
 
         BeforeAll {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
-            $dockerImages = Join-Path $testData 'DockerImage'
             $exampleRepos = Join-Path $testData 'ExampleRepos'
             $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
             $pruneImageCommand = 'docker system prune --force'
