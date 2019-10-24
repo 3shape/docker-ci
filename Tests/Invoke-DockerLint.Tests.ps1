@@ -82,10 +82,11 @@ Describe 'Execute linting on a given docker image' {
 
         BeforeEach {
             Initialize-MockReg
+            $script:currentLocation = Get-Location
         }
 
         AfterEach {
-            Pop-Location
+            Set-Location $script:currentLocation
         }
 
         It "Defaults to `'Dockerfile`'" {
@@ -93,7 +94,7 @@ Describe 'Execute linting on a given docker image' {
                 StoreMockValue -Key "Invoke-Command" -Value "$Command"
             }
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-            Push-Location -Path $dockerTestData
+            Set-Location -Path $dockerTestData
 
             Invoke-DockerLint
 

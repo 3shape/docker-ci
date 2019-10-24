@@ -25,14 +25,18 @@ Describe 'Use cases for this module' {
             Invoke-Command 'docker container rm -v registry'
         }
 
+        BeforeEach {
+            $script:backupLocation = Get-Location
+        }
+
         AfterEach {
-            Pop-Location
+            Set-Location $script:backupLocation
         }
 
         It "Use case #1: Can derive docker image name and tag in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
-            Push-Location $location
+            Set-Location $location
             New-FakeGitRepository $location
 
             $result = Find-ImageName $location
@@ -47,7 +51,7 @@ Describe 'Use cases for this module' {
         It "Use case #2: Can build and push in one go" {
             $exampleReposPath = Join-Path $testData "ExampleRepos"
             $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
-            Push-Location $location
+            Set-Location $location
             New-FakeGitRepository $location
 
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
@@ -69,7 +73,7 @@ Describe 'Use cases for this module' {
 
         It 'Use case #4: Can produce an image from scratch' {
             $dockerFileDirectory = Join-Path  $exampleRepos '3.0/servercore/amd64'
-            Push-Location $dockerFileDirectory
+            Set-Location $dockerFileDirectory
             New-FakeGitRepository $dockerFileDirectory
             $imageName = (Find-ImageName -RepositoryPath $dockerFileDirectory).ImageName
 
@@ -79,8 +83,8 @@ Describe 'Use cases for this module' {
 
             # 2. Build and push image to latest tag, then grab it and see it's ok
             $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |
-                Invoke-DockerPush |
-                Invoke-DockerPull
+                        Invoke-DockerPush |
+                            Invoke-DockerPull
 
             $result.Result.ExitCode | Should -Be 0
             $result.ImageName | Should -Be $imageName
