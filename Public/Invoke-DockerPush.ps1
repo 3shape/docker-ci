@@ -4,7 +4,6 @@ function Invoke-DockerPush {
     [CmdletBinding()]
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNull()]
         [String]
         $Registry = '',
 

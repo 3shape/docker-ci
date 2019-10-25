@@ -10,7 +10,7 @@ function Invoke-DockerTests {
         $TestDirectory = '.'
     )
     $testDirectoryPath = Format-AsAbsolutePath (Add-PostFix $TestDirectory)
-    $testDirectoryExists = [System.IO.Directory]::Exists($testDirectoryPath)
+    $testDirectoryExists = Test-Path -Path $testDirectoryPath -PathType Container
     if (!$testDirectoryExists) {
         $mesage = "No such directory: ${testDirectoryPath}"
         throw [System.IO.DirectoryNotFoundException]::new($mesage)

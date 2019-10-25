@@ -4,17 +4,19 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Parse context from git repository' {
 
-    $tempFolder = New-RandomFolder
-    $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
-
     Context 'When git is installed' {
 
-        BeforeEach {
-            Initialize-MockReg
+        BeforeAll {
+            $tempFolder = New-RandomFolder
+            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
         }
 
         AfterAll {
             Remove-Item $tempFolder -Recurse -Force | Out-Null
+        }
+
+        BeforeEach {
+            Initialize-MockReg
         }
 
         It 'can find a repository origin' {

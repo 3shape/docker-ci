@@ -18,39 +18,32 @@ Describe 'Build docker images' {
         $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
     }
 
-    Context 'Docker build with latest tag' {
-        BeforeEach {
-            Initialize-MockReg
+    BeforeEach {
+        Initialize-MockReg
+        if ($IsWindows) {
+            $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
         }
+        elseif ($IsLinux) {
+            $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
+        }
+    }
 
-        $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-        $dockerTestData = Join-Path $testData "DockerImage"
+    $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
+    $dockerTestData = Join-Path $testData "DockerImage"
+
+    Context 'Docker build with latest tag' {
 
         It 'creates correct docker build command' {
-            if ($IsWindows) {
-                $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
-            }
-            elseif ($IsLinux) {
-                $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
-            }
 
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
-
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
-
             $result = GetMockValue -Key "command"
             $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'Throws exception if exitcode is not 0' {
-            if ($IsWindows) {
-                $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
-            }
-            elseif ($IsLinux) {
-                $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
-            }
+
             $returnExitCodeOne = {
                 Write-Debug $Command
                 StoreMockValue -Key "command" -Value $Command
@@ -63,13 +56,37 @@ Describe 'Build docker images' {
             $runner = {
                 Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
             }
-
             $runner | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+        }
+    }
 
+    Context 'Docker build with various parameters' {
+
+        It 'creates correct docker build command, with valid registry parameter' {
+
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry 'valid'
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            $result = GetMockValue -Key "command"
+            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t valid/leeandrasmus:latest -f `"${dockerFile}`""
+        }
+
+        It 'creates correct docker build command, with $null registry parameter' {
+
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry $null
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            $result = GetMockValue -Key "command"
+            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
     }
 
     Context 'Pipeline execution' {
+
+        BeforeEach {
+            Initialize-MockReg
+        }
+
         $pipedInput = {
             $input = [PSCustomObject]@{
                 "ImageName" = "myimage";

@@ -23,7 +23,7 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
         $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
         $exampleReposPath = Join-Path $testData "ExampleRepos"
 
-        It 'throws an exception' {
+        It 'throws an exception, when Dockerfile is not found' {
             $noSuchDockerFile = Join-Path $exampleReposPath "NotADockerFile"
             $code = { Format-DockerTag -Dockerfile $noSuchDockerFile }
             $code | Should -Throw -ExceptionType ([System.IO.FileNotFoundException]) -PassThru
@@ -40,7 +40,7 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
         }
 
         It 'can consume arguments from pipeline' {
-           & ${pipedInput} | Format-DockerTag
+            & ${pipedInput} | Format-DockerTag
         }
 
         It 'returns the expected pscustomobject' {
