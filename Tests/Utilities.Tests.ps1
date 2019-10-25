@@ -47,6 +47,11 @@ Describe 'Validate various support functions for testing' {
             $postfixed | Should -BeLikeExactly 'lalaland'
         }
 
+        It 'wont add postfix to a whitespace only value' {
+            $postfixed = Add-Postfix -Value '    ' -Postfix 'land'
+            [string]::IsNullOrEmpty($postfixed) | Should -Be $true
+        }
+
         It 'wont add postfix to a $null value' {
             $postfixed = Add-Postfix -Value $null -Postfix 'land'
             [string]::IsNullOrEmpty($postfixed) | Should -Be $true

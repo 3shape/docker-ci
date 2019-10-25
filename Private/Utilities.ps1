@@ -36,11 +36,12 @@ function Add-Postfix {
         [String] $Postfix = '/'
     )
 
-    if ([String]::IsNullOrEmpty($Value)) {
-        return $Value
+    # Docker registry, images, nor tag allow white spaces, so let's trim it clean
+    $trimmedValue = $Value.Trim()
+    if ([String]::IsNullOrEmpty($trimmedValue)) {
+        return $trimmedValue
     }
 
-    $trimmedValue = $Value.Trim()
     if ( -Not $trimmedValue.EndsWith($Postfix) ) {
         $trimmedValue += $Postfix
     }
