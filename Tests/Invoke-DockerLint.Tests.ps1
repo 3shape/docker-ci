@@ -71,7 +71,7 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
 
             $code = {
-                Invoke-DockerLint -DockerFile $dockerFile -TreatLintRemarksFoundAsException $true
+                Invoke-DockerLint -DockerFile $dockerFile -TreatLintRemarksFoundAsException
             }
 
             $code | Should -Throw -ExceptionType ([System.Exception]) -PassThru

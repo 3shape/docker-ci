@@ -8,8 +8,8 @@ function Invoke-DockerLint {
         [ValidateNotNullOrEmpty()]
         [String]
         $DockerFile = 'Dockerfile',
-        [bool]
-        $TreatLintRemarksFoundAsException = $false
+        [Switch]
+        $TreatLintRemarksFoundAsException
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
@@ -19,12 +19,8 @@ function Invoke-DockerLint {
     }
     $hadoLintImage = 'hadolint/hadolint:v1.17.2'
     [String[]] $code = Get-Content -Path $DockerFile
-    if ($IsWindows) {
-        $lintCommand = "cmd /c 'docker run -i ${hadoLintImage} < `"${pathToDockerFile}`"'"
-    }
-    elseif ($IsLinux) {
-        $lintCommand = "sh -c 'docker run -i ${hadoLintImage} < `"${pathToDockerFile}`"'"
-    }
+
+    $lintCommand = "Get-Content `"${pathToDockerFile}`" | docker run -i ${hadoLintImage}"
     $commandResult = Invoke-Command $lintCommand
     if ($TreatLintRemarksFoundAsException) {
         Assert-ExitCodeOk $commandResult
