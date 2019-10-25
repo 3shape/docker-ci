@@ -9,7 +9,7 @@ function Invoke-DockerLogin {
         [Securestring]
         $Password,
 
-        [ValidateNotNullOrEmpty()]
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $Registry
     )

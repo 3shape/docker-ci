@@ -1,14 +1,8 @@
-function Get-TempPath {
-    if ($IsWindows) {
-        return [system.io.path]::GetTempPath()
-    } elseif ($IsLinux) {
-        return '/tmp'
-    }
-}
-
 function New-RandomFolder {
+
+    $driveRoot = (Get-PSDrive TestDrive).Root
     do {
-        $randomPath = Join-Path $(Get-TempPath) $(New-Guid)
+        $randomPath = Join-Path $driveRoot $(New-Guid)
     } while (Test-Path -Path $randomPath -PathType Container)
     New-Item -Path $randomPath -ItemType Directory | Out-Null
     return $randomPath
@@ -16,7 +10,7 @@ function New-RandomFolder {
 
 function New-FakeGitRepository {
     param (
-        [Parameter(mandatory=$true)]
+        [Parameter(mandatory = $true)]
         [String]$Path
     )
 
@@ -36,19 +30,20 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 
 function Add-Postfix {
     param (
-        [String] $Value,
+        [String] $Value = '',
 
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
 
-    if ([String]::IsNullOrWhiteSpace($Value)) {
-        return $Value
+    # Docker registry, images, nor tag allow white spaces, so let's trim it clean
+    $trimmedValue = $Value.Trim()
+    if ([String]::IsNullOrEmpty($trimmedValue)) {
+        return $trimmedValue
     }
 
-    $trimmedValue = $Value.Trim()
     if ( -Not $trimmedValue.EndsWith($Postfix) ) {
-            $trimmedValue += $Postfix
+        $trimmedValue += $Postfix
     }
     return $trimmedValue
 }

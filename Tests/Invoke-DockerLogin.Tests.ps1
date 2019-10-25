@@ -36,5 +36,11 @@ Describe 'Docker login ' {
             $result = GetMockValue -Key 'Invoke-Command'
             $result | Should -BeLikeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin my.docker.registry'
         }
+
+        It 'produced the correct command to invoke, with $null registry parameter' {
+            Invoke-DockerLogin -Registry $null -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force)
+            $result = GetMockValue -Key 'Invoke-Command'
+            $result | Should -BeLikeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin'
+        }
     }
 }

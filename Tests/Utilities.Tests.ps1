@@ -5,16 +5,6 @@ Describe 'Validate various support functions for testing' {
 
     Context 'Validating support functions for - When git is installed' {
 
-        It 'returns platform agnostic TEMP folder' {
-            $tempPath = Get-TempPath
-
-            if ($IsWindows) {
-                $tempPath.IndexOf((Get-Item -LiteralPath $Env:TEMP).FullName) | Should -Be 0
-            } elseif ($IsLinux) {
-                $tempPath.IndexOf('/tmp') | Should -Be 0
-            }
-        }
-
         It 'can create random folder in TEMP folder' {
             $pathInTemp = New-RandomFolder
 
@@ -55,6 +45,16 @@ Describe 'Validate various support functions for testing' {
         It 'can postfix a string to a string' {
             $postfixed = Add-Postfix -Value 'lala' -Postfix 'land'
             $postfixed | Should -BeLikeExactly 'lalaland'
+        }
+
+        It 'wont add postfix to a whitespace only value' {
+            $postfixed = Add-Postfix -Value '    ' -Postfix 'land'
+            [string]::IsNullOrEmpty($postfixed) | Should -Be $true
+        }
+
+        It 'wont add postfix to a $null value' {
+            $postfixed = Add-Postfix -Value $null -Postfix 'land'
+            [string]::IsNullOrEmpty($postfixed) | Should -Be $true
         }
     }
 }

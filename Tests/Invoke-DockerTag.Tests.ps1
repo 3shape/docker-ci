@@ -32,28 +32,28 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag oldname:latest newimage:latest"
         }
 
         It 'tags image by image name and tag with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'pester' -NewImageName 'newimage' -NewTag 'pester'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:pester ${global:DockerPublicRegistry}/newimage:pester"
+            $result | Should -BeLikeExactly "docker tag oldname:pester newimage:pester"
         }
 
         It 'tags image by image name and tag, with new image name' {
             Invoke-DockerTag -ImageName 'oldname' -Tag 'source' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:source ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag oldname:source newimage:latest"
         }
 
         It 'tags image by image name with new image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'target'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest ${global:DockerPublicRegistry}/newimage:target"
+            $result | Should -BeLikeExactly "docker tag oldname:latest newimage:target"
         }
     }
 
@@ -63,28 +63,42 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:latest"
+        }
+
+        It 'tags private image as public image with image name and $null registry value' {
+            Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -NewRegistry $null
+            $result = GetMockValue -Key "mock"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:latest"
         }
 
         It 'tags private docker image as public docker image with image name and tag' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest ${global:DockerPublicRegistry}/newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:newtag"
         }
 
         It 'tags private docker image with tag as public docker image with image name only' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -Tag 'nomansland' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland ${global:DockerPublicRegistry}/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland newimage:latest"
         }
 
         It 'tags private docker image with tag as public docker image with image name and tag' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -Tag 'nomansland' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland ${global:DockerPublicRegistry}/newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland newimage:newtag"
+        }
+
+        It 'tags private docker image with tag as public docker image with image name, tag and empty registry' {
+            Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -Tag 'nomansland' -NewImageName 'newimage' -NewTag 'newtag' -NewRegistry ''
+            $result = GetMockValue -Key "mock"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:nomansland newimage:newtag"
         }
 
         It 'tags private docker image as private docker image with image name only' {
@@ -105,14 +119,21 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999/docker-repo' -NewImageName 'newimage'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
+            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/docker-repo/newimage:latest"
         }
 
         It 'tags public docker image as private docker image with image name and tag' {
             Invoke-DockerTag -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker tag ${global:DockerPublicRegistry}/oldname:latest dockerhub.com:5999/newimage:newtag"
+            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/newimage:newtag"
+        }
+
+        It 'tags explicit public docker image as private docker image with image name and tag' {
+            Invoke-DockerTag -Registry '' -ImageName 'oldname' -NewRegistry 'dockerhub.com:5999' -NewImageName 'newimage' -NewTag 'newtag'
+            $result = GetMockValue -Key "mock"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker tag oldname:latest dockerhub.com:5999/newimage:newtag"
         }
     }
 
