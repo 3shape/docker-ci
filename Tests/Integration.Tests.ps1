@@ -14,7 +14,7 @@ Describe 'Use cases for this module' {
             $exampleRepos = Join-Path $testData 'ExampleRepos'
             $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
             $pruneImageCommand = 'docker system prune --force'
-            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v ${htpasswdPath}:/auth -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
+            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v `"${htpasswdPath}:/auth`" -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
             Invoke-Command $removeImageCommand
             Invoke-Command $pruneImageCommand
             Invoke-Command $startRegistryCommand
@@ -40,7 +40,6 @@ Describe 'Use cases for this module' {
             New-FakeGitRepository $location
 
             $result = Find-ImageName $location
-
             $result = Format-DockerTag | Invoke-DockerBuild -ImageName $result.ImageName
 
             $result.Dockerfile | Should -BeLike "*Dockerfile"
@@ -55,7 +54,6 @@ Describe 'Use cases for this module' {
             New-FakeGitRepository $location
 
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
-
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
@@ -64,10 +62,8 @@ Describe 'Use cases for this module' {
 
         It "Use case #3: Can pull, tag and push in one go" {
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry $localRegistryName
-
             Invoke-DockerPull -ImageName 'ubuntu' | Invoke-DockerTag -NewImageName 'ubuntu' -NewTag 'v1.0.2' -NewRegistry $localRegistryName | Invoke-DockerPush
             $result = Invoke-DockerPull -Registry $localRegistryName -ImageName 'ubuntu' -Tag 'v1.0.2'
-
             $result.Result.ExitCode | Should -Be 0
         }
 
@@ -83,13 +79,12 @@ Describe 'Use cases for this module' {
 
             # 2. Build and push image to latest tag, then grab it and see it's ok
             $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |
-                        Invoke-DockerPush |
-                            Invoke-DockerPull
+                Invoke-DockerPush |
+                Invoke-DockerPull
 
             $result.Result.ExitCode | Should -Be 0
             $result.ImageName | Should -Be $imageName
             $result.Registry | Should -Be "${localRegistryName}/"
         }
-
     }
 }
