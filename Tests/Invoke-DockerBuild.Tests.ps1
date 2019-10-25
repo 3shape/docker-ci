@@ -60,7 +60,7 @@ Describe 'Build docker images' {
         }
     }
 
-    Context 'Docker build with various parameterse' {
+    Context 'Docker build with various parameters' {
 
         It 'creates correct docker build command, with valid registry parameter' {
 

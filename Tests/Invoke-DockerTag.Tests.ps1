@@ -66,6 +66,13 @@ Describe 'Tag docker images' {
             $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:latest"
         }
 
+        It 'tags private image as public image with image name and $null registry value' {
+            Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -NewRegistry $null
+            $result = GetMockValue -Key "mock"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker tag artifactoryfqdn/oldname:latest newimage:latest"
+        }
+
         It 'tags private docker image as public docker image with image name and tag' {
             Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -NewTag 'newtag'
             $result = GetMockValue -Key "mock"

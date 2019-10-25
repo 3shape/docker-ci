@@ -34,13 +34,6 @@ Describe 'Pull docker images' {
             $result | Should -BeLikeExactly "docker pull ubuntu:latest"
         }
 
-        It 'pulls public docker image by registry and image name' {
-            Invoke-DockerPull -Registry 'not.docker.hub' -ImageName 'ubuntu'
-            $result = GetMockValue -Key "pull"
-            Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull not.docker.hub/ubuntu:latest"
-        }
-
         It 'pulls public docker image by image name and tag' {
             Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic'
             $result = GetMockValue -Key "pull"
@@ -48,7 +41,28 @@ Describe 'Pull docker images' {
             $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
         }
 
-        It 'pulls explicit public docker image by image name and tag' {
+        It 'pulls public docker image by registry and image name' {
+            Invoke-DockerPull -Registry 'not.docker.hub' -ImageName 'ubuntu'
+            $result = GetMockValue -Key "pull"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker pull not.docker.hub/ubuntu:latest"
+        }
+
+        It 'pulls explicit public docker image with $null registry value and image name' {
+            Invoke-DockerPull -Registry $null -ImageName 'ubuntu'
+            $result = GetMockValue -Key "pull"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
+        }
+
+        It 'pulls explicit public docker image with whitespace registry value and image name' {
+            Invoke-DockerPull -Registry '   ' -ImageName 'ubuntu'
+            $result = GetMockValue -Key "pull"
+            Write-Debug $result
+            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
+        }
+
+        It 'pulls explicit public docker image with empty registry value, image name and tag' {
             Invoke-DockerPull -Registry '' -ImageName 'ubuntu' -Tag 'bionic'
             $result = GetMockValue -Key "pull"
             Write-Debug $result
