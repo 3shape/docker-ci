@@ -30,13 +30,13 @@ url = https://github.com/3shapeAS/dockerbuild-pwsh.git
 
 function Add-Postfix {
     param (
-        [String] $Value,
+        [String] $Value = '',
 
         [ValidateNotNullOrEmpty()]
         [String] $Postfix = '/'
     )
 
-    if ([String]::IsNullOrWhiteSpace($Value)) {
+    if ([String]::IsNullOrEmpty($Value)) {
         return $Value
     }
 

@@ -46,5 +46,10 @@ Describe 'Validate various support functions for testing' {
             $postfixed = Add-Postfix -Value 'lala' -Postfix 'land'
             $postfixed | Should -BeLikeExactly 'lalaland'
         }
+
+        It 'wont add postfix to a $null value' {
+            $postfixed = Add-Postfix -Value $null -Postfix 'land'
+            [string]::IsNullOrEmpty($postfixed) | Should -Be $true
+        }
     }
 }
