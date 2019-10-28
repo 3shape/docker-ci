@@ -36,8 +36,6 @@ Task PrePublish {
 
     $prerelease = $env:GitVersion_PreReleaseTagWithDash
 
-    Write-Output "Prerelease info: ${prerelease}"
-
     if (!$env:GitVersion_Version) {
         throw 'Module version not found in env:GitVersion_Version where it was expected. Bailing.'
     }
