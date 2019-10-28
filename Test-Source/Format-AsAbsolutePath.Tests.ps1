@@ -1,12 +1,13 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Format-AsAbsolutePath.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Format-AsAbsolutePath.ps1"
 
 Describe 'Parse absolute path from input string' {
 
     Context 'When an absolute path is provided' {
         if ($IsWindows) {
             $absolutePath = 'C:\Windows\System32'
-        } elseif ($IsLinux) {
+        }
+        elseif ($IsLinux) {
             $absolutePath = '/usr/bin'
         }
 

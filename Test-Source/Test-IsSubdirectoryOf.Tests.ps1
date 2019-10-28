@@ -1,6 +1,6 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Test-IsSubdirectoryOf.ps1"
-. "$PSScriptRoot\..\Private\Format-AsAbsolutePath.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Test-IsSubdirectoryOf.ps1"
+. "$PSScriptRoot\..\Source\Private\Format-AsAbsolutePath.ps1"
 
 Describe 'test if child path is a subdirectory of path' {
 

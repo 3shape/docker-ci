@@ -1,5 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Utilities.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Utilities.ps1"
 
 Describe 'Validate various support functions for testing' {
 

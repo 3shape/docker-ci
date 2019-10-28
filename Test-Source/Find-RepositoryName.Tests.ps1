@@ -1,5 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Find-RepositoryName.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Find-RepositoryName.ps1"
 
 Describe 'Parse repos name from full git repository' {
 

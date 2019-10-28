@@ -1,6 +1,6 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Find-LintRemarks.ps1"
-. "$PSScriptRoot\..\Private\LintRemark.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Find-LintRemarks.ps1"
+. "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 
 Describe 'Parse context from git repository' {
 

@@ -1,9 +1,9 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Parse version, distro and arch from Dockerfile path' {
 
-    $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+    $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
     $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
     $exampleReposPath = Join-Path $testData "ExampleRepos"
 
