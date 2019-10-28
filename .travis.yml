@@ -21,7 +21,7 @@ addons:
             - powershell
 
 before_install:
-    - ./travis/setup_repo.sh
+    - ./Travis/setup_repo.sh
 
 install:
     - cd $TRAVIS_BUILD_DIR
