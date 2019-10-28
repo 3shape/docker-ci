@@ -38,6 +38,3 @@ deploy:
     skip_cleanup: true
     provider: script
     script: pwsh -f "./Invoke-Publish.ps1"
-    on:
-        tags: true
-        branch: master
