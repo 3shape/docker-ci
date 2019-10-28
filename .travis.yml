@@ -39,3 +39,4 @@ deploy:
     skip_cleanup: true
     provider: script
     script: pwsh -f "./Invoke-Publish.ps1"
+    all_branches: true
