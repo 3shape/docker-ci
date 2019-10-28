@@ -1,5 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\Remove-Prefix.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\Remove-Prefix.ps1"
 
 Describe 'Remove a prefix' {
 
