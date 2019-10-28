@@ -77,7 +77,7 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
 
     Write-Host "Publishing $ModuleName version $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
 
-    # Publish-Module @publishParams
+    Publish-Module @publishParams
 }
 
 Task Test -depends Build {
