@@ -73,9 +73,9 @@ Describe 'Use cases for this module' {
             New-FakeGitRepository $dockerFileDirectory
             $imageName = (Find-ImageName -RepositoryPath $dockerFileDirectory).ImageName
 
-            # 1. Make sure we play by the rules
+            # 1. Make sure we play by the rules: do linting and test
             Invoke-DockerLint
-            Invoke-DockerTests
+            Invoke-DockerTests -ImageName $imageName
 
             # 2. Build and push image to latest tag, then grab it and see it's ok
             $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |

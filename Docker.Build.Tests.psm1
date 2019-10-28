@@ -16,3 +16,6 @@ function Set-GlobalVar {
 # Add any variables that are needed globally in test scope
 Set-GlobalVar -Variable TestDataDir -Value (Join-Path $PSScriptRoot 'Test-Data')
 Set-GlobalVar -Variable PesterTestsDir -Value (Join-Path $Global:TestDataDir 'PesterTests')
+Set-GlobalVar -Variable StructureTestsDir -Value (Join-Path $Global:TestDataDir 'StructureTestsConfig')
+Set-GlobalVar -Variable StructureTestsPassDir -Value (Join-Path $Global:StructureTestsDir 'Pass')
+Set-GlobalVar -Variable StructureTestsFailDir -Value (Join-Path $Global:StructureTestsDir 'Fail')

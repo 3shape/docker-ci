@@ -1,46 +1,133 @@
 Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
 Import-Module -Force $PSScriptRoot/../Docker.Build.Tests.psm1
+Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
-Describe 'Run docker tests' {
-    $dirWithNoTest = Join-Path $Global:TestDataDir "DockerImage"
-    $dirThatDoesNotExist = Join-Path $Global:TestDataDir "GibberishGoo"
+Describe 'Run docker tests using Google Structure' {
 
-    Context 'Run with 1 pester test' {
-        It 'finds test files and produces correct command to run them' {
-            $result = Invoke-DockerTests -TestDirectory $Global:PesterTestsDir
-            $result.PassedCount | Should -Be 1
-            $result.TestResult[0].Describe | Should -BeExactly 'At level 0'
+    Context 'Running structure tests' {
+
+        BeforeEach {
+            $script:backupLocation = Get-Location
+            Set-Location $Global:TestDataDir
         }
-    }
 
-    Context 'Run with 2 pester tests' {
-        It 'finds test files and produces correct command to run them' {
-            $result = Invoke-DockerTests -TestDirectory $Global:PesterTestsDir -Depth 1
-            $result.PassedCount | Should -Be 2
-            $result.TestResult[0].Describe | Should -BeExactly 'At level 1'
-            $result.TestResult[1].Describe | Should -BeExactly 'At level 0'
+        AfterEach {
+            Set-Location $script:backupLocation
         }
-    }
 
-    Context 'Run with 0 pester tests' {
-        It 'finds test files and produces correct command to run them' {
-            $result = Invoke-DockerTests -TestDirectory $dirWithNoTest -Depth 1
-            $result.PassedCount | Should -Be 0
+        It 'can execute 1 succesful test' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $commandResult = $result.Result
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 1
+            $testResult.Pass | Should -Be 1
+            $testResult.Fail | Should -Be 0
+            $testResult.Results[0].Name | Should -Be 'Command Test: Say hello world'
+            $testResult.Results[0].Pass | Should -Be $true
+            $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
         }
-    }
 
-    Context 'Run with dir that does not exist' {
-        It 'finds test files and produces correct command to run them' {
-            $code = { Invoke-DockerTests -TestDirectory $dirThatDoesNotExist }
-            $code | Should -Throw -ExceptionType ([System.IO.DirectoryNotFoundException]) -PassThru
+        It 'can execute multiple succesful tests' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $structureExistConfig = Join-Path $Global:StructureTestsPassDir 'fileexistence.yaml'
+            $configs = @($structureCommandConfig, $structureExistConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $commandResult = $result.Result
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 2
+            $testResult.Pass | Should -Be 2
+            $testResult.Fail | Should -Be 0
+            $testResult.Results.Length | Should -Be 2
+        }
+
+        It 'can execute multiple failing tests' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
+            $structureExistConfig = Join-Path $Global:StructureTestsFailDir 'fileexistence.yaml'
+            $configs = @($structureCommandConfig, $structureExistConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $commandResult = $result.Result
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 1
+            $testResult.Total | Should -Be 2
+            $testResult.Pass | Should -Be 0
+            $testResult.Fail | Should -Be 2
+            $testResult.Results.Length | Should -Be 2
+        }
+
+        It 'can detect when there are no test configs and throw exception.' {
+            Set-Location $Global:StructureTestsDir
+
+            $theCode = {
+                $imageToTest = 'ubuntu:latest'
+                Invoke-DockerTests -ImageName $imageToTest
+            }
+
+            $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
+        }
+
+        It 'throws an exception if required on test failures' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions }
+
+            $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+        }
+
+        It 'picks up all yaml files at the current location if ConfigFiles argument is not supplied' {
+            Set-Location $Global:StructureTestsPassDir
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest
+            $commandResult = $result.Result
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 2
+            $testResult.Pass | Should -Be 2
+            $testResult.Fail | Should -Be 0
+            $testResult.Results.Length | Should -Be 2
         }
     }
 
     Context 'Pipeline execution' {
 
+        BeforeAll {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $structureExistConfig = Join-Path $Global:StructureTestsPassDir 'fileexistence.yaml'
+            $configs = @($structureCommandConfig, $structureExistConfig)
+            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+
+            $pipedInput = {
+                $input = [PSCustomObject]@{
+                    "ImageName"   = "myimage";
+                    'ConfigFiles' = $configs
+                }
+                return $input
+            }
+        }
+
+        It 'can consume arguments from pipeline' {
+            & $pipedInput | Invoke-DockerTests
+        }
+
         It 'returns the expected pscustomobject' {
-            $result = Invoke-DockerTests -TestDirectory $Global:PesterTestsDir
-            $result.TestResult | Should -Not -BeNullOrEmpty
+            $result = & $pipedInput | Invoke-DockerTests
+            $result.ImageName | Should -Be 'myimage'
         }
     }
 }
