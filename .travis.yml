@@ -6,7 +6,6 @@ if: |
     repo != 3shapeAS/dockerbuild-pwsh OR \
     type = pull_request OR \
     branch = master OR \
-    branch = refactor/split_to_separate_src_dirs OR \
     tag IS present
 
 services:
@@ -36,9 +35,9 @@ script:
     - pwsh -f "./Invoke-Tests.ps1"
 
 deploy:
-    all_branches: true
     skip_cleanup: true
     provider: script
     script: pwsh -f "./Invoke-Publish.ps1"
     on:
-        all_branches: true
+        tags: true
+        branch: master
