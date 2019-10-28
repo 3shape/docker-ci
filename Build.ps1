@@ -34,7 +34,7 @@ Task PrePublish {
     $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Source\Public\*.ps1 -ErrorAction SilentlyContinue)
     [string[]]$functionNames = @($functionScriptFiles.BaseName)
 
-    $prerelease = env:GitVersion_PreReleaseTagWithDash
+    $prerelease = $env:GitVersion_PreReleaseTagWithDash
 
     Write-Output "Prerelease info: ${prerelease}"
 
