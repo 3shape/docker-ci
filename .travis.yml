@@ -6,6 +6,7 @@ if: |
     repo != 3shapeAS/dockerbuild-pwsh OR \
     type = pull_request OR \
     branch = master OR \
+    branch = refactor/split_to_separate_src_dirs OR \
     tag IS present
 
 services:
