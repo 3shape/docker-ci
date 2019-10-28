@@ -1,20 +1,54 @@
 function Invoke-DockerTests {
     [CmdletBinding()]
     param (
-        [ValidateRange("NonNegative")]
-        [Int32]
-        $Depth = 0,
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+        [String]
+        $ImageName,
+
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [String[]]
+        $ConfigFiles = ((Get-ChildItem -Path . -Filter *.y*ml | Select-Object Name) | ForEach-Object { $_.Name }),
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TestDirectory = '.'
+        $TestReportDir = $(New-RandomFolder),
+
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $TestReportName = 'testreport.json',
+
+        [Switch]
+        $TreatTestFailuresAsExceptions = $false
     )
-    $testDirectoryPath = Format-AsAbsolutePath (Add-PostFix $TestDirectory)
-    $testDirectoryExists = Test-Path -Path $testDirectoryPath -PathType Container
-    if (!$testDirectoryExists) {
-        $mesage = "No such directory: ${testDirectoryPath}"
-        throw [System.IO.DirectoryNotFoundException]::new($mesage)
+    if ($null -eq $ConfigFiles -or $ConfigFiles.Length -eq 0) {
+        throw [System.ArgumentException]::new('$ConfigFiles must contain one more test configuration file paths.')
     }
-    $files = Get-ChildItem -Path "${testDirectoryPath}*.Tests.ps1" -Depth $Depth
-    Invoke-Pester -Path $files -PassThru
+
+    $here = Format-AsAbsolutePath (Get-Location)
+    $structureCommand = "docker run -i" + `
+        " -v ${here}:/configs" + `
+        " -v `"${TestReportDir}:/report`"" + `
+        " -v /var/run/docker.sock:/var/run/docker.sock" + `
+        " containerized-structure-test test -i ${ImageName} --test-report /report/${TestReportName}"
+
+    $ConfigFiles.ForEach( {
+            $configFile = Convert-ToUnixPath (Resolve-Path -Path $_  -Relative)
+            $configName = Remove-Prefix -Value $configFile -Prefix './'
+            $structureCommand = -join ($structureCommand, " -c /configs/${configName}")
+        }
+    )
+    $commandResult = Invoke-Command $structureCommand
+    if ($TreatTestFailuresAsExceptions) {
+        Assert-ExitCodeOk $commandResult
+    }
+
+    $testReportPath = Join-Path $TestReportDir $TestReportName
+
+    $result = [PSCustomObject]@{
+        TestResult     = $(ConvertFrom-Json $(Get-Content $testReportPath))
+        TestReportPath = $testReportPath
+        Result         = $commandResult
+        ImageName      = $ImageName
+    }
+    return $result
 }
