@@ -26,7 +26,7 @@ function Invoke-DockerTests {
 
     $here = Format-AsAbsolutePath (Get-Location)
     $structureCommand = "docker run -i" + `
-        " -v ${here}:/configs" + `
+        " -v `"${here}:/configs`"" + `
         " -v `"${TestReportDir}:/report`"" + `
         " -v /var/run/docker.sock:/var/run/docker.sock" + `
         " rasmusjelsgaard/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
