@@ -36,7 +36,7 @@ script:
     - pwsh -f "./Invoke-Tests.ps1"
 
 deploy:
+    all_branches: true
     skip_cleanup: true
     provider: script
     script: pwsh -f "./Invoke-Publish.ps1"
-    all_branches: true
