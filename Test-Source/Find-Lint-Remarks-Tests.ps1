@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Find-LintRemarks.ps1"
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 

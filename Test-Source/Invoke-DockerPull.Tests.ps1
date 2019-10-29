@@ -1,12 +1,10 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 
 Describe 'Pull docker images' {
-
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    }
 
     $code = {
         Write-Debug $Command
@@ -18,11 +16,11 @@ Describe 'Pull docker images' {
 
     BeforeEach {
         Initialize-MockReg
-        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:moduleName
     }
 
     AfterEach {
-        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:moduleName
     }
 
     Context 'Docker pulls docker images' {
@@ -117,7 +115,7 @@ Describe 'Pull docker images' {
                 $commandResult.ExitCode = 1
                 return $commandResult
             }
-            Mock -CommandName "Invoke-Command" $returnNonZeroExitCode  -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $returnNonZeroExitCode  -Verifiable -ModuleName $Global:ModuleName
             $theCode = {
                 Invoke-DockerPull -ImageName 'mcr.microsoft.com/ubuntu'
             }
@@ -137,11 +135,11 @@ Describe 'Pull docker images' {
 
         BeforeEach {
             Initialize-MockReg
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
         }
         BeforeAll {
             $pipedInput = {

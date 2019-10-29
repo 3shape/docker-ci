@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 . "$PSScriptRoot\..\Source\Private\Merge-CodeAndLintRemarks.ps1"
 
@@ -38,7 +39,5 @@ Describe 'Merge code lines with linting remarks' {
             $expected = @("1: FROM ubuntu:18.04", "2:", "DL3027 Do not use apt as it is meant to be an end-user tool, use apt-get or apt-cache instead.", "3: RUN apt update")
             $result | Should -BeExactly $expected
         }
-
     }
-
 }

@@ -1,5 +1,7 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
@@ -12,10 +14,6 @@ Describe 'Build docker images' {
         $result = [CommandResult]::new()
         $result.ExitCode = 0
         return $result
-    }
-
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
     }
 
     BeforeEach {
@@ -35,9 +33,9 @@ Describe 'Build docker images' {
 
         It 'creates correct docker build command' {
 
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key "command"
             $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
@@ -51,7 +49,7 @@ Describe 'Build docker images' {
                 $result.ExitCode = 1
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:ModuleName
 
             $runner = {
                 Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
@@ -64,18 +62,18 @@ Describe 'Build docker images' {
 
         It 'creates correct docker build command, with valid registry parameter' {
 
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry 'valid'
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key "command"
             $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t valid/leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'creates correct docker build command, with $null registry parameter' {
 
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry $null
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key "command"
             $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
@@ -95,12 +93,12 @@ Describe 'Build docker images' {
         }
 
         It 'can consume arguments from pipeline' {
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             & $pipedInput | Invoke-DockerBuild
         }
 
         It 'returns the expected pscustomobject' {
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             $result = & $pipedInput | Invoke-DockerBuild
             $result.Dockerfile | Should -Not -BeNullOrEmpty
             $result.ImageName | Should -Not -BeNullOrEmpty

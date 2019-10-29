@@ -19,3 +19,4 @@ Set-GlobalVar -Variable PesterTestsDir -Value (Join-Path $Global:TestDataDir 'Pe
 Set-GlobalVar -Variable StructureTestsDir -Value (Join-Path $Global:TestDataDir 'StructureTestsConfig')
 Set-GlobalVar -Variable StructureTestsPassDir -Value (Join-Path $Global:StructureTestsDir 'Pass')
 Set-GlobalVar -Variable StructureTestsFailDir -Value (Join-Path $Global:StructureTestsDir 'Fail')
+Set-GlobalVar -Variable ModuleName -Value 'Docker.Build'

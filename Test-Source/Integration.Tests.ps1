@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
 

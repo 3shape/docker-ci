@@ -1,12 +1,9 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 
 Describe 'Docker login ' {
-
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    }
 
     BeforeEach {
         Initialize-MockReg
@@ -17,7 +14,7 @@ Describe 'Docker login ' {
             $result.ExitCode = 0
             return $result
         }
-        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
     }
 
     Context 'Login to default docker registry' {

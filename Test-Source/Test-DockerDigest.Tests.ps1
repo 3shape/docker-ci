@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Test-DockerDigest.ps1"
 
 Describe 'Docker digest basic validation' {

@@ -1,14 +1,12 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 
 Describe 'docker push' {
 
     Context 'Push an image' {
-
-        BeforeAll {
-            $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-        }
 
         BeforeEach {
             Initialize-MockReg
@@ -18,11 +16,11 @@ Describe 'docker push' {
                 $result.ExitCode = 0
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
-            Assert-MockCalled -CommandName 'Invoke-Command' -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName 'Invoke-Command' -ModuleName $Global:ModuleName
         }
 
         It 'produces the correct command to invoke with only image name provided' {
@@ -59,7 +57,7 @@ Describe 'docker push' {
                 $result.ExitCode = 1
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $errorProducingCode -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $errorProducingCode -Verifiable -ModuleName $Global:ModuleName
 
             $theCode = {
                 Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages' -Tag 'v1.0.3'
@@ -80,10 +78,6 @@ Describe 'docker push' {
             return $input
         }
 
-        BeforeAll {
-            $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-        }
-
         BeforeEach {
             Initialize-MockReg
             $code = {
@@ -92,11 +86,11 @@ Describe 'docker push' {
                 $result.ExitCode = 0
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
-            Assert-MockCalled -CommandName 'Invoke-Command' -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName 'Invoke-Command' -ModuleName $Global:ModuleName
         }
 
         It 'can consume arguments from pipeline' {

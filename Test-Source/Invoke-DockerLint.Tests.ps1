@@ -1,12 +1,10 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 
 Describe 'Execute linting on a given docker image' {
-
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    }
 
     $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
     $dockerTestData = Join-Path $testData "DockerImage"
@@ -93,12 +91,12 @@ Describe 'Execute linting on a given docker image' {
             $code = {
                 StoreMockValue -Key "Invoke-Command" -Value "$Command"
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             Set-Location -Path $dockerTestData
 
             Invoke-DockerLint
 
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key 'Invoke-Command'
             $result | Should -BeLike "*Dockerfile*"
         }

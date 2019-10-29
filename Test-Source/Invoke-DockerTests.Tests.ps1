@@ -110,7 +110,6 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
             $structureExistConfig = Join-Path $Global:StructureTestsPassDir 'fileexistence.yaml'
             $configs = @($structureCommandConfig, $structureExistConfig)
-            $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
 
             $pipedInput = {
                 $input = [PSCustomObject]@{

@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Format-AsAbsolutePath.ps1"
 
 Describe 'Parse absolute path from input string' {
