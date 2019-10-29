@@ -6,7 +6,7 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Pull docker images' {
 
-    $code = {
+    $returnExitCodeOne = {
         Write-Debug $Command
         StoreMockValue -Key "pull" -Value $Command
         $commandResult = [CommandResult]::new()
@@ -16,7 +16,7 @@ Describe 'Pull docker images' {
 
     BeforeEach {
         Initialize-MockReg
-        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:moduleName
+        Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:moduleName
     }
 
     AfterEach {
@@ -110,12 +110,12 @@ Describe 'Pull docker images' {
         }
 
         It 'cannot pull the requested docker image, throws exception on non-zero exit code' {
-            $returnNonZeroExitCode = {
+            $returnExitCodeOne = {
                 $commandResult = [CommandResult]::new()
                 $commandResult.ExitCode = 1
                 return $commandResult
             }
-            Mock -CommandName "Invoke-Command" $returnNonZeroExitCode  -Verifiable -ModuleName $Global:ModuleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeOne  -Verifiable -ModuleName $Global:ModuleName
             $theCode = {
                 Invoke-DockerPull -ImageName 'mcr.microsoft.com/ubuntu'
             }
