@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
@@ -10,12 +11,20 @@ Describe 'Use cases for this module' {
         $localRegistryName = 'localhost:5000'
 
         BeforeAll {
+            $dockerImageDir = Join-Path $Global:ExampleReposDir "3.0/servercore/amd64"
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $exampleRepos = Join-Path $testData 'ExampleRepos'
             $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
             $pruneImageCommand = 'docker system prune --force'
-            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry -v `"${htpasswdPath}:/auth`" -e 'REGISTRY_AUTH=htpasswd' -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm' -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd registry:2"
+
+            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry" + `
+                " -v `"$($Global:LocalDockerRegistryDir):/auth`"" + `
+                " -e 'REGISTRY_AUTH=htpasswd'" + `
+                " -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm'" + `
+                " -e 'REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd'" + `
+                " registry:2"
+
             Invoke-Command $removeImageCommand
             Invoke-Command $pruneImageCommand
             Invoke-Command $startRegistryCommand
@@ -28,6 +37,8 @@ Describe 'Use cases for this module' {
 
         BeforeEach {
             $script:backupLocation = Get-Location
+            New-FakeGitRepository $dockerImageDir
+            Set-Location $dockerImageDir
         }
 
         AfterEach {
@@ -35,12 +46,7 @@ Describe 'Use cases for this module' {
         }
 
         It "Use case #1: Can derive docker image name and tag in one go" {
-            $exampleReposPath = Join-Path $testData "ExampleRepos"
-            $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
-            Set-Location $location
-            New-FakeGitRepository $location
-
-            $result = Find-ImageName $location
+            $result = Find-ImageName $dockerImageDir
             $result = Format-DockerTag | Invoke-DockerBuild -ImageName $result.ImageName
 
             $result.Dockerfile | Should -BeLike "*Dockerfile"
@@ -49,11 +55,6 @@ Describe 'Use cases for this module' {
         }
 
         It "Use case #2: Can build and push in one go" {
-            $exampleReposPath = Join-Path $testData "ExampleRepos"
-            $location = Join-Path $exampleReposPath "3.0/servercore/amd64"
-            Set-Location $location
-            New-FakeGitRepository $location
-
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry 'localhost:5000'
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
@@ -69,10 +70,7 @@ Describe 'Use cases for this module' {
         }
 
         It 'Use case #4: Can produce an image from scratch' {
-            $dockerFileDirectory = Join-Path  $exampleRepos '3.0/servercore/amd64'
-            Set-Location $dockerFileDirectory
-            New-FakeGitRepository $dockerFileDirectory
-            $imageName = (Find-ImageName -RepositoryPath $dockerFileDirectory).ImageName
+            $imageName = (Find-ImageName -RepositoryPath $dockerImageDir).ImageName
 
             # 1. Make sure we play by the rules: do linting and test
             Invoke-DockerLint
