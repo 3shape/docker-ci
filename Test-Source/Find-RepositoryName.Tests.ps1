@@ -18,5 +18,4 @@ Describe 'Parse repos name from full git repository' {
             $result | Should -BeExactly "dockerbuild-pwsh"
         }
     }
-
 }
