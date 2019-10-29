@@ -14,7 +14,6 @@ Describe 'Remove a prefix' {
             $result | Should -BeExactly $input
         }
 
-
         It 'can remove the prefix on valid input when prefix is entire string' {
             $input = "test"
 
