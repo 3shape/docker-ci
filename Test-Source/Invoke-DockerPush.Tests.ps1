@@ -10,13 +10,13 @@ Describe 'docker push' {
 
         BeforeEach {
             Initialize-MockReg
-            $code = {
+            $returnExitCodeZero = {
                 StoreMockValue -Key "Invoke-Command" -Value $Command
                 $result = [CommandResult]::new()
                 $result.ExitCode = 0
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
@@ -80,13 +80,13 @@ Describe 'docker push' {
 
         BeforeEach {
             Initialize-MockReg
-            $code = {
+            $returnExitCodeZero = {
                 StoreMockValue -Key "Invoke-Command" -Value $Command
                 $result = [CommandResult]::new()
                 $result.ExitCode = 0
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
