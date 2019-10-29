@@ -7,14 +7,14 @@ Describe 'Docker login ' {
 
     BeforeEach {
         Initialize-MockReg
-        $code = {
+        $returnsExitCodeZero = {
             Write-Debug $Command
             StoreMockValue -Key "Invoke-Command" -Value $Command
             $result = [CommandResult]::new()
             $result.ExitCode = 0
             return $result
         }
-        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
+        Mock -CommandName "Invoke-Command" $returnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
     }
 
     Context 'Login to default docker registry' {
