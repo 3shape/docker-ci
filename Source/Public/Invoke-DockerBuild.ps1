@@ -39,7 +39,9 @@ function Invoke-DockerBuild {
         "CommandResult" = $commandResult
     }
     if ($PassThru) {
-        Write-Host $commandResult.Output
+        foreach ($line in $($commandResult.Output)) {
+            Write-Information $line
+        }
     }
     return $result
 }
