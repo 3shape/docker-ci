@@ -104,8 +104,10 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Windows.Dockerfile'
 
             $result = Invoke-DockerLint -DockerFile $dockerFile
+
             $result.LintOutput | Should -Not -BeNullOrEmpty
-            $result.Result.ExitCode | Should -Be 0
+            $result.CommandResult.ExitCode | Should -Be 0
+            $result.CommandResult | Should -Not -BeNullOrEmpty
         }
     }
 
