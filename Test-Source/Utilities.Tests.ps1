@@ -6,7 +6,7 @@ Describe 'Validate various support functions for testing' {
     Context 'Validating support functions for - When git is installed' {
 
         It 'can create random folder in TEMP folder' {
-            $pathInTemp = New-RandomFolder
+            $pathInTemp = New-RandomFolderForTestUse
 
             Test-Path -Path $pathInTemp | Should -Be $true
 
@@ -14,7 +14,7 @@ Describe 'Validate various support functions for testing' {
         }
 
         It 'can create fake git repository for testing' {
-            $pathInTemp = New-RandomFolder
+            $pathInTemp = New-RandomFolderForTestUse
             New-FakeGitRepository -Path $pathInTemp
 
             Test-Path -Path (Join-Path $pathInTemp ".git") -PathType Container | Should -Be $true
@@ -24,7 +24,7 @@ Describe 'Validate various support functions for testing' {
         }
 
         It 'can remove and create fake git repository for testing' {
-            $pathInTemp = New-RandomFolder
+            $pathInTemp = New-RandomFolderForTestUse
             New-Item (Join-Path $pathInTemp '.git') -ItemType Container -Force
             New-FakeGitRepository -Path $pathInTemp
 

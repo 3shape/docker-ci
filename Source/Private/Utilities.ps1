@@ -1,4 +1,4 @@
-function New-RandomFolder {
+function New-RandomFolderForTestUse {
 
     $driveRoot = (Get-PSDrive TestDrive).Root
     do {

@@ -11,7 +11,7 @@ function Invoke-DockerTests {
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TestReportDir = $(New-RandomFolder),
+        $TestReportDir = (New-RandomFolderForTestUse),
 
         [ValidateNotNullOrEmpty()]
         [String]

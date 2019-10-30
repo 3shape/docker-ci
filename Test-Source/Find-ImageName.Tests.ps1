@@ -9,7 +9,7 @@ Describe 'Parse context from git repository' {
     Context 'When git is installed' {
 
         BeforeAll {
-            $tempFolder = New-RandomFolder
+            $tempFolder = New-RandomFolderForTestUse
         }
 
         AfterAll {
@@ -60,7 +60,7 @@ Describe 'Parse context from git repository' {
 
     Context 'Pipeline execution' {
         BeforeAll {
-            $tempFolder = New-RandomFolder
+            $tempFolder = New-RandomFolderForTestUse
             $location = Join-Path $tempFolder "NoSpace"
             New-FakeGitRepository -Path $location
 
