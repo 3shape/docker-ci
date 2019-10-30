@@ -5,6 +5,6 @@ function Write-PassThruOuput {
         $Message
     )
     foreach ($line in $($Message)) {
-        Write-Information $line
+        Write-Information -InformationAction 'Continue' -MessageData $line
     }
 }
