@@ -82,6 +82,8 @@ Task Test -depends Build {
     Import-Module Pester
     $testResult = Invoke-Pester $TestsDir -CodeCoverage @("${SourceDir}/Public/*.ps1", "${SourceDir}/Private/*.ps1") -PassThru
 
+    Export-CodeCovIoJson -CodeCoverage $testResult.CodeCoverage -RepoRoot $pwd -Path coverage.json;
+
     if ($TestResult.FailedCount -gt 0) {
         $TestResult | Format-List
         throw 'One or more tests for the module failed. Failing the build.'
