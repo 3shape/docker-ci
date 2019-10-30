@@ -108,4 +108,18 @@ Describe 'Execute linting on a given docker image' {
             $result.Result.ExitCode | Should -Be 0
         }
     }
+
+    Context 'Passthru execution' {
+        It 'Captures the output of the command invoked' {
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+            $tempFile = New-TemporaryFile
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
+
+            Invoke-DockerLint -DockerFile $dockerFile -Passthru 6> $tempFile
+
+            $result = Get-Content $tempFile
+
+            $result | Should -Be @('Hello', 'World')
+        }
+    }
 }
