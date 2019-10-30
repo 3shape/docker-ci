@@ -11,7 +11,7 @@ function Invoke-DockerTests {
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TestReportDir = (New-RandomFolderForTestUse),
+        $TestReportDir = '.',
 
         [ValidateNotNullOrEmpty()]
         [String]
@@ -29,6 +29,9 @@ function Invoke-DockerTests {
 
     $here = Format-AsAbsolutePath (Get-Location)
     $absTestReportDir = Format-AsAbsolutePath ($TestReportDir)
+    if (!(Test-Path $absTestReportDir -PathType Container)) {
+        New-Item $absTestReportDir -ItemType Directory -Force | Out-Null
+    }
     $structureCommand = "docker run -i" + `
         " -v `"${here}:/configs`"" + `
         " -v `"${absTestReportDir}:/report`"" + `
