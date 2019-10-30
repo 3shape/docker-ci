@@ -45,6 +45,13 @@ Describe 'Use cases for this module' {
             Set-Location $script:backupLocation
         }
 
+        It 'can build an image and tag it' {
+            Invoke-DockerBuild . -ImageName 'integration-testcase-1'
+            $findImageCommand = 'docker images integration-testcase-1'
+            $result = Invoke-Command $findImageCommand
+            ([regex]::Matches($result.Output, "integration-testcase-1" )).Count | Should -BeExactly 1
+        }
+
         It "Use case #1: Can derive docker image name and tag in one go" {
             $result = Find-ImageName $dockerImageDir
             $result = Format-DockerTag | Invoke-DockerBuild -ImageName $result.ImageName
