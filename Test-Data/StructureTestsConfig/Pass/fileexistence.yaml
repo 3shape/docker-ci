@@ -1,7 +1,7 @@
 schemaVersion: "2.0.0"
 
 fileExistenceTests:
-    - name: "ls"
-      path: "/bin/ls"
-      shouldExist: true
-      permissions: "-rwxr-xr-x"
+  - name: "ls"
+    path: "/bin/ls"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
