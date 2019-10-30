@@ -33,9 +33,8 @@ addons:
 
 install:
     - cd $TRAVIS_BUILD_DIR
-    - pwsh -f "./Install-Prerequisites.ps1"
     - export PATH="$PATH:$HOME/.dotnet/tools"
-    - dotnet tool install --global GitVersion.Tool --version 5.1.1
+    - pwsh -f "./Install-Prerequisites.ps1"
     - export GitVersion_Version=$(dotnet gitversion -output json -showvariable majorminorpatch)
     - export GitVersion_PreReleaseTagWithDash=$(dotnet gitversion -output json -showvariable PreReleaseTagWithDash)
     - 'echo "GitVersion says version is : ${GitVersion_Version} "'
