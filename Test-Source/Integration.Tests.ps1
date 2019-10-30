@@ -46,7 +46,7 @@ Describe 'Use cases for this module' {
         }
 
         It 'can build an image and tag it' {
-            Invoke-DockerBuild . -ImageName 'integration-testcase-1'
+            Invoke-DockerBuild . -ImageName 'integration-testcase-1' -Passthru
             $findImageCommand = 'docker images integration-testcase-1'
             $result = Invoke-Command $findImageCommand
             ([regex]::Matches($result.Output, "integration-testcase-1" )).Count | Should -BeExactly 1
