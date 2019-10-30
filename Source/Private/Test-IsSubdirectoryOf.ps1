@@ -4,13 +4,13 @@ function Test-IsSubdirectoryOf {
     param (
         [Parameter(mandatory = $true)]
         [String]
-        $Path,
+        $ParentPath,
 
         [Parameter(mandatory = $true)]
         [String]
         $ChildPath
     )
-    $absolutePath = Format-AsAbsolutePath $Path
+    $absolutePath = Format-AsAbsolutePath $ParentPath
     $absoluteChildPath = Format-AsAbsolutePath $ChildPath
 
     return (Test-Path $absolutePath -PathType Container) -and

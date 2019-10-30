@@ -1,16 +1,13 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Parse version, distro and arch from Dockerfile path' {
 
-    $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-    $exampleReposPath = Join-Path $testData "ExampleRepos"
-
     Context 'Given a well-formed directory structure' {
 
         It 'Can parse tool version, distro and arch' {
-            $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
+            $dockerFile = Join-Path $Global:ExampleReposDir '/3.0/servercore/amd64/Dockerfile'
             $result = Format-DockerTag -Dockerfile $dockerFile
             $result.Tag | Should -Be '3.0-servercore-amd64'
             $result.Distro | Should -Be 'servercore'
@@ -20,18 +17,16 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
     }
 
     Context 'Given a well-formed directory structure but non-existing Dockerfile' {
-        $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-        $exampleReposPath = Join-Path $testData "ExampleRepos"
 
         It 'throws an exception, when Dockerfile is not found' {
-            $noSuchDockerFile = Join-Path $exampleReposPath "NotADockerFile"
+            $noSuchDockerFile = Join-Path $Global:ExampleReposDir "NotADockerFile"
             $code = { Format-DockerTag -Dockerfile $noSuchDockerFile }
             $code | Should -Throw -ExceptionType ([System.IO.FileNotFoundException]) -PassThru
         }
     }
 
     Context 'Pipeline exeuction' {
-        $dockerFile = Join-Path $exampleReposPath '/3.0/servercore/amd64/Dockerfile'
+        $dockerFile = Join-Path $Global:ExampleReposDir '/3.0/servercore/amd64/Dockerfile'
         $pipedInput = {
             $input = [PSCustomObject]@{
                 'Dockerfile' = $dockerFile;

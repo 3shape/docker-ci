@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Find-RepositoryName.ps1"
 
 Describe 'Parse repos name from full git repository' {
@@ -17,5 +18,4 @@ Describe 'Parse repos name from full git repository' {
             $result | Should -BeExactly "dockerbuild-pwsh"
         }
     }
-
 }

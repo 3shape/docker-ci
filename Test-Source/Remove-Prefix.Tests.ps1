@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Remove-Prefix.ps1"
 
 Describe 'Remove a prefix' {
@@ -12,7 +13,6 @@ Describe 'Remove a prefix' {
 
             $result | Should -BeExactly $input
         }
-
 
         It 'can remove the prefix on valid input when prefix is entire string' {
             $input = "test"

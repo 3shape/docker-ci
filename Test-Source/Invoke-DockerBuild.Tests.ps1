@@ -1,49 +1,47 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
 
 Describe 'Build docker images' {
 
-    $code = {
-        Write-Debug $Command
-        StoreMockValue -Key "command" -Value $Command
-        $result = [CommandResult]::new()
-        $result.ExitCode = 0
-        return $result
-    }
-
     BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
+        $returnExitCodeZero = {
+            Write-Debug $Command
+            StoreMockValue -Key "command" -Value $Command
+            $result = [CommandResult]::new()
+            $result.ExitCode = 0
+            return $result
+        }
     }
 
     BeforeEach {
         Initialize-MockReg
         if ($IsWindows) {
-            $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
+            $dockerFile = Join-Path $Global:DockerImagesDir "Windows.Dockerfile"
         }
         elseif ($IsLinux) {
-            $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
+            $dockerFile = Join-Path $Global:DockerImagesDir "Linux.Dockerfile"
         }
+        Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
     }
 
-    $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-    $dockerTestData = Join-Path $testData "DockerImage"
+    AfterEach {
+        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
+    }
 
     Context 'Docker build with latest tag' {
 
         It 'creates correct docker build command' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
+            $result | Should -BeLikeExactly "docker build `"$($Global:DockerImagesDir)`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'Throws exception if exitcode is not 0' {
-
             $returnExitCodeOne = {
                 Write-Debug $Command
                 StoreMockValue -Key "command" -Value $Command
@@ -51,10 +49,9 @@ Describe 'Build docker images' {
                 $result.ExitCode = 1
                 return $result
             }
-            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $script:moduleName
-
+            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:ModuleName
             $runner = {
-                Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile
+                Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile
             }
             $runner | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
@@ -63,21 +60,15 @@ Describe 'Build docker images' {
     Context 'Docker build with various parameters' {
 
         It 'creates correct docker build command, with valid registry parameter' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry 'valid'
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry 'valid'
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t valid/leeandrasmus:latest -f `"${dockerFile}`""
+            $result | Should -BeLikeExactly "docker build `"$($Global:DockerImagesDir)`" -t valid/leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'creates correct docker build command, with $null registry parameter' {
-
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $dockerTestData -Dockerfile $dockerFile -Registry $null
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"${dockerTestData}`" -t leeandrasmus:latest -f `"${dockerFile}`""
+            $result | Should -BeLikeExactly "docker build `"$($Global:DockerImagesDir)`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
     }
 
@@ -95,12 +86,12 @@ Describe 'Build docker images' {
         }
 
         It 'can consume arguments from pipeline' {
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             & $pipedInput | Invoke-DockerBuild
         }
 
         It 'returns the expected pscustomobject' {
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $result = & $pipedInput | Invoke-DockerBuild
             $result.Dockerfile | Should -Not -BeNullOrEmpty
             $result.ImageName | Should -Not -BeNullOrEmpty

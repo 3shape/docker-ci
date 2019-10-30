@@ -1,29 +1,27 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 
 Describe 'Tag docker images' {
 
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    }
-
-    $code = {
-        Write-Debug $Command
-        StoreMockValue -Key "mock" -Value $Command
-        $result = [PSCustomObject]@{
-            ExitCode = 0
-        }
-        return $result
-    }
 
     BeforeEach {
+        $returnExitCodeZero = {
+            Write-Debug $Command
+            StoreMockValue -Key "mock" -Value $Command
+            $result = [PSCustomObject]@{
+                ExitCode = 0
+            }
+            return $result
+        }
         Initialize-MockReg
-        Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
+        Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
     }
 
     AfterEach {
-        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
     }
 
     Context 'Docker tags public registry images' {
@@ -139,16 +137,16 @@ Describe 'Tag docker images' {
 
     Context 'tags invalid image' {
 
-        $code = {
-            Write-Debug $Command
-            StoreMockValue -Key "mock" -Value $Command
-            $result = [PSCustomObject]@{
-                ExitCode = 1
-            }
-            return $result
-        }
-
         It 'tags invalid image with invalid registry' {
+            $returnExitCodeOne = {
+                Write-Debug $Command
+                StoreMockValue -Key "mock" -Value $Command
+                $result = [PSCustomObject]@{
+                    ExitCode = 1
+                }
+                return $result
+            }
+            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:ModuleName
             $runner = { Invoke-DockerTag -ImageName 'oldname' -NewRegistry '.' -NewImageName 'newimage' -NewTag 'newtag' }
             $runner | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
@@ -179,5 +177,4 @@ Describe 'Tag docker images' {
             $result.Tag | Should -Be 'v1.0.2'
         }
     }
-
 }

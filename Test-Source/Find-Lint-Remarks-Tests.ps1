@@ -1,11 +1,11 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+
 . "$PSScriptRoot\..\Source\Private\Find-LintRemarks.ps1"
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 
 Describe 'Parse context from git repository' {
 
     Context 'When parsing text as lint remarks' {
-
 
         It 'can find 5 lint remarks' {
             $validText = @"
@@ -32,7 +32,6 @@ sdf sdfsdf sdf sdfsd
 
             $result.Length | Should -Be 1
         }
-
     }
 }
 

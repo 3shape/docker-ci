@@ -1,43 +1,38 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 
 Describe 'Execute linting on a given docker image' {
 
-    BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
-    }
-
-    $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
-    $dockerTestData = Join-Path $testData "DockerImage"
-
     Context 'When full path to a docker image is specified' {
 
         It 'can find 0 rule violations' {
-            $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
-            $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Windows.Dockerfile.Linted")
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Windows.Dockerfile'
+            $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Windows.Dockerfile.Linted')
             $result = Invoke-DockerLint -DockerFile $dockerFile
             $lintedDockerFile | Should -Be $result.LintOutput
         }
 
         It 'can find 0 rule violations, on folder with space' {
-            $folderWithSpace = Join-Path $dockerTestData "Folder with space"
-            $dockerFile = Join-Path $folderWithSpace "Windows.Dockerfile"
-            $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Windows.Dockerfile.Linted")
+            $folderWithSpace = Join-Path $Global:DockerImagesDir 'Folder with space'
+            $dockerFile = Join-Path $folderWithSpace 'Windows.Dockerfile'
+            $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Windows.Dockerfile.Linted')
             $result = Invoke-DockerLint -DockerFile $dockerFile
             $lintedDockerFile | Should -Be $result.LintOutput
         }
 
         It 'can find 1 rule violation' {
-            $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
-            $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Linux.Dockerfile.Linted")
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
+            $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Linux.Dockerfile.Linted')
             $result = Invoke-DockerLint -DockerFile $dockerFile
             $lintedDockerFile | Should -Be $result.LintOutput
         }
 
         It 'can find multiple rule violations' {
-            $dockerFile = Join-Path $dockerTestData "Poorly.Written.Dockerfile"
-            [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $dockerTestData "Poorly.Written.Dockerfile.Linted")
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile'
+            [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile.Linted')
 
             try {
                 [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
@@ -67,8 +62,8 @@ Describe 'Execute linting on a given docker image' {
             $exception.Message | Should -BeLike "*not.here*"
         }
 
-        It 'throws exception on lint remarks if required' {
-            $dockerFile = Join-Path $dockerTestData "Linux.Dockerfile"
+        It 'throws exception if lint remarks are found if required' {
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
 
             $code = {
                 Invoke-DockerLint -DockerFile $dockerFile -TreatLintRemarksFoundAsException
@@ -93,12 +88,12 @@ Describe 'Execute linting on a given docker image' {
             $code = {
                 StoreMockValue -Key "Invoke-Command" -Value "$Command"
             }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $script:moduleName
-            Set-Location -Path $dockerTestData
+            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
+            Set-Location -Path $Global:DockerImagesDir
 
             Invoke-DockerLint
 
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $script:moduleName
+            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key 'Invoke-Command'
             $result | Should -BeLike "*Dockerfile*"
         }
@@ -106,7 +101,7 @@ Describe 'Execute linting on a given docker image' {
 
     Context 'Pipeline execution' {
         It 'returns the expected pscustomobject' {
-            $dockerFile = Join-Path $dockerTestData "Windows.Dockerfile"
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Windows.Dockerfile'
 
             $result = Invoke-DockerLint -DockerFile $dockerFile
             $result.LintOutput | Should -Not -BeNullOrEmpty
