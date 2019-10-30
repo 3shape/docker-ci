@@ -26,8 +26,9 @@ before_install:
 install:
     - cd $TRAVIS_BUILD_DIR
     - pwsh -f "./Install-Prerequisites.ps1"
-    - export GitVersion_Version=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.0.1-linux-debian-9-netcoreapp2.2 /repo -output json -showvariable majorminorpatch)
-    - export GitVersion_PreReleaseTagWithDash=$(docker run --rm -v "$(pwd):/repo" gittools/gitversion:5.0.1-linux-debian-9-netcoreapp2.2 /repo -output json -showvariable PreReleaseTagWithDash)
+    - dotnet tool install --global GitVersion.Tool --version 5.1.1
+    - export GitVersion_Version=$(dotnet gitversion -output json -showvariable majorminorpatch)
+    - export GitVersion_PreReleaseTagWithDash=$(dotnet gitversion -output json -showvariable PreReleaseTagWithDash)
     - 'echo "GitVersion says version is : ${GitVersion_Version} "'
     - 'echo "GitVersion says prerelease tag is: ${GitVersion_PreReleaseTagWithDash} "'
 
