@@ -5,6 +5,11 @@ mono: none
 git:
     depth: false
 
+cache:
+    directories:
+        - /home/travis/.dotnet/tools
+        - /home/travis/.local/share/powershell/Modules
+
 if: |
     repo != 3shapeAS/dockerbuild-pwsh OR \
     type = pull_request OR \
