@@ -1,6 +1,11 @@
 function Invoke-DockerBuild {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Context = ".",
+
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $Registry = '',
@@ -8,10 +13,6 @@ function Invoke-DockerBuild {
         [Parameter(ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
         [String]
         $ImageName,
-
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $Context = ".",
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
@@ -21,8 +22,11 @@ function Invoke-DockerBuild {
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Dockerfile = "Dockerfile"
+        $Dockerfile = "Dockerfile",
 
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $PassThru
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
     $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
@@ -33,6 +37,9 @@ function Invoke-DockerBuild {
         'Registry'      = $postfixedRegistry;
         'Tag'           = $Tag;
         "CommandResult" = $commandResult
+    }
+    if ($PassThru) {
+        Write-Host $commandResult.Output
     }
     return $result
 }
