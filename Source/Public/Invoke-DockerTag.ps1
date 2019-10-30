@@ -25,7 +25,10 @@ function Invoke-DockerTag {
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $NewTag = 'latest'
+        $NewTag = 'latest',
+
+        [Switch]
+        $PassThru
     )
 
     $postfixedRegistry = Add-Postfix -Value $Registry
@@ -40,6 +43,9 @@ function Invoke-DockerTag {
         'ImageName' = $NewImageName
         'Registry'  = $postfixedNewRegistry
         'Result'    = $commandResult
+    }
+    if ($PassThru) {
+        Write-PassThruOuput $($commandResult.Output)
     }
     return $result
 }

@@ -6,7 +6,6 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Tag docker images' {
 
-
     BeforeEach {
         $returnExitCodeZero = {
             Write-Debug $Command
@@ -175,6 +174,19 @@ Describe 'Tag docker images' {
             $result.ImageName | Should -Be 'my-new-image'
             $result.Registry | Should -Be 'localhost/'
             $result.Tag | Should -Be 'v1.0.2'
+        }
+    }
+
+    Context 'Passthru execution' {
+
+        it 'can redirect output' {
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+            $tempFile = New-TemporaryFile
+
+            Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -Passthru 6> $tempFile
+
+            $result = Get-Content $tempFile
+            $result | Should -Be @('Hello', 'World')
         }
     }
 }
