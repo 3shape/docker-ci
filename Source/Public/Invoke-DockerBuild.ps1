@@ -16,7 +16,6 @@ function Invoke-DockerBuild {
         [String]
         $ImageName,
 
-
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -34,11 +33,11 @@ function Invoke-DockerBuild {
     $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
     Assert-ExitCodeOK $commandResult
     $result = [PSCustomObject]@{
-        "Dockerfile"    = $Dockerfile;
-        "ImageName"     = $ImageName;
+        'Dockerfile'    = $Dockerfile;
+        'ImageName'     = $ImageName;
         'Registry'      = $postfixedRegistry;
         'Tag'           = $Tag;
-        "CommandResult" = $commandResult
+        'CommandResult' = $commandResult
     }
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)

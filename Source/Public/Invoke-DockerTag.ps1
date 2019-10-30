@@ -39,10 +39,10 @@ function Invoke-DockerTag {
     $commandResult = Invoke-Command "docker tag ${source} ${target}"
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
-        'Tag'       = $NewTag
-        'ImageName' = $NewImageName
-        'Registry'  = $postfixedNewRegistry
-        'Result'    = $commandResult
+        'Tag'           = $NewTag
+        'ImageName'     = $NewImageName
+        'Registry'      = $postfixedNewRegistry
+        'CommandResult' = $commandResult
     }
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)

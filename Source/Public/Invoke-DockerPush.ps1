@@ -25,10 +25,10 @@ function Invoke-DockerPush {
     $commandResult = Invoke-Command $command
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
-        'Result'    = $commandResult;
-        'ImageName' = $ImageName;
-        'Registry'  = $postfixedRegistry;
-        'Tag'       = $Tag;
+        'CommandResult' = $commandResult;
+        'ImageName'     = $ImageName;
+        'Registry'      = $postfixedRegistry;
+        'Tag'           = $Tag;
     }
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)

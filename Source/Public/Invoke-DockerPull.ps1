@@ -49,11 +49,11 @@ function Invoke-DockerPull {
     $commandResult = Invoke-Command "docker pull ${imageToPull}"
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
-        'Result'    = $commandResult
-        'ImageName' = $ImageName
-        'Tag'       = $Tag
-        'Registry'  = $postfixedRegistry
-        'Digest'    = $Digest
+        'CommandResult' = $commandResult
+        'ImageName'     = $ImageName
+        'Tag'           = $Tag
+        'Registry'      = $postfixedRegistry
+        'Digest'        = $Digest
     }
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)
