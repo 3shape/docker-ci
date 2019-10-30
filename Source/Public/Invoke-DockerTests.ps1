@@ -28,9 +28,10 @@ function Invoke-DockerTests {
     }
 
     $here = Format-AsAbsolutePath (Get-Location)
+    $absTestReportDir = Format-AsAbsolutePath ($TestReportDir)
     $structureCommand = "docker run -i" + `
         " -v `"${here}:/configs`"" + `
-        " -v `"${TestReportDir}:/report`"" + `
+        " -v `"${absTestReportDir}:/report`"" + `
         " -v /var/run/docker.sock:/var/run/docker.sock" + `
         " rasmusjelsgaard/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
 
@@ -45,7 +46,7 @@ function Invoke-DockerTests {
         Assert-ExitCodeOk $commandResult
     }
 
-    $testReportPath = Join-Path $TestReportDir $TestReportName
+    $testReportPath = Join-Path $absTestReportDir $TestReportName
 
     $result = [PSCustomObject]@{
         'TestResult'     = $(ConvertFrom-Json $(Get-Content $testReportPath))

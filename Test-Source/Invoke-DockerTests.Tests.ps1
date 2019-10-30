@@ -15,6 +15,24 @@ Describe 'Run docker tests using Google Structure' {
             Set-Location $script:backupLocation
         }
 
+        It 'can accept a relative path as test report directory' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir './'
+            $commandResult = $result.Result
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 1
+            $testResult.Pass | Should -Be 1
+            $testResult.Fail | Should -Be 0
+            $testResult.Results[0].Name | Should -Be 'Command Test: Say hello world'
+            $testResult.Results[0].Pass | Should -Be $true
+            $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
+        }
+
         It 'can execute 1 succesful test' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
             $configs = @($structureCommandConfig)
