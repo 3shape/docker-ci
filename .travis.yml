@@ -3,7 +3,7 @@ dotnet: 3.0
 mono: none
 
 git:
-  depth: false
+    depth: false
 
 if: |
     repo != 3shapeAS/dockerbuild-pwsh OR \
