@@ -3,8 +3,10 @@
 # Customize these properties for your module.
 ###############################################################################
 Properties {
+    $TestsDir = "$PSScriptRoot\Test-Source"
+    $SourceDir = "$PSScriptRoot\Source"
     # The name of your module should match the basename of the PSD1 file.
-    $ModuleName = (Get-Item $PSScriptRoot\*.psd1)[0].BaseName
+    $ModuleName = (Get-Item $SourceDir\*.psd1)[0].BaseName
 
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = $null
@@ -12,6 +14,7 @@ Properties {
     # The directory used to publish the module from.  If you are using Git, the
     # $PublishDir should be ignored if it is under the workspace directory.
     $PublishDir = "$PSScriptRoot\.publish\$ModuleName"
+
 
     # The following items will not be copied to the $PublishDir.
     # Add items that should not be published with the module.
@@ -28,11 +31,13 @@ Properties {
 # Customize these tasks for performing operations before and/or after publish.
 ###############################################################################
 Task PrePublish {
-    $functionScriptFiles  = @(Get-ChildItem -Path $PublishDir\Public\*.ps1 -ErrorAction SilentlyContinue)
+    $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Source\Public\*.ps1 -ErrorAction SilentlyContinue)
     [string[]]$functionNames = @($functionScriptFiles.BaseName)
 
+    $prerelease = $env:GitVersion_PreReleaseTagWithDash
+
     if (!$env:GitVersion_Version) {
-        throw 'Version not found in env:GitVersion_Version where it was expected. Bailing.'
+        throw 'Module version not found in env:GitVersion_Version where it was expected. Bailing.'
     }
 
     Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 `
@@ -64,14 +69,18 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
         $publishParams['Repository'] = $Repository
     }
 
-    Write-Host "Publishing $ModuleName version $env:GitVersion_Version"
+    if ($prerelease) {
+        $publishParams['Prerelease'] = $prerelease
+    }
+
+    Write-Host "Publishing $ModuleName version $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
 
     Publish-Module @publishParams
 }
 
 Task Test -depends Build {
     Import-Module Pester
-    $testResult = Invoke-Pester $PSScriptRoot/Tests -CodeCoverage @("Public/*.ps1","Private/*.ps1") -PassThru
+    $testResult = Invoke-Pester $TestsDir -CodeCoverage @("${SourceDir}/Public/*.ps1", "${SourceDir}/Private/*.ps1") -PassThru
 
     if ($TestResult.FailedCount -gt 0) {
         $TestResult | Format-List
@@ -80,7 +89,7 @@ Task Test -depends Build {
 }
 
 Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
-    Copy-Item $PSScriptRoot\* -Destination $PublishDir -Recurse -Exclude $Exclude
+    Copy-Item $SourceDir\* -Destination $PublishDir -Recurse -Exclude $Exclude
 
     # Get contents of the ReleaseNotes file and update the copied module manifest file
     # with the release notes.

@@ -1,5 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-Import-Module -Force $PSScriptRoot/../Docker.Build.Tests.psm1
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Run docker tests using Google Structure' {
@@ -110,7 +110,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
             $structureExistConfig = Join-Path $Global:StructureTestsPassDir 'fileexistence.yaml'
             $configs = @($structureCommandConfig, $structureExistConfig)
-            $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+            $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
 
             $pipedInput = {
                 $input = [PSCustomObject]@{

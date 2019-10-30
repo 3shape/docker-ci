@@ -1,11 +1,11 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
-. "$PSScriptRoot\..\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 
 Describe 'Tag docker images' {
 
     BeforeAll {
-        $script:moduleName = (Get-Item $PSScriptRoot\..\*.psd1)[0].BaseName
+        $script:moduleName = (Get-Item $PSScriptRoot\..\Source\*.psd1)[0].BaseName
     }
 
     $code = {

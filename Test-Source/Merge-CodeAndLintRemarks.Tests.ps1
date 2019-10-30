@@ -1,6 +1,6 @@
-Import-Module -Force $PSScriptRoot/../Docker.Build.psm1
-. "$PSScriptRoot\..\Private\LintRemark.ps1"
-. "$PSScriptRoot\..\Private\Merge-CodeAndLintRemarks.ps1"
+Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+. "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
+. "$PSScriptRoot\..\Source\Private\Merge-CodeAndLintRemarks.ps1"
 
 Describe 'Merge code lines with linting remarks' {
 
@@ -18,7 +18,7 @@ Describe 'Merge code lines with linting remarks' {
         It 'can produce correct output for 1 violation' {
             $code = @("FROM ubuntu:18.04", "RUN apt update")
             $linting = @(
-                [LintRemark]@{LineNumber=2;LintRule="DL3027";Explanation="Do not use apt as it is meant to be an end-user tool, use apt-get or apt-cache instead."}
+                [LintRemark]@{LineNumber = 2; LintRule = "DL3027"; Explanation = "Do not use apt as it is meant to be an end-user tool, use apt-get or apt-cache instead." }
             )
 
             $result = Merge-CodeAndLintRemarks $code $linting
@@ -30,7 +30,7 @@ Describe 'Merge code lines with linting remarks' {
         It 'can produce correct output for code with blank lines' {
             $code = @("FROM ubuntu:18.04", "", "RUN apt update")
             $linting = @(
-                [LintRemark]@{LineNumber=3;LintRule="DL3027";Explanation="Do not use apt as it is meant to be an end-user tool, use apt-get or apt-cache instead."}
+                [LintRemark]@{LineNumber = 3; LintRule = "DL3027"; Explanation = "Do not use apt as it is meant to be an end-user tool, use apt-get or apt-cache instead." }
             )
 
             $result = Merge-CodeAndLintRemarks $code $linting
