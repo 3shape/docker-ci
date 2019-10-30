@@ -1,20 +1,20 @@
 function Find-LintRemarks {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string]
-        $Text
+        [string[]]
+        $LintLines
     )
+    if ($null -eq $LintLines) {
+        return @()
+    }
+
     $lineNumber = "\B\/dev\/stdin:\d+\b"
     $lintRule = "\w{2}\d{4}"
     $lintRemark = ".*)"
-    $splitExpression = "(.+?(?=\/dev\/stdin:\d+?))"
-    $lines = ($Text -split $splitExpression | Where-Object { $_ })
     $pattern = "^(?<linenumbergroup>${lineNumber}) (?<lintrule>${lintRule}) (?<lintremark>${lintRemark}"
-
     [LintRemark[]] $lintRemarks = @()
-    $lines | Select-String -Pattern $pattern | ForEach-Object {
+    $LintLines | Select-String -Pattern $pattern | ForEach-Object {
         $lineNumber, $lintRule, $lintRemark = $_.Matches[0].Groups['linenumbergroup', 'lintrule', 'lintremark'].Value
 
         $remark = [LintRemark] @{
