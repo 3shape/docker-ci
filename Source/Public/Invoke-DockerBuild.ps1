@@ -34,5 +34,10 @@ function Invoke-DockerBuild {
         'Tag'           = $Tag;
         "CommandResult" = $commandResult
     }
+    if ($PassThru) {
+        foreach ($line in $($commandResult.Output)) {
+            Write-Information $line
+        }
+    }
     return $result
 }
