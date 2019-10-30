@@ -40,4 +40,17 @@ Describe 'Docker login ' {
             $result | Should -BeLikeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin'
         }
     }
+
+    Context 'Passthru execution' {
+
+        it 'can redirect output' {
+            $tempFile = New-TemporaryFile
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+
+            Invoke-DockerLogin -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force) -Passthru 6> $tempFile
+            $result = Get-Content $tempFile
+
+            $result | Should -Be @('Hello', 'World')
+        }
+    }
 }

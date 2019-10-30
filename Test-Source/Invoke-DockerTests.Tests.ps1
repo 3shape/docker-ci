@@ -129,4 +129,20 @@ Describe 'Run docker tests using Google Structure' {
             $result.ImageName | Should -Be 'myimage'
         }
     }
+
+    Context 'Passthru execution' {
+
+        it 'can redirect output' {
+            $tempFile = New-TemporaryFile
+            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Passthru 6> $tempFile
+
+            $result = Get-Content $tempFile
+            Write-Debug "Result: $result"
+            $result | Should -BeLike "*level=fatal msg=FAIL*"
+        }
+    }
 }

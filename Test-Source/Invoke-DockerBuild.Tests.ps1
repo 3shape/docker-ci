@@ -8,16 +8,6 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Build docker images' {
 
-    BeforeAll {
-        $returnExitCodeZero = {
-            Write-Debug $Command
-            StoreMockValue -Key "command" -Value $Command
-            $result = [CommandResult]::new()
-            $result.ExitCode = 0
-            return $result
-        }
-    }
-
     BeforeEach {
         Initialize-MockReg
         if ($IsWindows) {
@@ -26,7 +16,7 @@ Describe 'Build docker images' {
         elseif ($IsLinux) {
             $dockerFile = Join-Path $Global:DockerImagesDir "Linux.Dockerfile"
         }
-        Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+        Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
     }
 
     AfterEach {
@@ -86,15 +76,24 @@ Describe 'Build docker images' {
         }
 
         It 'can consume arguments from pipeline' {
-            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             & $pipedInput | Invoke-DockerBuild
         }
 
         It 'returns the expected pscustomobject' {
-            Mock -CommandName "Invoke-Command" $returnExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $result = & $pipedInput | Invoke-DockerBuild
             $result.Dockerfile | Should -Not -BeNullOrEmpty
             $result.ImageName | Should -Not -BeNullOrEmpty
+        }
+    }
+
+    Context 'Passthru execution' {
+
+        It 'Captures the output of the command invoked' {
+            $tempFile = New-TemporaryFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Passthru 6> $tempFile
+            $result = Get-Content $tempFile
+
+            $result | Should -Be @('Hello', 'World')
         }
     }
 }

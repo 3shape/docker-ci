@@ -1,6 +1,7 @@
 . "$PSScriptRoot\..\Private\LintRemark.ps1"
 . "$PSScriptRoot\..\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Private\Format-AsAbsolutePath.ps1"
+. "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerLint {
     [CmdletBinding()]
@@ -8,8 +9,12 @@ function Invoke-DockerLint {
         [ValidateNotNullOrEmpty()]
         [String]
         $DockerFile = 'Dockerfile',
+
         [Switch]
-        $TreatLintRemarksFoundAsException
+        $TreatLintRemarksFoundAsException,
+
+        [Switch]
+        $PassThru
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
@@ -30,6 +35,9 @@ function Invoke-DockerLint {
     $result = [PSCustomObject]@{
         'Result'     = $commandResult
         'LintOutput' = $lintedDockerfile
+    }
+    if ($PassThru) {
+        Write-PassThruOuput $($commandResult.Output)
     }
     return $result
 }

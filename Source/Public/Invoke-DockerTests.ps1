@@ -18,7 +18,10 @@ function Invoke-DockerTests {
         $TestReportName = 'testreport.json',
 
         [Switch]
-        $TreatTestFailuresAsExceptions = $false
+        $TreatTestFailuresAsExceptions = $false,
+
+        [Switch]
+        $PassThru
     )
     if ($null -eq $ConfigFiles -or $ConfigFiles.Length -eq 0) {
         throw [System.ArgumentException]::new('$ConfigFiles must contain one more test configuration file paths.')
@@ -49,6 +52,9 @@ function Invoke-DockerTests {
         TestReportPath = $testReportPath
         Result         = $commandResult
         ImageName      = $ImageName
+    }
+    if ($PassThru) {
+        Write-PassThruOuput $($commandResult.Output)
     }
     return $result
 }

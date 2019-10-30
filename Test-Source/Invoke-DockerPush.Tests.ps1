@@ -104,4 +104,17 @@ Describe 'docker push' {
             $result.Tag | Should -Be 'v1.0.2'
         }
     }
+
+    Context 'Passthru execution' {
+
+        it 'can redirect output' {
+            $tempFile = New-TemporaryFile
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+
+            Invoke-DockerPush -ImageName 'cool-image' -Passthru 6> $tempFile
+
+            $result = Get-Content $tempFile
+            $result | Should -Be @('Hello', 'World')
+        }
+    }
 }

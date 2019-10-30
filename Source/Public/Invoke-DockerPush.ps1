@@ -1,4 +1,5 @@
 . "$PSScriptRoot\..\Private\Utilities.ps1"
+. "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerPush {
     [CmdletBinding()]
@@ -14,7 +15,10 @@ function Invoke-DockerPush {
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Tag = 'latest'
+        $Tag = 'latest',
+
+        [Switch]
+        $PassThru
     )
     $postfixedRegistry = Add-PostFix $Registry
     $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
@@ -25,6 +29,9 @@ function Invoke-DockerPush {
         'ImageName' = $ImageName;
         'Registry'  = $postfixedRegistry;
         'Tag'       = $Tag;
+    }
+    if ($PassThru) {
+        Write-PassThruOuput $($commandResult.Output)
     }
     return $result
 }

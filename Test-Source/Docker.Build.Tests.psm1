@@ -26,3 +26,12 @@ Set-GlobalVar -Variable StructureTestsFailDir -Value (Join-Path $Global:Structur
 Set-GlobalVar -Variable ModuleName -Value 'Docker.Build'
 Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
+
+# Global scriptblocks
+Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value ( {
+        StoreMockValue -Key "command" -Value $Command
+        $result = [CommandResult]::new()
+        $result.Output = @("Hello", "World")
+        $result.ExitCode = 0
+        return $result
+    })
