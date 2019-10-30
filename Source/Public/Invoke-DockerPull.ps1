@@ -1,3 +1,5 @@
+. "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
+
 function Invoke-DockerPull {
     [CmdletBinding()]
     param (
@@ -20,7 +22,10 @@ function Invoke-DockerPull {
         [ValidateNotNullOrEmpty()]
         [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest')]
         [String]
-        $Digest = ''
+        $Digest = '',
+
+        [Switch]
+        $PassThru
     )
 
     if ($ImageName.Contains(':') -or $ImageName.Contains('@')) {
@@ -49,6 +54,9 @@ function Invoke-DockerPull {
         'Tag'       = $Tag
         'Registry'  = $postfixedRegistry
         'Digest'    = $Digest
+    }
+    if ($PassThru) {
+        Write-PassThruOuput $($commandResult.Output)
     }
     return $result
 }
