@@ -46,7 +46,7 @@ Describe 'Use cases for this module' {
         }
 
         It 'can build an image and tag it' {
-            Invoke-DockerBuild . -ImageName 'integration-testcase-1' -Passthru
+            Invoke-DockerBuild . -ImageName 'integration-testcase-1'
             $findImageCommand = 'docker images integration-testcase-1'
             $result = Invoke-Command $findImageCommand
             ([regex]::Matches($result.Output, "integration-testcase-1" )).Count | Should -BeExactly 1
@@ -66,14 +66,14 @@ Describe 'Use cases for this module' {
             Invoke-DockerBuild -ImageName 'integration-testcase-2' -Registry 'localhost:5000' | Invoke-DockerPush -Registry 'localhost:5000'
 
             $result = Invoke-DockerPull -Registry 'localhost:5000' -ImageName 'integration-testcase-2' -Tag 'latest'
-            $result.Result.ExitCode | Should -Be 0
+            $result.CommandResult.ExitCode | Should -Be 0
         }
 
         It "Use case #3: Can pull, tag and push in one go" {
             Invoke-DockerLogin -Username 'admin' -Password (ConvertTo-SecureString 'password' –asplaintext –force) -Registry $localRegistryName
             Invoke-DockerPull -ImageName 'ubuntu' | Invoke-DockerTag -NewImageName 'ubuntu' -NewTag 'v1.0.2' -NewRegistry $localRegistryName | Invoke-DockerPush
             $result = Invoke-DockerPull -Registry $localRegistryName -ImageName 'ubuntu' -Tag 'v1.0.2'
-            $result.Result.ExitCode | Should -Be 0
+            $result.CommandResult.ExitCode | Should -Be 0
         }
 
         It 'Use case #4: Can produce an image from scratch' {
@@ -88,7 +88,7 @@ Describe 'Use cases for this module' {
                 Invoke-DockerPush |
                 Invoke-DockerPull
 
-            $result.Result.ExitCode | Should -Be 0
+            $result.CommandResult.ExitCode | Should -Be 0
             $result.ImageName | Should -Be $imageName
             $result.Registry | Should -Be "${localRegistryName}/"
         }

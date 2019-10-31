@@ -48,10 +48,10 @@ function Invoke-DockerTests {
     $testReportPath = Join-Path $TestReportDir $TestReportName
 
     $result = [PSCustomObject]@{
-        TestResult     = $(ConvertFrom-Json $(Get-Content $testReportPath))
-        TestReportPath = $testReportPath
-        Result         = $commandResult
-        ImageName      = $ImageName
+        'TestResult'     = $(ConvertFrom-Json $(Get-Content $testReportPath))
+        'TestReportPath' = $testReportPath
+        'CommandResult'  = $commandResult
+        'ImageName'      = $ImageName
     }
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)

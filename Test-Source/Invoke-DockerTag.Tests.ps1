@@ -174,6 +174,7 @@ Describe 'Tag docker images' {
             $result.ImageName | Should -Be 'my-new-image'
             $result.Registry | Should -Be 'localhost/'
             $result.Tag | Should -Be 'v1.0.2'
+            $result.CommandResult | Should -Not -BeNullOrEmpty
         }
     }
 

@@ -21,7 +21,7 @@ Describe 'Run docker tests using Google Structure' {
             $imageToTest = 'ubuntu:latest'
 
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
-            $commandResult = $result.Result
+            $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 0
@@ -40,7 +40,7 @@ Describe 'Run docker tests using Google Structure' {
             $imageToTest = 'ubuntu:latest'
 
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
-            $commandResult = $result.Result
+            $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 0
@@ -57,7 +57,7 @@ Describe 'Run docker tests using Google Structure' {
             $imageToTest = 'ubuntu:latest'
 
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
-            $commandResult = $result.Result
+            $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 1
@@ -93,7 +93,7 @@ Describe 'Run docker tests using Google Structure' {
             $imageToTest = 'ubuntu:latest'
 
             $result = Invoke-DockerTests -ImageName $imageToTest
-            $commandResult = $result.Result
+            $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 0
@@ -127,6 +127,7 @@ Describe 'Run docker tests using Google Structure' {
         It 'returns the expected pscustomobject' {
             $result = & $pipedInput | Invoke-DockerTests
             $result.ImageName | Should -Be 'myimage'
+            $result.CommandResult | Should -Not -BeNullOrEmpty
         }
     }
 

@@ -83,6 +83,9 @@ Describe 'Build docker images' {
             $result = & $pipedInput | Invoke-DockerBuild
             $result.Dockerfile | Should -Not -BeNullOrEmpty
             $result.ImageName | Should -Not -BeNullOrEmpty
+            $result.Registry | Should -Not -Be $null
+            $result.Tag | Should -Not -BeNullOrEmpty
+            $result.CommandResult | Should -Not -BeNullOrEmpty
         }
     }
 

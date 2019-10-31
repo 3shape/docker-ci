@@ -102,6 +102,7 @@ Describe 'docker push' {
             $result.ImageName | Should -Be 'myimage'
             $result.Registry | Should -Be 'localhost/'
             $result.Tag | Should -Be 'v1.0.2'
+            $result.CommandResult | Should -Not -BeNullOrEmpty
         }
     }
 
