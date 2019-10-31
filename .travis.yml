@@ -51,6 +51,7 @@ deploy:
         tags: true
         branch: master
 
+
 after_success:
     # Upload coverage report to codecov
     - bash <(curl -s https://codecov.io/bash) -f coverage.json
