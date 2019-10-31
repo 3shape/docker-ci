@@ -44,12 +44,15 @@ deploy:
     tags: true
     branch: master
 notifications:
-  email: false
-  slack:
-    rooms:
-      - secure: "IMobdMPYgGTjG92BfGUYD5dJjSkl/UQilerckd+5v+FQC/Axo3oKW/qUzzgVa6HSSuWhXQZmHWs9mFaWysZ0NBNzCriXu5dP2ntHG6r3qINCX3AGZo3oQQdYB/v12ebUZOtmU6Xxvw4ZCZi8ZtoW9WyrdUs793bsZdLazXqvhUFCsDgZ/jkNt5BM1230vMqhi96TpvsTu8eUdV+r2FfyiSAG0sJZWp5v4rKbSJfpVDi6ndg1j3L9uXZjmKOQqmG/QtDmC8R8yRz7F0OmQ5Dd8vqg2bKNTQLBRKiUZWoJukSQi3A2HST7qvX6SAdAH/OV+BIFtlW7I+ROldLuyYJPKaDOcSj/aDZAdH9tji1J8kzQfM6Hsns2PLRIfB4PXJfNFJh+Vj23eW+mtSIayYAXGYJlvFwAxTkiWNokvJ4aBZ9HAjcnnTzJtUJq0oswVvIBQYZ/NLwMzeTjzeeuiDwN9FLZxt69woHDby44bD8IoAiNkLf6hUl952SDxbWoD02W8pwJUwgmSIgBFsqIR7VIu1HFe9yLJJ3BYZ6L0pnANV4kQIe/VOySxxDKlMprmhgBStusLwL5bl1PDilGECK8e843tRIkCHs5evxCWmAxcLXadqaFZywRQEpzvh5iyIH1xgS0kSRNFGHYKH3T+iLA8GzLIWAGx9LOQTzW/1DLyUg="
+notifications:
+  email:
+    recipients: rasmus.jelsgaard@gmail.com
     on_success: always
     on_failure: always
-
+  slack:
+    rooms:
+      - secure: "jFegToc5tLojkLiPpNme6ZCsQXFykNmarnvvlo/JXEyTyA5iiEAf+Yri9tJ4Q3u0QlN6nrH311+3a65NUsJadKoVqSqDa+uMUz/9iudoStR6LdbuV1MfsUw+2eCHCL3+HxvA0eF+3RN/wRfw6nCc7AaMgPwmNJvWKOv1ERel9H46vN1FbBscitkZ4lN33Lj7pkGPw29HYncrXuUTVQhZdZVoICDQkXgn/ivBOgWRy9w2poPlKNcRtXQiGrP9ISH4Wp1clgQWHYfNxPTjxyELsg941VnWXlqtCfCKvXT7sqUgvQ8TcqSmAUh2E90tP8WYJ6bMcC0OIKyJKn+wEtSeaxGSzEVtortJ4rPVyt2mOHAYRW8KA3jzzRz68UkkWotu3WvT7Hv11sL/xXiXVGMNjhr0nRNCco4Ofu8zuneJ4iOsa8OiaxFuc+Anp+TWf+wKRN3F2loOiWHr41xAXs3QwKS9rIcVYceU7WRFlv7nQJNeIo3w76YB+1tfcePkDrLRddMjppKC84JQ+uxopjKf+djOLZPClMhWzrsvNEiQeaNFgGl8gSH/dv5MQPWOq+mextJCPnnW4RhMBUeU2Jr4Uzok9h1wiiLVJgxOLmmrSWKrZMsDFhz6YHSxyuR5D9dAf2jgQ2np4K1ofu7PMEKBaQ2mSjJeOvv4bmVhiqwNrlY="
+    on_success: always
+    on_failure: always
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage.json
