@@ -6,6 +6,7 @@ Install-Module -Name pester -MinimumVersion 4.9.0 -Repository "PSGallery"
 Install-Module -Name PSCodeCovIo -MinimumVersion 1.0.1 -Repository "PSGallery"
 
 if ($env:TRAVIS -eq 'true') {
+    & dotnet help | Out-Null
     if (Test-Path -Path "$env:HOME/.dotnet/tools/dotnet-gitversion") {
         Write-Host "GitVersion already installed, skipping installation."
     } else {
