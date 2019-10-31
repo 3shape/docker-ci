@@ -1,19 +1,25 @@
 language: csharp
 dotnet: 3.0
+
 mono: none
+
 git:
   depth: false
+
 cache:
   directories:
     - "/home/travis/.dotnet/tools"
     - "/home/travis/.local/share/powershell/Modules"
+
 if: |
   repo != 3shapeAS/dockerbuild-pwsh OR \
   type = pull_request OR \
   branch = master OR \
   tag IS present
+
 services:
   - docker
+
 dist: bionic
 addons:
   apt:
@@ -25,6 +31,7 @@ addons:
         key_url: https://packages.microsoft.com/keys/microsoft.asc
     packages:
       - powershell
+
 install:
   - cd $TRAVIS_BUILD_DIR
   - export PATH="$PATH:$HOME/.dotnet/tools"
@@ -34,8 +41,10 @@ install:
     PreReleaseTagWithDash)
   - 'echo "GitVersion says version is : ${GitVersion_Version}"'
   - 'echo "GitVersion says prerelease tag is: ${GitVersion_PreReleaseTagWithDash}"'
+
 script:
   - pwsh -f "./Invoke-Tests.ps1"
+
 deploy:
   skip_cleanup: true
   provider: script
@@ -43,11 +52,13 @@ deploy:
   on:
     tags: true
     branch: master
+
 notifications:
   slack:
     rooms:
       - secure: "jFegToc5tLojkLiPpNme6ZCsQXFykNmarnvvlo/JXEyTyA5iiEAf+Yri9tJ4Q3u0QlN6nrH311+3a65NUsJadKoVqSqDa+uMUz/9iudoStR6LdbuV1MfsUw+2eCHCL3+HxvA0eF+3RN/wRfw6nCc7AaMgPwmNJvWKOv1ERel9H46vN1FbBscitkZ4lN33Lj7pkGPw29HYncrXuUTVQhZdZVoICDQkXgn/ivBOgWRy9w2poPlKNcRtXQiGrP9ISH4Wp1clgQWHYfNxPTjxyELsg941VnWXlqtCfCKvXT7sqUgvQ8TcqSmAUh2E90tP8WYJ6bMcC0OIKyJKn+wEtSeaxGSzEVtortJ4rPVyt2mOHAYRW8KA3jzzRz68UkkWotu3WvT7Hv11sL/xXiXVGMNjhr0nRNCco4Ofu8zuneJ4iOsa8OiaxFuc+Anp+TWf+wKRN3F2loOiWHr41xAXs3QwKS9rIcVYceU7WRFlv7nQJNeIo3w76YB+1tfcePkDrLRddMjppKC84JQ+uxopjKf+djOLZPClMhWzrsvNEiQeaNFgGl8gSH/dv5MQPWOq+mextJCPnnW4RhMBUeU2Jr4Uzok9h1wiiLVJgxOLmmrSWKrZMsDFhz6YHSxyuR5D9dAf2jgQ2np4K1ofu7PMEKBaQ2mSjJeOvv4bmVhiqwNrlY="
     on_success: always
     on_failure: always
+
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage.json
