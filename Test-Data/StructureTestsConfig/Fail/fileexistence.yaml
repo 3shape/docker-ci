@@ -1,7 +1,7 @@
 schemaVersion: "2.0.0"
 
 fileExistenceTests:
-    - name: "nonsense"
-      path: "/bin/nonsense"
-      shouldExist: true
-      permissions: "-rwxr-xr-x"
+  - name: "nonsense"
+    path: "/bin/nonsense"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
