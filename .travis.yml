@@ -1,25 +1,19 @@
 language: csharp
 dotnet: 3.0
-
 mono: none
-
 git:
   depth: false
-
 cache:
   directories:
     - "/home/travis/.dotnet/tools"
     - "/home/travis/.local/share/powershell/Modules"
-
 if: |
   repo != 3shapeAS/dockerbuild-pwsh OR \
   type = pull_request OR \
   branch = master OR \
   tag IS present
-
 services:
   - docker
-
 dist: bionic
 addons:
   apt:
@@ -31,7 +25,6 @@ addons:
         key_url: https://packages.microsoft.com/keys/microsoft.asc
     packages:
       - powershell
-
 install:
   - cd $TRAVIS_BUILD_DIR
   - export PATH="$PATH:$HOME/.dotnet/tools"
@@ -41,10 +34,8 @@ install:
     PreReleaseTagWithDash)
   - 'echo "GitVersion says version is : ${GitVersion_Version}"'
   - 'echo "GitVersion says prerelease tag is: ${GitVersion_PreReleaseTagWithDash}"'
-
 script:
   - pwsh -f "./Invoke-Tests.ps1"
-
 deploy:
   skip_cleanup: true
   provider: script
@@ -52,13 +43,8 @@ deploy:
   on:
     tags: true
     branch: master
-
 notifications:
   slack:
-    rooms:
-      - secure: "jFegToc5tLojkLiPpNme6ZCsQXFykNmarnvvlo/JXEyTyA5iiEAf+Yri9tJ4Q3u0QlN6nrH311+3a65NUsJadKoVqSqDa+uMUz/9iudoStR6LdbuV1MfsUw+2eCHCL3+HxvA0eF+3RN/wRfw6nCc7AaMgPwmNJvWKOv1ERel9H46vN1FbBscitkZ4lN33Lj7pkGPw29HYncrXuUTVQhZdZVoICDQkXgn/ivBOgWRy9w2poPlKNcRtXQiGrP9ISH4Wp1clgQWHYfNxPTjxyELsg941VnWXlqtCfCKvXT7sqUgvQ8TcqSmAUh2E90tP8WYJ6bMcC0OIKyJKn+wEtSeaxGSzEVtortJ4rPVyt2mOHAYRW8KA3jzzRz68UkkWotu3WvT7Hv11sL/xXiXVGMNjhr0nRNCco4Ofu8zuneJ4iOsa8OiaxFuc+Anp+TWf+wKRN3F2loOiWHr41xAXs3QwKS9rIcVYceU7WRFlv7nQJNeIo3w76YB+1tfcePkDrLRddMjppKC84JQ+uxopjKf+djOLZPClMhWzrsvNEiQeaNFgGl8gSH/dv5MQPWOq+mextJCPnnW4RhMBUeU2Jr4Uzok9h1wiiLVJgxOLmmrSWKrZMsDFhz6YHSxyuR5D9dAf2jgQ2np4K1ofu7PMEKBaQ2mSjJeOvv4bmVhiqwNrlY="
-    on_success: always
-    on_failure: always
-
+    secure: QtY+ytuHg04v68q5kQ891r4UGAFKYyHu4gCbVfmMXpYlU4OR5XiHxnUG3bPdmI3my18gg56PrdXw/54UEzc0sh2GUKMhnTVvL3h59FuvqQ+EJToWUv8Pl9whZj/4YJIMPPetfD5Dp4pz5EqiZBHgho7vyM3aqMUqZGlwy8xaqYNqjh3R5DB1wrrsoNMqgmgeebMfMh9S1f5fKVW39lt9bhrzB14idMJADUC35vT6Gis+5egMQMBZo11A4/65Hy9xbnK7GbiedLmG3uZtGKyW9Qt7EyDJFFIiV9eoMeAkivS4EiAxuu+3bFL3lOUCojqDwTVKEnJHODGhLMve2JXTjCBtdc9qI3DunuY51O5TFWrJSE5673WThftWJDejwDwNmtCsqmC++IPOoJA7+Qmf5LGJLiWXFHsSV/YEQmwYDT73EXNKLQJBmpkitOOBme5zUJBRfP9eOhW8ydHJQ8SB+E4WD/+Jag/2ceSxK8Oo3bMwkl4e4i3xbsgiTFMRGotaapjiJNxDsWDl0x2NLNe4GQgBoketGKDAsj6NDMC3nLLISxWbj2Bi2iV8n3cSHQbkbz35WX82r4khCZ+NPx+/8cGsh8S4dmLps0OaFnCHFhUWkh2OJAQGRJeeAWyFOBs1UzeOr01qXF+BrCoAORlQyZwkXTQ4ZS5Oc6n+54XU/aU=
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage.json
