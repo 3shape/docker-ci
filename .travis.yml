@@ -35,8 +35,8 @@ install:
   - pwsh -f "./Install-Prerequisites.ps1"
   - export GitVersion_Version=$(dotnet gitversion -output json -showvariable majorminorpatch)
   - export GitVersion_PreReleaseTagWithDash=$(dotnet gitversion -output json -showvariable PreReleaseTagWithDash)
-  - 'echo "GitVersion says version is : ${GitVersion_Version} "'
-  - 'echo "GitVersion says prerelease tag is: ${GitVersion_PreReleaseTagWithDash} "'
+  - 'echo "GitVersion says version is : ${GitVersion_Version}"'
+  - 'echo "GitVersion says prerelease tag is: ${GitVersion_PreReleaseTagWithDash}"'
 
 script:
   - pwsh -f "./Invoke-Tests.ps1"
@@ -48,6 +48,13 @@ deploy:
   on:
     tags: true
     branch: master
+
+# require the branch name to be master (note for PRs this is the base branch name)
+notifications:
+  email: false
+  slack: "${SlackIntegration}"
+    on_success: always
+    on_failure: always
 
 after_success:
   # Upload coverage report to codecov
