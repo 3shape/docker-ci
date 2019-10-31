@@ -31,7 +31,10 @@ Properties {
 # Customize these tasks for performing operations before and/or after publish.
 ###############################################################################
 Task PrePublish {
-    $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Source\Public\*.ps1 -ErrorAction SilentlyContinue)
+    $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Public\*.ps1 -ErrorAction SilentlyContinue)
+
+    Write-Debug "These functions will be included in the published module: ${functionScriptFiles}"
+
     [string[]]$functionNames = @($functionScriptFiles.BaseName)
 
     $prerelease = $env:GitVersion_PreReleaseTagWithDash
