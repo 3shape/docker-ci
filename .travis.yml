@@ -52,7 +52,9 @@ deploy:
 # require the branch name to be master (note for PRs this is the base branch name)
 notifications:
   email: false
-  slack: "${SlackIntegration}"
+  slack:
+    rooms:
+      - "3shape:${SlackToken}"
     on_success: always
     on_failure: always
 
