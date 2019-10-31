@@ -14,7 +14,6 @@ if: |
     repo != 3shapeAS/dockerbuild-pwsh OR \
     type = pull_request OR \
     branch = master OR \
-    branch = update/travis OR \
     tag IS present
 
 services:
