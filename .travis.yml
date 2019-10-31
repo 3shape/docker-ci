@@ -50,7 +50,7 @@ deploy:
     branch: master
 
 notifications:
-  email: true
+  email: false
   slack:
     rooms:
       - "3shape:${SlackToken}#travis_test"
