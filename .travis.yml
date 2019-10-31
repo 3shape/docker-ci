@@ -44,10 +44,6 @@ deploy:
     tags: true
     branch: master
 notifications:
-  email:
-    recipients: "rasmus.jelsgaard@gmail.com"
-    on_success: always
-    on_failure: always
   slack:
     rooms:
       - secure: "jFegToc5tLojkLiPpNme6ZCsQXFykNmarnvvlo/JXEyTyA5iiEAf+Yri9tJ4Q3u0QlN6nrH311+3a65NUsJadKoVqSqDa+uMUz/9iudoStR6LdbuV1MfsUw+2eCHCL3+HxvA0eF+3RN/wRfw6nCc7AaMgPwmNJvWKOv1ERel9H46vN1FbBscitkZ4lN33Lj7pkGPw29HYncrXuUTVQhZdZVoICDQkXgn/ivBOgWRy9w2poPlKNcRtXQiGrP9ISH4Wp1clgQWHYfNxPTjxyELsg941VnWXlqtCfCKvXT7sqUgvQ8TcqSmAUh2E90tP8WYJ6bMcC0OIKyJKn+wEtSeaxGSzEVtortJ4rPVyt2mOHAYRW8KA3jzzRz68UkkWotu3WvT7Hv11sL/xXiXVGMNjhr0nRNCco4Ofu8zuneJ4iOsa8OiaxFuc+Anp+TWf+wKRN3F2loOiWHr41xAXs3QwKS9rIcVYceU7WRFlv7nQJNeIo3w76YB+1tfcePkDrLRddMjppKC84JQ+uxopjKf+djOLZPClMhWzrsvNEiQeaNFgGl8gSH/dv5MQPWOq+mextJCPnnW4RhMBUeU2Jr4Uzok9h1wiiLVJgxOLmmrSWKrZMsDFhz6YHSxyuR5D9dAf2jgQ2np4K1ofu7PMEKBaQ2mSjJeOvv4bmVhiqwNrlY="
