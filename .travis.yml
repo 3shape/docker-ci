@@ -22,7 +22,6 @@ services:
 dist: bionic
 addons:
     apt:
-        update: true
         sources:
             - sourceline: 'deb http://archive.ubuntu.com/ubuntu bionic main universe'
             - sourceline: "deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main"
