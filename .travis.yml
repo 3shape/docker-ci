@@ -49,12 +49,11 @@ deploy:
     tags: true
     branch: master
 
-# require the branch name to be master (note for PRs this is the base branch name)
 notifications:
-  email: false
+  email: true
   slack:
     rooms:
-      - "3shape:${SlackToken}"
+      - "3shape:${SlackToken}#travis_test"
     on_success: always
     on_failure: always
 
