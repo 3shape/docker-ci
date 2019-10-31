@@ -53,7 +53,7 @@ notifications:
   email: false
   slack:
     rooms:
-      - "3shape:${SlackToken}#travis_test"
+      - secure: "mI1qCeu+NvpADnfcIBbP/fx8Aq3OhguVEZyCVAfZWuxCoI3o123ffM8dU4e4cNL+O0lPUOBSHwElLVGVI4W/liKjOd0ZNUA9Oc0XYnEU6ZB6/X6XTTaIngwxIKOb20V+SuUi8WnJcCh8jDWjWivRhHDG4HdsJnoUX0B9OVyZ7Ar1fivLmwW8ZZjOfPLcYhNFvoMY8WBdEJ2GzNV6G5a5WegOdhdi8o1yKJ8sOL+pM8Xg5XJs0mGBrBLe+0cqbhJKAjayjjIPibXVVVBYFdG0lTPt8aI/Xmv+/SZ7Z370YwOTOwoyTbnIEc6q7Jk3AgaJO9Sv10zLmanISWc4wFbsr6bO7cEbI0c+Jk89XmkwpFF/wSg1pNc4b2I9hZDQCvlBpCrqJ1ZKCpWZrfdxcayOJb8dhZPy3MY2PmxZ0kiGwTxPFE1qSw9NY58F/52AQmDSEVlOoNe6uPnl/ALkgu2fNz/7uD+nK2nMCUqPeogxcgCjTnNVVlwQh7qoZg995J3fiSNY6nt4iPaLaJPqXt1OHGrN980FUkrSv68tk7v3nEaoPfmwEOv+ZBe4sQ6/aljfmUiukuiftCnUPfHJRmXKqx48X3up1iKy2diincW7D4FAj6B+uLqDskGqkpJ199wmEGp8VBzI1peHZ735ODSe60rGpGkJIxExpwX1prj2etw="
     on_success: always
     on_failure: always
 
