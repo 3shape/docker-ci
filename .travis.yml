@@ -44,7 +44,6 @@ deploy:
     tags: true
     branch: master
 notifications:
-notifications:
   email:
     recipients: rasmus.jelsgaard@gmail.com
     on_success: always
