@@ -45,7 +45,7 @@ deploy:
     branch: master
 notifications:
   email:
-    recipients: rasmus.jelsgaard@gmail.com
+    recipients: "rasmus.jelsgaard@gmail.com"
     on_success: always
     on_failure: always
   slack:
