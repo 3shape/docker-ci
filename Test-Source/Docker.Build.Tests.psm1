@@ -36,7 +36,6 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
     return $result
 }
 
-
 Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
     StoreMockValue -Key "command" -Value $Command
     $result = [CommandResult]::new()
