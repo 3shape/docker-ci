@@ -35,3 +35,10 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value ( {
         $result.ExitCode = 0
         return $result
     })
+
+Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value ( {
+        StoreMockValue -Key "command" -Value $Command
+        $result = [CommandResult]::new()
+        $result.ExitCode = 1
+        return $result
+    })
