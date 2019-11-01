@@ -40,7 +40,7 @@ Describe 'Run docker tests using Google Structure' {
             $configs = @($structureCommandConfig)
             $imageToTest = 'ubuntu:latest'
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir (Join-Path (New-RandomFolderForTestUse) (New-Guid))
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir (Join-Path (New-RandomFolder) (New-Guid))
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -110,7 +110,7 @@ Describe 'Run docker tests using Google Structure' {
 
             $theCode = {
                 $imageToTest = 'ubuntu:latest'
-                Invoke-DockerTests -ImageName $imageToTest -TestReportDir (New-RandomFolderForTestUse)
+                Invoke-DockerTests -ImageName $imageToTest -TestReportDir (New-RandomFolder)
             }
 
             $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
@@ -121,7 +121,7 @@ Describe 'Run docker tests using Google Structure' {
             $configs = @($structureCommandConfig)
             $imageToTest = 'ubuntu:latest'
 
-            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions -TestReportDir (New-RandomFolderForTestUse) }
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions -TestReportDir (New-RandomFolder) }
 
             $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
