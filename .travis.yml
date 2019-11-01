@@ -51,7 +51,9 @@ deploy:
   on:
     tags: true
     branch: master
+
 after_deploy:
   - pwsh -f "./Notify-Slack.ps1"
+
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage.json
