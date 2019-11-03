@@ -1,17 +1,10 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
+. "$PSScriptRoot\New-RandomFolder.ps1"
 
 Describe 'Validate various support functions for testing' {
 
     Context 'Validating support functions for - When git is installed' {
-
-        It 'can create random folder in TEMP folder' {
-            $pathInTemp = New-RandomFolder
-
-            Test-Path -Path $pathInTemp | Should -Be $true
-
-            Remove-Item $pathInTemp -Recurse -Force
-        }
 
         It 'can create fake git repository for testing' {
             $pathInTemp = New-RandomFolder

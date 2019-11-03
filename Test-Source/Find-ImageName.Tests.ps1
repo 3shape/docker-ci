@@ -3,6 +3,7 @@ Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
+. "$PSScriptRoot\New-RandomFolder.ps1"
 
 Describe 'Parse context from git repository' {
 
