@@ -6,17 +6,9 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 Describe 'Pull docker images' {
 
-    $returnExitCodeOne = {
-        Write-Debug $Command
-        StoreMockValue -Key "pull" -Value $Command
-        $commandResult = [CommandResult]::new()
-        $commandResult.ExitCode = 0
-        return $commandResult
-    }
-
     BeforeEach {
         Initialize-MockReg
-        Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:moduleName
+        Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:moduleName
     }
 
     AfterEach {
@@ -27,115 +19,90 @@ Describe 'Pull docker images' {
 
         It 'pulls public docker image by image name only' {
             Invoke-DockerPull -ImageName 'ubuntu'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu:latest"
         }
 
         It 'pulls public docker image by image name and tag' {
             Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
         }
 
         It 'pulls public docker image by registry and image name' {
             Invoke-DockerPull -Registry 'not.docker.hub' -ImageName 'ubuntu'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull not.docker.hub/ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with $null registry value and image name' {
             Invoke-DockerPull -Registry $null -ImageName 'ubuntu'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with whitespace registry value and image name' {
             Invoke-DockerPull -Registry '   ' -ImageName 'ubuntu'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with empty registry value, image name and tag' {
             Invoke-DockerPull -Registry '' -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
         }
 
         It 'pulls public docker image by image name and digest' {
             Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152'
-            $result = GetMockValue -Key "pull"
+            $result = GetMockValue -Key "command"
             Write-Debug $result
             $result | Should -BeLikeExactly "docker pull ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
         }
 
         It 'pulls public docker image by image name, with both tag and digest; and fails' {
-            $theCode = {
-                Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
-            }
+            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
 
         It 'pulls public docker image by image name with invalid digest, missing sha256: prefix; and fails' {
-            $theCode = {
-                Invoke-DockerPull -ImageName 'ubuntu' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840'
-            }
+            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
 
         It 'pulls public docker image by image name with invalid digest, wrong digest length; and fails' {
-            $theCode = {
-                Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d'
-            }
+            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
         }
 
         It 'does not allow colons in imagename, force use of tag' {
-            $theCode = {
-                Invoke-DockerPull -ImageName 'ubuntu:bionic'
-            }
+            $theCode = { Invoke-DockerPull -ImageName 'ubuntu:bionic' }
             $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
         }
 
         It 'does not allow at signs in imagename, force use of tag' {
-            $theCode = {
-                Invoke-DockerPull -ImageName 'ubuntu@sha256:f5c0a8d225a4b7556db2b26753a7f4c4d'
-            }
+            $theCode = { Invoke-DockerPull -ImageName 'ubuntu@sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' }
             $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
         }
 
         It 'cannot pull the requested docker image, throws exception on non-zero exit code' {
-            $returnExitCodeOne = {
-                $commandResult = [CommandResult]::new()
-                $commandResult.ExitCode = 1
-                return $commandResult
-            }
-            Mock -CommandName "Invoke-Command" $returnExitCodeOne  -Verifiable -ModuleName $Global:ModuleName
-            $theCode = {
-                Invoke-DockerPull -ImageName 'mcr.microsoft.com/ubuntu'
-            }
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeOne  -Verifiable -ModuleName $Global:ModuleName
+            $theCode = { Invoke-DockerPull -ImageName 'mcr.microsoft.com/ubuntu' }
             $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
     }
 
     Context 'Pipeline execution' {
 
-        $code = {
-            Write-Debug $Command
-            StoreMockValue -Key "pull" -Value $Command
-            $commandResult = [CommandResult]::new()
-            $commandResult.ExitCode = 0
-            return $commandResult
-        }
-
         BeforeEach {
             Initialize-MockReg
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
         }
 
         AfterEach {
