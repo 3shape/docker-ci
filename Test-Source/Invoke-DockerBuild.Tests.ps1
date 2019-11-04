@@ -44,7 +44,22 @@ Describe 'Build docker images' {
         It 'creates correct docker build command, with $null registry parameter' {
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"$($Global:DockerImagesDir)`" -t leeandrasmus:latest -f `"${dockerFile}`""
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`""
+        }
+    }
+
+    Context 'Docker build with cache from parameter' {
+
+        It 'creates correct docker build command, with valid registry parameter and with correct CacheFrom image name' {
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry 'valid' -CacheFrom 'leeandrasmus:sha256'
+            $result = GetMockValue -Key "command"
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t valid/leeandrasmus:latest -f `"${dockerFile}`" --cache-from leeandrasmus:sha256"
+        }
+
+        It 'creates correct docker build command, with $null registry parameter and with correct CacheFrom image name' {
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null -CacheFrom 'leeandrasmus:notlatest'
+            $result = GetMockValue -Key "command"
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" --cache-from leeandrasmus:notlatest"
         }
     }
 
