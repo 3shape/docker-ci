@@ -42,7 +42,28 @@ Describe 'Build docker images' {
         It 'creates correct docker build command, with $null registry parameter' {
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"$($Global:DockerImagesDir)`" -t leeandrasmus:latest -f `"${dockerFile}`""
+            $result | Should -BeLikeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`""
+        }
+    }
+
+    Context 'Docker build with the extra parameter' {
+
+        It 'creates correct docker build command, with the extra parameter' {
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -ExtraParams '--cache-from garbage-in:garbage-out'
+            $result = GetMockValue -Key "command"
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" --cache-from garbage-in:garbage-out"
+        }
+
+        It 'creates correct docker build command, with the extra parameter and  $null registry parameter' {
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null -ExtraParams '-m=4g'
+            $result = GetMockValue -Key "command"
+            $result | Should -BeLikeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" -m=4g"
+        }
+
+        It 'creates correct docker build command, with a longer extra parameter' {
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -ExtraParams '--cache-from garbage-in:garbage-out -m=4g'
+            $result = GetMockValue -Key "command"
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" --cache-from garbage-in:garbage-out -m=4g"
         }
     }
 
