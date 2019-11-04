@@ -3,19 +3,12 @@ Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
-. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
-. "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
 
 Describe 'Build docker images' {
 
     BeforeEach {
         Initialize-MockReg
-        if ($IsWindows) {
-            $dockerFile = Join-Path $Global:DockerImagesDir "Windows.Dockerfile"
-        }
-        elseif ($IsLinux) {
-            $dockerFile = Join-Path $Global:DockerImagesDir "Linux.Dockerfile"
-        }
+        $dockerFile = Join-Path $Global:DockerImagesDir "Linux.Dockerfile"
         Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
     }
 
