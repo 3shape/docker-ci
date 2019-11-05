@@ -24,6 +24,7 @@ For each tasks there is a corresponding CmdLet:
 - Invoke-DockerPull
 - Invoke-DockerPush
 - Invoke-DockerTag
+- Invoke-DockerInspect
 
 To run, just do
 
