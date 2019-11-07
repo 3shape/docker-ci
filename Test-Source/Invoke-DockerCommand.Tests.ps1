@@ -33,51 +33,41 @@ Describe 'Run external tools as commands' {
             $result.StdErr | Should -BeNullOrEmpty
         }
 
-        It 'returns the error output for failing commands, silently' {
+        It 'returns the exit code for failing commands, silently' {
             $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -ShowInProgressOutput:$false
             $result.ExitCode | Should -Not -Be 0
-            $result.StdOut | Should -BeNullOrEmpty
-            $result.StdErr | Should -Not -BeNullOrEmpty
+            #   Not all command bails out by print error output to stderr
         }
 
-        It 'returns the error output for failing commands, verbosely' {
+        It 'returns the exit code for failing commands, verbosely' {
             $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -ShowInProgressOutput:$true
             $result.ExitCode | Should -Not -Be 0
-            $result.StdOut | Should -BeNullOrEmpty
-            $result.StdErr | Should -Not -BeNullOrEmpty
+            #   Not all command bails out by print error output to stderr
         }
     }
 
-    Context 'Cannot run a PS CmdLet' {
-        It 'returns error result information' {
-            $commandName = 'Get-Verb'
-            $result = Invoke-ExecCommandCore $commandName
-            $result.ExitCode | Should -Not -Be 0
-            $result.StdOut | Should -Not -BeNullOrEmpty
-        }
-    }
-
-    Context 'Run a nonexisting command' {
+    Context 'Run a non-existent command, throws an exception' {
         It 'throws an exception' {
-            $theCode = {
-                Invoke-ExecCommandCore 'GibberishGoo'
-            }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.CommandNotFoundException]) -PassThru
+            $theCode = { Invoke-ExecCommandCore 'GibberishGoo' }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
+        }
+    }
+
+    Context 'Cannot run a PS CmdLet, behaves just like running a non-existent command' {
+        It 'returns error result information' {
+            $theCode = { Invoke-ExecCommandCore 'Get-Verb' }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
         }
     }
 
     Context 'Run a null or empty command' {
         It 'throws an exception if a null command is passed' {
-            $theCode = {
-                Invoke-Command $null
-            }
+            $theCode = { Invoke-ExecCommandCore $null }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
 
         It 'throws an exception if an empty command is passed' {
-            $theCode = {
-                Invoke-Command ""
-            }
+            $theCode = { Invoke-ExecCommandCore "" }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
     }

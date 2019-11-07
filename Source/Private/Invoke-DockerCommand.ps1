@@ -78,20 +78,27 @@ function Invoke-ExecCommandCore {
         #     throw "Command failed to execute: $Command $CommandArgs"
         # }
     }
-    catch [System.Management.Automation.MethodInvocationException] {
-        Write-Error -InformationAction 'SilentlyContinue' -Message $_.Exception.Message
-        if ($null -eq $result.StdOut) {
-            $result.StdOut += $_.Exception.Message
-        }
-        if ($result.ExitCode -eq 0) {
-            $result.ExitCode = 1
-        }
-        $finished = $true
-    }
+    #   Catch the exception and process the output
+    # catch [System.Management.Automation.MethodInvocationException] {
+    #     $finished = $true
+    #     $exception = $_.Exception
+    #     if ($null -ne $_.Exception.InnerException) {
+    #         $exception = $_.Exception.InnerException
+    #     }
+    #     if ($ShowInProgressOutput) {
+    #         Write-Error -InformationAction 'SilentlyContinue' -Exception $exception
+    #     }
+    #     if ($null -eq $result.StdErr) {
+    #         $result.StdErr += $exception.Message
+    #     }
+    #     if ($result.ExitCode -eq 0) {
+    #         $result.ExitCode = $exception.ErrorCode
+    #     }
+    # }
     finally {
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
-        if (-not $finished) {
+        if ((Get-Variable -Name 'finished' -ErrorAction 'SilentlyContinue') -and -not $finished) {
             $process.Kill()
         }
     }
