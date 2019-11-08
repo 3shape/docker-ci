@@ -50,7 +50,7 @@ function Invoke-ExecCommandCore {
         $out = $process.StandardOutput
         while (-not $out.EndOfStream) {
             $outLine = $out.ReadLine()
-            $result.StdOut += $outLine
+            $result.Output += $outLine
 
             if ($ShowInProgressOutput) {
                 Write-Information -InformationAction 'Continue' -MessageData $outLine
@@ -59,7 +59,7 @@ function Invoke-ExecCommandCore {
         $err = $process.StandardError
         while (-not $err.EndOfStream) {
             $errLine = $err.ReadLine()
-            $result.StdErr += $errLine
+            $result.Output += $errLine
 
             if ($ShowInProgressOutput) {
                 Write-Information -InformationAction 'Continue' -MessageData $errLine
@@ -88,8 +88,8 @@ function Invoke-ExecCommandCore {
     #     if ($ShowInProgressOutput) {
     #         Write-Error -InformationAction 'SilentlyContinue' -Exception $exception
     #     }
-    #     if ($null -eq $result.StdErr) {
-    #         $result.StdErr += $exception.Message
+    #     if ($null -eq $result.Output) {
+    #         $result.Output += $exception.Message
     #     }
     #     if ($result.ExitCode -eq 0) {
     #         $result.ExitCode = $exception.ErrorCode
