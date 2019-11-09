@@ -1,6 +1,6 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 
-. "$PSScriptRoot\..\Source\Private\Invoke-DockerCommand.ps1"
+. "$PSScriptRoot\..\Source\Private\Invoke-ExecCommandCore.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
 
 Describe 'Runs only external tools' {
