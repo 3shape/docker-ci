@@ -1,14 +1,3 @@
-
-function Invoke-DockerCommand {
-    param (
-        [Parameter(mandatory = $true)]
-        [string] $CommandArgs,
-        [switch] $PassThru = $true
-    )
-    $result = Invoke-ExecCommandCore -Command 'docker' -CommandArgs $CommandArgs -PassThru:$PassThru
-    return $result
-}
-
 #   Borrowed from our friendly provider: https://github.com/dotnet/roslyn/blob/master/src/Setup/Installer/tools/utils.ps1
 
 function Invoke-ExecCommandCore {
