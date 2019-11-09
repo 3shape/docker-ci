@@ -3,9 +3,9 @@ function Invoke-DockerCommand {
     param (
         [Parameter(mandatory = $true)]
         [string] $CommandArgs,
-        [switch] $ShowInProgressOutput = $true
+        [switch] $PassThru = $true
     )
-    $result = Invoke-ExecCommandCore -Command 'docker' -CommandArgs $CommandArgs -ShowInProgressOutput:$ShowInProgressOutput
+    $result = Invoke-ExecCommandCore -Command 'docker' -CommandArgs $CommandArgs -PassThru:$PassThru
     return $result
 }
 
@@ -16,7 +16,7 @@ function Invoke-ExecCommandCore {
         [Parameter(mandatory = $true)]
         [string] $Command,
         [string] $CommandArgs,
-        [switch] $ShowInProgressOutput = $true
+        [switch] $PassThru = $true
     )
 
     $result = [CommandCoreResult]::new()
@@ -52,7 +52,7 @@ function Invoke-ExecCommandCore {
             $outLine = $out.ReadLine()
             $result.Output += $outLine
 
-            if ($ShowInProgressOutput) {
+            if ($PassThru) {
                 Write-Information -InformationAction 'Continue' -MessageData $outLine
             }
         }
@@ -61,7 +61,7 @@ function Invoke-ExecCommandCore {
             $errLine = $err.ReadLine()
             $result.Output += $errLine
 
-            if ($ShowInProgressOutput) {
+            if ($PassThru) {
                 Write-Information -InformationAction 'Continue' -MessageData $errLine
             }
         }
@@ -72,33 +72,12 @@ function Invoke-ExecCommandCore {
 
         $finished = $true
         $result.ExitCode = $process.ExitCode
-
-        #   Dont' bail on failure
-        # if ($process.ExitCode -ne 0) {
-        #     throw "Command failed to execute: $Command $CommandArgs"
-        # }
     }
-    #   Catch the exception and process the output
-    # catch [System.Management.Automation.MethodInvocationException] {
-    #     $finished = $true
-    #     $exception = $_.Exception
-    #     if ($null -ne $_.Exception.InnerException) {
-    #         $exception = $_.Exception.InnerException
-    #     }
-    #     if ($ShowInProgressOutput) {
-    #         Write-Error -InformationAction 'SilentlyContinue' -Exception $exception
-    #     }
-    #     if ($null -eq $result.Output) {
-    #         $result.Output += $exception.Message
-    #     }
-    #     if ($result.ExitCode -eq 0) {
-    #         $result.ExitCode = $exception.ErrorCode
-    #     }
-    # }
     finally {
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
-        if ((Get-Variable -Name 'finished' -ErrorAction 'SilentlyContinue') -and -not $finished) {
+        if ((Get-Variable -Name 'finished' -ErrorAction 'Ignore') -and -not $finished) {
+            #   Only kill when finish is $false
             $process.Kill()
         }
     }

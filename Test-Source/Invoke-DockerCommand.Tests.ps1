@@ -19,28 +19,40 @@ Describe 'Runs only external tools' {
             }
         }
 
+        BeforeEach {
+            $tempFile = New-TemporaryFile
+        }
+
+        AfterEach {
+            Remove-Item $tempFile -Force
+        }
+
         It 'returns correct output and exit code, silently' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -ShowInProgressOutput:$false
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -PassThru:$false 6> $tempFile
             $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'returns correct output and exit code, verbosely' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -ShowInProgressOutput:$true
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -PassThru:$true 6> $tempFile
             $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, silently' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -ShowInProgressOutput:$false
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -PassThru:$false 6> $tempFile
             $result.ExitCode | Should -Not -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, verbosely' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -ShowInProgressOutput:$true
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -PassThru:$true 6> $tempFile
             $result.ExitCode | Should -Not -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
     }
 
