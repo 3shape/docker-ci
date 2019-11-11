@@ -27,15 +27,17 @@ For each tasks there is a corresponding CmdLet:
 
 To run, just do
 
-```pwsh
+```powershell
 PS C:\docker> Invoke-DockerBuild .
 ```
 and so on.
 
 
 ## Installation
-PS /home/rasmusjelsgaard/docker> Install-Module Docker.Build -Repository PSGallery
 
+```powershell
+PS C:\docker> Install-Module Docker.Build -Repository PSGallery
+```
 
 ## Example
 In the following section we'll cover how to use the module to add testing and linting to an existing Dockerfile. I am assuming you repository looks like this at the moment:
