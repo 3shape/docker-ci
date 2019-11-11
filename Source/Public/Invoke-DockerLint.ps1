@@ -17,7 +17,7 @@ function Invoke-DockerLint {
         $PassThru
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
-    $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
+    $dockerFileExists = Test-Path -Path $pathToDockerFile -PathType Leaf
     if (!$dockerFileExists) {
         $mesage = "No such file: ${pathToDockerFile}"
         throw [System.IO.FileNotFoundException]::new($mesage)

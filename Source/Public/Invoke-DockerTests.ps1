@@ -11,7 +11,7 @@ function Invoke-DockerTests {
 
         [ValidateNotNullOrEmpty()]
         [String]
-        $TestReportDir = $(New-RandomFolder),
+        $TestReportDir = '.',
 
         [ValidateNotNullOrEmpty()]
         [String]
@@ -28,9 +28,13 @@ function Invoke-DockerTests {
     }
 
     $here = Format-AsAbsolutePath (Get-Location)
+    $absoluteTestReportDir = Format-AsAbsolutePath ($TestReportDir)
+    if (!(Test-Path $absoluteTestReportDir -PathType Container)) {
+        New-Item $absoluteTestReportDir -ItemType Directory -Force | Out-Null
+    }
     $structureCommand = "docker run -i" + `
         " -v `"${here}:/configs`"" + `
-        " -v `"${TestReportDir}:/report`"" + `
+        " -v `"${absoluteTestReportDir}:/report`"" + `
         " -v /var/run/docker.sock:/var/run/docker.sock" + `
         " rasmusjelsgaard/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
 
@@ -45,9 +49,11 @@ function Invoke-DockerTests {
         Assert-ExitCodeOk $commandResult
     }
 
-    $testReportPath = Join-Path $TestReportDir $TestReportName
+    $testReportPath = Join-Path $absoluteTestReportDir $TestReportName
 
     $result = [PSCustomObject]@{
+        # Todo: Need to check if the test report folder is missing.
+        # It should not crash when folder is not there, but should simply return nothing
         'TestResult'     = $(ConvertFrom-Json $(Get-Content $testReportPath))
         'TestReportPath' = $testReportPath
         'CommandResult'  = $commandResult

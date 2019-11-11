@@ -20,11 +20,14 @@ function Invoke-DockerLogin {
     )
     [String] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password
     $command = "Write-Output `"${plainTextPassword}`" | docker login --username `"${Username}`" --password-stdin ${Registry}".TrimEnd()
-    Write-Debug ($command.Replace($plaintextPassword, "*********"))
+    $maskedCommand = $command.Replace($plaintextPassword, "*********")
+    Write-Debug ($maskedCommand)
     [CommandResult] $commandResult = Invoke-Command $command
     if ($PassThru) {
         Write-PassThruOuput $($commandResult.Output)
     }
+    # Mask password from being shown
+    $commandResult.Command = $maskedCommand
     Assert-ExitCodeOK $commandResult
     return $commandResult
 }
