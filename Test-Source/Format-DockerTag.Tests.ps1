@@ -48,3 +48,20 @@ Describe 'Parse version, distro and arch from Dockerfile path' {
     }
 
 }
+
+Describe 'Format-DockerTag throws exception' {
+
+    BeforeEach {
+        Initialize-MockReg
+        $formatAsAbsolutePath = { "/tmp/Dockerfile" }
+        $testPath = { $True }
+        Mock -CommandName "Format-AsAbsolutePath" $formatAsAbsolutePath -Verifiable -ModuleName $Global:ModuleName
+        Mock -CommandName "Test-Path" $testPath -Verifiable -ModuleName $Global:ModuleName
+    }
+
+    it 'should thrown exception if parent directory count is less than 3' {
+        $code = { Format-DockerTag }
+        $code | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+    }
+
+}

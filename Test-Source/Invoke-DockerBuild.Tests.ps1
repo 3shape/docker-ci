@@ -32,14 +32,7 @@ Describe 'Build docker images' {
         }
 
         It 'Throws exception if exitcode is not 0' {
-            $returnExitCodeOne = {
-                Write-Debug $Command
-                StoreMockValue -Key "command" -Value $Command
-                $result = [CommandResult]::new()
-                $result.ExitCode = 1
-                return $result
-            }
-            Mock -CommandName "Invoke-Command" $returnExitCodeOne -Verifiable -ModuleName $Global:ModuleName
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeOne -Verifiable -ModuleName $Global:ModuleName
             $runner = {
                 Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile
             }

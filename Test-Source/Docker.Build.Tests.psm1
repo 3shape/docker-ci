@@ -28,10 +28,17 @@ Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
 
 # Global scriptblocks
-Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value ( {
-        StoreMockValue -Key "command" -Value $Command
-        $result = [CommandResult]::new()
-        $result.Output = @("Hello", "World")
-        $result.ExitCode = 0
-        return $result
-    })
+Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
+    StoreMockValue -Key "command" -Value $Command
+    $result = [CommandResult]::new()
+    $result.Output = @("Hello", "World")
+    $result.ExitCode = 0
+    return $result
+}
+
+Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
+    StoreMockValue -Key "command" -Value $Command
+    $result = [CommandResult]::new()
+    $result.ExitCode = 1
+    return $result
+}

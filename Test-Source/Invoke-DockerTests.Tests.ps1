@@ -2,6 +2,9 @@ Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
 Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
+. "$PSScriptRoot\..\Source\Private\Utilities.ps1"
+. "$PSScriptRoot\New-RandomFolder.ps1"
+
 Describe 'Run docker tests using Google Structure' {
 
     Context 'Running structure tests' {
@@ -13,6 +16,42 @@ Describe 'Run docker tests using Google Structure' {
 
         AfterEach {
             Set-Location $script:backupLocation
+        }
+
+        It 'can accept a relative path as test report directory' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir './'
+            $commandResult = $result.CommandResult
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 1
+            $testResult.Pass | Should -Be 1
+            $testResult.Fail | Should -Be 0
+            $testResult.Results[0].Name | Should -Be 'Command Test: Say hello world'
+            $testResult.Results[0].Pass | Should -Be $true
+            $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
+        }
+
+        It 'can accept a non-existant path as test report directory, and can create the path to store test reports' {
+            $structureCommandConfig = Join-Path $Global:StructureTestsPassDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir (Join-Path (New-RandomFolder) (New-Guid))
+            $commandResult = $result.CommandResult
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 1
+            $testResult.Pass | Should -Be 1
+            $testResult.Fail | Should -Be 0
+            $testResult.Results[0].Name | Should -Be 'Command Test: Say hello world'
+            $testResult.Results[0].Pass | Should -Be $true
+            $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
         }
 
         It 'can execute 1 succesful test' {
@@ -72,7 +111,7 @@ Describe 'Run docker tests using Google Structure' {
 
             $theCode = {
                 $imageToTest = 'ubuntu:latest'
-                Invoke-DockerTests -ImageName $imageToTest
+                Invoke-DockerTests -ImageName $imageToTest -TestReportDir (New-RandomFolder)
             }
 
             $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
@@ -83,7 +122,7 @@ Describe 'Run docker tests using Google Structure' {
             $configs = @($structureCommandConfig)
             $imageToTest = 'ubuntu:latest'
 
-            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions }
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions -TestReportDir (New-RandomFolder) }
 
             $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }

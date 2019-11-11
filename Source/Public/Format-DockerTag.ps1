@@ -7,7 +7,7 @@ function Format-DockerTag {
         $Dockerfile = 'Dockerfile'
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
-    $dockerFileExists = [System.IO.File]::Exists($pathToDockerFile)
+    $dockerFileExists = Test-Path -Path $pathToDockerFile -PathType Leaf
     if (!$dockerFileExists) {
         $message = "No such file: ${pathToDockerFile}"
         throw [System.IO.FileNotFoundException]::new($message)
