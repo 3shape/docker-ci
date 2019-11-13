@@ -34,7 +34,10 @@ function Invoke-DockerBuild {
         $PassThru
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
-    $dockerBuildCommand = "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`" " + $ExtraParams
+    if ($ExtraParams) {
+        $extraParameters = ' ' + $ExtraParams
+    }
+    $dockerBuildCommand = "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`"" + $extraParameters
     $commandResult = Invoke-Command $dockerBuildCommand
     Assert-ExitCodeOK $commandResult
     $result = [PSCustomObject]@{

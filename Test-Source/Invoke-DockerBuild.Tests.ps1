@@ -21,7 +21,7 @@ Describe 'Build docker images' {
         It 'creates correct docker build command' {
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile
             $result = GetMockValue -Key "command"
-            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" "
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'Throws exception if exitcode is not 0' {
@@ -36,13 +36,13 @@ Describe 'Build docker images' {
         It 'creates correct docker build command, with valid registry parameter' {
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry 'valid'
             $result = GetMockValue -Key "command"
-            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t valid/leeandrasmus:latest -f `"${dockerFile}`" "
+            $result | Should -BeExactly "docker build `"$Global:DockerImagesDir`" -t valid/leeandrasmus:latest -f `"${dockerFile}`""
         }
 
         It 'creates correct docker build command, with $null registry parameter' {
             Invoke-DockerBuild -ImageName "leeandrasmus" -Context $Global:DockerImagesDir -Dockerfile $dockerFile -Registry $null
             $result = GetMockValue -Key "command"
-            $result | Should -BeLikeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`" "
+            $result | Should -BeLikeExactly "docker build `"$Global:DockerImagesDir`" -t leeandrasmus:latest -f `"${dockerFile}`""
         }
     }
 
