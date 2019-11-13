@@ -20,28 +20,28 @@ Describe 'docker push' {
         It 'produces the correct command to invoke with only image name provided' {
             Invoke-DockerPush -ImageName 'cool-image'
 
-            $mockResult = GetMockValue -Key 'command'
+            $mockResult = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
             $mockResult | Should -Be "docker push cool-image:latest"
         }
 
         It 'produces the correct command to invoke with image name and registry provided' {
             Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages'
 
-            $mockResult = GetMockValue -Key 'command'
+            $mockResult = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:latest"
         }
 
         It 'produces the correct command to invoke with image name and $null registry value provided' {
             Invoke-DockerPush -ImageName 'cool-image' -Registry $null
 
-            $mockResult = GetMockValue -Key 'command'
+            $mockResult = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
             $mockResult | Should -Be "docker push cool-image:latest"
         }
 
         It 'produces the correct command to invoke with image name, registry and tag provided' {
             Invoke-DockerPush -ImageName 'cool-image' -Registry 'hub.docker.com:1337/thebestdockerimages' -Tag 'v1.0.3'
 
-            $mockResult = GetMockValue -Key 'command'
+            $mockResult = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
             $mockResult | Should -Be "docker push hub.docker.com:1337/thebestdockerimages/cool-image:v1.0.3"
         }
 
