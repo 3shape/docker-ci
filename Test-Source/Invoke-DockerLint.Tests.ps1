@@ -86,7 +86,7 @@ Describe 'Execute linting on a given docker image' {
 
         It "Defaults to `'Dockerfile`'" {
             $code = {
-                StoreMockValue -Key "Invoke-Command" -Value "$Command"
+                StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value "$Command"
             }
             Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
             Set-Location -Path $Global:DockerImagesDir
@@ -94,7 +94,7 @@ Describe 'Execute linting on a given docker image' {
             Invoke-DockerLint
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
-            $result = GetMockValue -Key 'Invoke-Command'
+            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
             $result | Should -BeLike "*Dockerfile*"
         }
     }
