@@ -26,11 +26,19 @@ function Invoke-DockerBuild {
         [String]
         $Dockerfile = "Dockerfile",
 
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ExtraParams = '',
+
         [Switch]
         $PassThru
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
-    $commandResult = Invoke-Command "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`""
+    if ($ExtraParams) {
+        $extraParameters = " ${ExtraParams}"
+    }
+    $dockerBuildCommand = "docker build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`"${extraParameters}"
+    $commandResult = Invoke-Command $dockerBuildCommand
     Assert-ExitCodeOK $commandResult
     $result = [PSCustomObject]@{
         'Dockerfile'    = $Dockerfile;
