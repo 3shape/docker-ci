@@ -36,7 +36,7 @@ function Invoke-DockerTests {
         " -v `"${here}:/configs`"" + `
         " -v `"${absoluteTestReportDir}:/report`"" + `
         " -v /var/run/docker.sock:/var/run/docker.sock" + `
-        " rasmusjelsgaard/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
+        " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
 
     $ConfigFiles.ForEach( {
             $configFile = Convert-ToUnixPath (Resolve-Path -Path $_  -Relative)
