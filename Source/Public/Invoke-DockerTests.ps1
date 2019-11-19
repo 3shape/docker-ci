@@ -32,16 +32,25 @@ function Invoke-DockerTests {
     if (!(Test-Path $absoluteTestReportDir -PathType Container)) {
         New-Item $absoluteTestReportDir -ItemType Directory -Force | Out-Null
     }
+    $osType = Find-DockerOSType
+    $dockerSocket = '/var/run/docker.sock:/var/run/docker.sock'
+    $configs = '/configs'
+    $report = '/report'
+    if ($osType -eq 'windows') {
+        $dockerSocket = '\\.\pipe\docker_engine:\\.\pipe\docker_engine'
+        $configs = 'C:/configs'
+        $report = 'C:/report'
+    }
     $structureCommand = "docker run -i" + `
-        " -v `"${here}:/configs`"" + `
-        " -v `"${absoluteTestReportDir}:/report`"" + `
-        " -v /var/run/docker.sock:/var/run/docker.sock" + `
-        " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report /report/${TestReportName}"
+        " -v `"${here}:${configs}`"" + `
+        " -v `"${absoluteTestReportDir}:${report}`"" + `
+        " -v `"${dockerSocket}`"" + `
+        " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report ${report}/${TestReportName}"
 
     $ConfigFiles.ForEach( {
             $configFile = Convert-ToUnixPath (Resolve-Path -Path $_  -Relative)
             $configName = Remove-Prefix -Value $configFile -Prefix './'
-            $structureCommand = -join ($structureCommand, " -c /configs/${configName}")
+            $structureCommand = -join ($structureCommand, " -c ${configs}/${configName}")
         }
     )
     $commandResult = Invoke-Command $structureCommand
