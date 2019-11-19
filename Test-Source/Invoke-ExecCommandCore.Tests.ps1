@@ -1,4 +1,5 @@
 Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-ExecCommandCore.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
@@ -82,6 +83,16 @@ Describe 'Runs only external tools' {
         It 'throws ParameterBindingException if an empty command is passed' {
             $theCode = { Invoke-ExecCommandCore -Command "" }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+        }
+    }
+
+    Context 'Runs a program that crashes' {
+
+        It 'can detect the crash' {
+            $code = { throw [System.ArgumentException]::new("exception message") }
+            Mock -CommandName "Write-Information" $code
+            $theCode = { Invoke-ExecCommandCore -Command "ping" -CommandArgs 'localhost' }
+            $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
         }
     }
 }

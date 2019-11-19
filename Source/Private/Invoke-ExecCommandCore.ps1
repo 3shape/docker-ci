@@ -11,6 +11,7 @@ function Invoke-ExecCommandCore {
     $result = [CommandCoreResult]::new()
     $result.Command = $Command
     $result.CommandArgs = $CommandArgs
+    $result.ExitCode = -1
 
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
     $startInfo.FileName = $Command
@@ -60,15 +61,18 @@ function Invoke-ExecCommandCore {
         }
 
         $finished = $true
-        $result.ExitCode = $process.ExitCode
     }
     finally {
+
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
         if ((Get-Variable -Name 'finished' -ErrorAction 'Ignore') -and -not $finished) {
-            #   Only kill when finish is $false
-            $process.Kill()
+            #   Only kill when finish is $false and the process did not already exit.
+            if (!$process.HasExited) {
+                $process.Kill()
+            }
         }
+        $result.ExitCode = $process.ExitCode
     }
     return $result
 }

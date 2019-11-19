@@ -22,6 +22,7 @@ $env:DOCKER_CI_QUIET_MODE = $true
 Set-GlobalVar -Variable TestDataDir -Value (Join-Path $PSScriptRoot '../Test-Data')
 Set-GlobalVar -Variable DockerImagesDir -Value(Join-Path $Global:TestDataDir 'DockerImage')
 Set-GlobalVar -Variable ExampleReposDir -Value(Join-Path $Global:TestDataDir 'ExampleRepos')
+Set-GlobalVar -Variable TestBinariesDir -Value(Join-Path $Global:TestDataDir 'Binaries')
 Set-GlobalVar -Variable LocalDockerRegistryDir -Value(Join-Path $Global:TestDataDir 'DockerRegistry')
 Set-GlobalVar -Variable PesterTestsDir -Value (Join-Path $Global:TestDataDir 'PesterTests')
 Set-GlobalVar -Variable StructureTestsDir -Value (Join-Path $Global:TestDataDir 'StructureTestsConfig')
