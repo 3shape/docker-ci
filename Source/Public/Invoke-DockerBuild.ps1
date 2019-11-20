@@ -31,7 +31,7 @@ function Invoke-DockerBuild {
         $ExtraParams = '',
 
         [Switch]
-        $PassThru
+        $Quiet
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
     if ($ExtraParams) {
@@ -47,7 +47,7 @@ function Invoke-DockerBuild {
         'Tag'           = $Tag;
         'CommandResult' = $commandResult
     }
-    if ($PassThru) {
+    if (!$Quiet) {
         Write-PassThruOuput $($commandResult.Output)
     }
     return $result
