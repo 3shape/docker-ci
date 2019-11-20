@@ -1,3 +1,4 @@
 .publish/
 **/coverage.json
 **/testreport.json
+coverage.json
