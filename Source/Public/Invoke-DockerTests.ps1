@@ -33,18 +33,17 @@ function Invoke-DockerTests {
         New-Item $absoluteTestReportDir -ItemType Directory -Force | Out-Null
     }
     $osType = Find-DockerOSType
-    $dockerSocket = '/var/run/docker.sock:/var/run/docker.sock'
+    $dockerSocket = Find-DockerSocket -OsType $osType
     $configs = '/configs'
     $report = '/report'
     if ($osType -eq 'windows') {
-        $dockerSocket = '\\.\pipe\docker_engine:\\.\pipe\docker_engine'
         $configs = 'C:/configs'
         $report = 'C:/report'
     }
     $structureCommand = "docker run -i" + `
         " -v `"${here}:${configs}`"" + `
         " -v `"${absoluteTestReportDir}:${report}`"" + `
-        " -v `"${dockerSocket}`"" + `
+        " -v `"${dockerSocket}:${dockerSocket}`"" + `
         " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report ${report}/${TestReportName}"
 
     $ConfigFiles.ForEach( {
