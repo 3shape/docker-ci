@@ -72,31 +72,7 @@ To build an image based on a Dockerfile, use the Invoke-DockerBuild CmdLet, like
 
 ```powershell
 PS C:\docker> Invoke-DockerBuild . -ImageName structure
-
-Dockerfile    : Dockerfile
-ImageName     : structure
-Registry      :
-Tag           : latest
-CommandResult : CommandResult
-```
-In this scenario, you will see the result of the execution which is a PSCustomObject that holds the command result and image name of the image you just created.
-
-You can verify the existence of the image using `docker images`
-```
-PS C:\docker> docker images
-```
-
-This is fine when everything goes well. But it's not very practial for troubleshooting. It would be better, if we could get some feedback while on the go.
-To see the output of the Docker command being run, use the `-PassThru` switch of the pertinent CmdLet.
-For example:
-
-```powershell
-PS C:\docker> Invoke-DockerBuild . -ImageName structure -PassThru
-```
-which will yield output along these lines:
-
-```powershell
-Sending build context to Docker daemon   2.56kB
+Sending build context to Docker daemon  4.608kB
 
 Step 1/8 : FROM ubuntu:18.04
  ---> 775349758637
@@ -107,9 +83,23 @@ Step 3/8 : RUN apt-get update     && apt-get install -y --no-install-recommends 
  ---> Using cache
  ---> 9470f9c9ecea
 Step 4/8 : RUN update-ca-certificates
-
- (snip)
-
+ ---> Using cache
+ ---> 80853c222946
+Step 5/8 : RUN curl -sL https://get.docker.com/ | sh
+ ---> Using cache
+ ---> af17b9b8fb1b
+Step 6/8 : RUN curl -LO https://storage.googleapis.com/container-structure-test/v1.8.0/container-structure-test-linux-amd64     && chmod +x container-structure-test-linux-amd64     && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+ ---> Using cache
+ ---> bea1dca8e10e
+Step 7/8 : VOLUME /configs
+ ---> Using cache
+ ---> 97e90bf8481b
+Step 8/8 : ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
+ ---> Using cache
+ ---> 6b9746ab76d8
+Successfully built 6b9746ab76d8
+Successfully tagged structure:latest
+SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
 
 Dockerfile    : Dockerfile
 ImageName     : structure
@@ -118,15 +108,57 @@ Tag           : latest
 CommandResult : CommandResult
 ```
 
-Now, we get both the result and the output from the docker command.
+In this scenario, you will see the both the output from Docker and the result of the execution which is a PSCustomObject that holds:
+
+- The path to the Dockerfile being used as the basis for the image.
+- The name of the image being produced.
+- The registry (if unset defaults to Docker's default registry)
+- The command result object which has more detailed information about the execution.
 
 In most cases you will want to store the result in a variable for further processing or output to a CI/CD pipeline, like so:
 
+```powershell
+PS C:\docker> Invoke-DockerBuild . -ImageName structure
+Sending build context to Docker daemon  4.608kB
+
+Step 1/8 : FROM ubuntu:18.04
+ ---> 775349758637
+Step 2/8 : SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ ---> Using cache
+ ---> b3d8c49615a7
+Step 3/8 : RUN apt-get update     && apt-get install -y --no-install-recommends curl=7.* ca-certificates=*     && apt-get clean     && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> 9470f9c9ecea
+Step 4/8 : RUN update-ca-certificates
+ ---> Using cache
+ ---> 80853c222946
+Step 5/8 : RUN curl -sL https://get.docker.com/ | sh
+ ---> Using cache
+ ---> af17b9b8fb1b
+Step 6/8 : RUN curl -LO https://storage.googleapis.com/container-structure-test/v1.8.0/container-structure-test-linux-amd64     && chmod +x container-structure-test-linux-amd64     && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+ ---> Using cache
+ ---> bea1dca8e10e
+Step 7/8 : VOLUME /configs
+ ---> Using cache
+ ---> 97e90bf8481b
+Step 8/8 : ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
+ ---> Using cache
+ ---> 6b9746ab76d8
+Successfully built 6b9746ab76d8
+Successfully tagged structure:latest
+SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
 ```
-PS C:\docker> $result = Invoke-DockerBuild . -ImageName structure -PassThru
+in which case you will only see the output from Docker, the result object is stored in $result.
+
+You can verify the existence of the image you just created using `docker images`
+```
+PS C:\docker> docker images
 ```
 
-Which would then output the status of the command and store the final result object in `$result`.
+If you want less output, use `-Quiet` switch to output only the final result of the command. Combined with storing the result in a variable, this will give a completely silent execution of the CmdLet.
+
+### Disabling verbose output
+You can also set the enviromenment variable `DOCKER_POSH_QUIET_MODE` to the desired setting for the `-Quiet` switch so you don't have to set it for each invocation of a cmdlet that supports it.
 
 ### Linting a Dockerfile
 An important aspect of writing quality Docker images is to try and learn from the best in the community. To this end, we provide a convenient way to run `hadolint` against a Dockerfile. Hadolint is a 3rd party component that scans a dockerfile and produces linted output. You can find the hadolint project here: https://github.com/hadolint/hadolint
@@ -135,7 +167,6 @@ Here's how to use the linter via a CmdLet:
 
 ```powershell
 PS C:\docker> $result = Invoke-DockerLint .\Dockerfile
-PS C:\docker> $result.LintOutput
 1: FROM ubuntu:18.04
 2:
 3: SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -158,11 +189,10 @@ PS C:\docker> $result.LintOutput
 20: ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
 ```
 
-This Dockerfile in particular has no linting remarks, so it is just output in its entirety with line numbers. Being a mere human, I will forget things from time to time. Let's imagine I omitted the instruction in line 3 on how to deal with commands that fail in a piped execution and run the same commands:
+This Dockerfile in particular has no linting remarks, so it is just output in its entirety with line numbers. Imagine I omitted the instruction in line 3 on how to deal with commands that fail in a piped execution and run the linting again:
 
 ```powershell
 PS C:\docker> $result = Invoke-DockerLint .\Dockerfile
-PS C:\docker> $result.LintOutput
 1: FROM ubuntu:18.04
 2:
 3: RUN apt-get update \
@@ -196,7 +226,7 @@ To run tests, you first define them in .yml configs. Then you build the image th
 So let's start by building an image called `structure`
 
 ```powershell
-PS C:\docker> Invoke-DockerBuild . -ImageName structure
+PS C:\docker> Invoke-DockerBuild . -Quiet -ImageName structure
 
 Dockerfile    : Dockerfile
 ImageName     : structure
@@ -227,8 +257,16 @@ commandTests:
 And you run the tests like this:
 
 ```powershell
-PS C:\docker> Invoke-DockerTests -ImageName 3shape/containerized-structure-test -ConfigFiles gcs-commands.yml
+PS C:\docker> $result = Invoke-DockerTests -ImageName 3shape/containerized-structure-test -ConfigFiles gcs-commands.yml
+@{Pass=1; Fail=0; Total=1; Results=System.Object[]}
+PS C:\docker> $result
+
+TestResult                                          TestReportPath            CommandResult ImageName
+----------                                          --------------            ------------- ---------
+@{Pass=1; Fail=0; Total=1; Results=System.Object[]} C:\docker\testreport.json CommandResult 3shape/containerized-structure-test
 ```
+
+This concludes the section with examples. Let us know if there is something missing, that is not clear from the documentation.
 
 # Development environment setup
 
