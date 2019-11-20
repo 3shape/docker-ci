@@ -135,7 +135,7 @@ Describe 'Pull docker images' {
 
     Context 'Verbosity of execution' {
 
-        It 'Outputs results if Quiet is disabled' {
+        It 'outputs results if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
@@ -145,7 +145,7 @@ Describe 'Pull docker images' {
             $result | Should -Be @('Hello', 'World')
         }
 
-        It 'Suppresses results if Quiet is enabled' {
+        It 'suppresses results if Quiet is enabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 

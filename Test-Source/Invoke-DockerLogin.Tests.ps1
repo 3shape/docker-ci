@@ -61,7 +61,7 @@ Describe 'Docker login ' {
 
     Context 'Verbosity of execution' {
 
-        It 'Outputs the result if Quiet is disabled' {
+        It 'outputs the result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
@@ -71,7 +71,7 @@ Describe 'Docker login ' {
             $result | Should -Be @('Hello', 'World')
         }
 
-        It 'Suppresses the result if Quiet is enabled' {
+        It 'suppresses the result if Quiet is enabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 

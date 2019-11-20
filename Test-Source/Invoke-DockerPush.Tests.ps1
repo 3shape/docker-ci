@@ -91,7 +91,7 @@ Describe 'docker push' {
 
     Context 'Verbosity of execution' {
 
-        It 'Outputs result if Quiet is disabled' {
+        It 'outputs result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName 'Invoke-Command' $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
@@ -101,7 +101,7 @@ Describe 'docker push' {
             $result | Should -Be @('Hello', 'World')
         }
 
-        It 'Suppresses output if Quiet is enabled' {
+        It 'suppresses output if Quiet is enabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName 'Invoke-Command' $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 

@@ -164,7 +164,7 @@ Describe 'Tag docker images' {
 
     Context 'Verbosity of execution' {
 
-        It 'It outputs result if Quiet is disabled' {
+        It 'outputs result if Quiet is disabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $tempFile = New-TemporaryFile
 
@@ -174,7 +174,7 @@ Describe 'Tag docker images' {
             $result | Should -Be @('Hello', 'World')
         }
 
-        It 'It suppresses output if Quiet is enabled' {
+        It 'suppresses output if Quiet is enabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $tempFile = New-TemporaryFile
 
