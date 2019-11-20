@@ -112,16 +112,28 @@ Describe 'Execute linting on a given docker image' {
     }
 
     Context 'Passthru execution' {
-        It 'Captures the output of the command invoked' {
+        It 'Captures the output of the command invoked if Quiet is disabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $tempFile = New-TemporaryFile
             $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
 
-            Invoke-DockerLint -DockerFile $dockerFile -Passthru 6> $tempFile
+            Invoke-DockerLint -DockerFile $dockerFile -Quiet:$false 6> $tempFile
 
             $result = Get-Content $tempFile
 
             $result | Should -Be @('Hello', 'World')
+        }
+
+        It 'Suppressess the output of the command invoked if Quiet is enabled' {
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+            $tempFile = New-TemporaryFile
+            $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
+
+            Invoke-DockerLint -DockerFile $dockerFile -Quiet:$true 6> $tempFile
+
+            $result = Get-Content $tempFile
+
+            $result | Should -BeNullOrEmpty
         }
     }
 }
