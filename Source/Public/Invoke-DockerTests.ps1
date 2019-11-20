@@ -60,7 +60,7 @@ function Invoke-DockerTests {
         'ImageName'      = $ImageName
     }
     if (!$Quiet) {
-        Write-CommandOuput $($commandResult.Output)
+        Write-CommandOuput $($result.TestResult)
     }
     return $result
 }
