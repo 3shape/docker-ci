@@ -1,0 +1,7 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: "license"
+    path: "C:/License.txt"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
