@@ -103,7 +103,7 @@ Describe 'Build docker images' {
 
         It 'Captures the output of the command invoked with Quiet mode disabled' {
             $tempFile = New-TemporaryFile
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile 6> $tempFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet:$false 6> $tempFile
             $result = Get-Content $tempFile
 
             $result | Should -Be @('Hello', 'World')
@@ -111,7 +111,7 @@ Describe 'Build docker images' {
 
         It 'Produces no output if quiet mode is enabled' {
             $tempFile = New-TemporaryFile
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet 6> $tempFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet:$true 6> $tempFile
             $result = Get-Content $tempFile
 
             $result | Should -BeNullOrEmpty
