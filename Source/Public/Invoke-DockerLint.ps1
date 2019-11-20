@@ -37,7 +37,7 @@ function Invoke-DockerLint {
         'LintOutput'    = $lintedDockerfile
     }
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

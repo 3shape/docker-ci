@@ -45,7 +45,7 @@ function Invoke-DockerTag {
         'CommandResult' = $commandResult
     }
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

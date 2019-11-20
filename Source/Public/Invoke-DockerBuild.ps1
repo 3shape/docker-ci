@@ -48,7 +48,7 @@ function Invoke-DockerBuild {
         'CommandResult' = $commandResult
     }
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

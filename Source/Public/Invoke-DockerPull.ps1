@@ -57,7 +57,7 @@ function Invoke-DockerPull {
         'Digest'        = $Digest
     }
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

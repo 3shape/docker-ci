@@ -31,7 +31,7 @@ function Invoke-DockerPush {
         'Tag'           = $Tag;
     }
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

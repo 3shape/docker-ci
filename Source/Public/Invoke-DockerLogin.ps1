@@ -24,7 +24,7 @@ function Invoke-DockerLogin {
     Write-Debug ($maskedCommand)
     [CommandResult] $commandResult = Invoke-Command $command
     if (!$Quiet) {
-        Write-PassThruOuput $($commandResult.Output)
+        Write-CommandOuput $($commandResult.Output)
     }
     # Mask password from being shown
     $commandResult.Command = $maskedCommand
