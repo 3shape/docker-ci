@@ -28,7 +28,7 @@ function Invoke-DockerTag {
         $NewTag = 'latest',
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
     )
 
     $postfixedRegistry = Add-Postfix -Value $Registry
@@ -44,7 +44,7 @@ function Invoke-DockerTag {
         'Registry'      = $postfixedNewRegistry
         'CommandResult' = $commandResult
     }
-    if ($PassThru) {
+    if (!$Quiet) {
         Write-PassThruOuput $($commandResult.Output)
     }
     return $result
