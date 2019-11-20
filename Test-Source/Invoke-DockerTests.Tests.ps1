@@ -182,7 +182,7 @@ Describe 'Run docker tests using Google Structure' {
 
             $result = Get-Content $tempFile
             Write-Debug "Result: $result"
-            $result | Should -BeLike "*level=fatal msg=FAIL*"
+            $result | Should -BeLike "*Pass=0; Fail=1; Total=1*"
         }
 
         It 'suppresses output if Quiet is enabled' {
