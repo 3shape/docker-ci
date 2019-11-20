@@ -16,14 +16,14 @@ function Invoke-DockerLogin {
         $Registry,
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
     )
     [String] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password
     $command = "Write-Output `"${plainTextPassword}`" | docker login --username `"${Username}`" --password-stdin ${Registry}".TrimEnd()
     $maskedCommand = $command.Replace($plaintextPassword, "*********")
     Write-Debug ($maskedCommand)
     [CommandResult] $commandResult = Invoke-Command $command
-    if ($PassThru) {
+    if (!$Quiet) {
         Write-PassThruOuput $($commandResult.Output)
     }
     # Mask password from being shown

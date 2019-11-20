@@ -59,16 +59,26 @@ Describe 'Docker login ' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        it 'can redirect output' {
+        It 'Outputs the result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
-            Invoke-DockerLogin -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force) -Passthru 6> $tempFile
+            Invoke-DockerLogin -Quiet:$false -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force) 6> $tempFile
             $result = Get-Content $tempFile
 
             $result | Should -Be @('Hello', 'World')
+        }
+
+        It 'Suppresses the result if Quiet is enabled' {
+            $tempFile = New-TemporaryFile
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+
+            Invoke-DockerLogin -Quiet:$true -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force) 6> $tempFile
+            $result = Get-Content $tempFile
+
+            $result | Should -BeNullOrEmpty
         }
     }
 }
