@@ -158,7 +158,8 @@ PS C:\docker> docker images
 If you want less output, use `-Quiet` switch to output only the final result of the command. Combined with storing the result in a variable, this will give a completely silent execution of the CmdLet.
 
 ### Disabling verbose output
-You can also set the enviromenment variable `DOCKER_POSH_QUIET_MODE` to the desired setting for the `-Quiet` switch so you don't have to set it for each invocation of a cmdlet that supports it.
+The -Quiet setting for CmdLets that support it, defaults to the value of the enviromenment variable `DOCKER_POSH_QUIET_MODE`.
+So you can set this environment variable to the desired setting for the `-Quiet` switch so you don't have to set it for each invocation of a cmdlet that supports it.
 
 ### Linting a Dockerfile
 An important aspect of writing quality Docker images is to try and learn from the best in the community. To this end, we provide a convenient way to run `hadolint` against a Dockerfile. Hadolint is a 3rd party component that scans a dockerfile and produces linted output. You can find the hadolint project here: https://github.com/hadolint/hadolint
