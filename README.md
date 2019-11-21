@@ -158,7 +158,7 @@ PS C:\docker> docker images
 If you want less output, use `-Quiet` switch to output only the final result of the command. Combined with storing the result in a variable, this will give a completely silent execution of the CmdLet.
 
 ### Disabling verbose output
-The -Quiet setting for CmdLets that support it, defaults to the value of the enviromenment variable `DOCKER_POSH_QUIET_MODE`.
+The -Quiet setting for CmdLets that support it, defaults to the value of the enviromenment variable `DOCKER_CI_QUIET_MODE`.
 So you can set this environment variable to the desired setting for the `-Quiet` switch so you don't have to set it for each invocation of a cmdlet that supports it.
 
 ### Linting a Dockerfile
