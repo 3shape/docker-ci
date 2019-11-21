@@ -101,7 +101,7 @@ Describe 'Build docker images' {
 
     Context 'Verbosity of execution' {
 
-        It 'captures the output of the command invoked with Quiet mode disabled' {
+        It 'outputs the result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet:$false 6> $tempFile
             $result = Get-Content $tempFile
