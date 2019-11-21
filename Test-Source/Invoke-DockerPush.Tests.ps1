@@ -89,16 +89,26 @@ Describe 'docker push' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        it 'can redirect output' {
+        It 'outputs result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName 'Invoke-Command' $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
-            Invoke-DockerPush -ImageName 'cool-image' -Passthru 6> $tempFile
+            Invoke-DockerPush -ImageName 'cool-image' -Quiet:$false 6> $tempFile
 
             $result = Get-Content $tempFile
             $result | Should -Be @('Hello', 'World')
+        }
+
+        It 'suppresses output if Quiet is enabled' {
+            $tempFile = New-TemporaryFile
+            Mock -CommandName 'Invoke-Command' $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+
+            Invoke-DockerPush -ImageName 'cool-image' -Quiet:$true 6> $tempFile
+
+            $result = Get-Content $tempFile
+            $result | Should -BeNullOrEmpty
         }
     }
 }

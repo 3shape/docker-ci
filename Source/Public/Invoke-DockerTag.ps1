@@ -28,7 +28,7 @@ function Invoke-DockerTag {
         $NewTag = 'latest',
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
 
     $postfixedRegistry = Add-Postfix -Value $Registry
@@ -39,13 +39,13 @@ function Invoke-DockerTag {
     $commandResult = Invoke-Command "docker tag ${source} ${target}"
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
-        'Tag'           = $NewTag
-        'ImageName'     = $NewImageName
         'Registry'      = $postfixedNewRegistry
+        'ImageName'     = $NewImageName
+        'Tag'           = $NewTag
         'CommandResult' = $commandResult
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

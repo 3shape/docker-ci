@@ -133,16 +133,27 @@ Describe 'Pull docker images' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        it 'can redirect output' {
+        It 'outputs results if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
 
-            Invoke-DockerPull -ImageName 'ubuntu' -Passthru 6> $tempFile
+            Invoke-DockerPull -ImageName 'ubuntu' -Quiet:$false 6> $tempFile
 
             $result = Get-Content $tempFile
             $result | Should -Be @('Hello', 'World')
         }
+
+        It 'suppresses results if Quiet is enabled' {
+            $tempFile = New-TemporaryFile
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+
+            Invoke-DockerPull -ImageName 'ubuntu' -Quiet:$true 6> $tempFile
+
+            $result = Get-Content $tempFile
+            $result | Should -BeNullOrEmpty
+        }
+
     }
 }

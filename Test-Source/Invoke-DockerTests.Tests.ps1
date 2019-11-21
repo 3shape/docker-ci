@@ -170,19 +170,32 @@ Describe 'Run docker tests using Google Structure' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        it 'can redirect output' {
+        It 'outputs result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
             $configs = @($structureCommandConfig)
             $imageToTest = 'ubuntu:latest'
 
-            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Passthru 6> $tempFile
+            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Quiet:$false 6> $tempFile
 
             $result = Get-Content $tempFile
             Write-Debug "Result: $result"
-            $result | Should -BeLike "*level=fatal msg=FAIL*"
+            $result | Should -BeLike "*Pass=0; Fail=1; Total=1*"
+        }
+
+        It 'suppresses output if Quiet is enabled' {
+            $tempFile = New-TemporaryFile
+            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
+            $configs = @($structureCommandConfig)
+            $imageToTest = 'ubuntu:latest'
+
+            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Quiet:$true 6> $tempFile
+
+            $result = Get-Content $tempFile
+            Write-Debug "Result: $result"
+            $result | Should -BeNullOrEmpty
         }
     }
 }
