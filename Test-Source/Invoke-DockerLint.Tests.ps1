@@ -113,7 +113,7 @@ Describe 'Execute linting on a given docker image' {
 
     Context 'Verbosity of execution' {
 
-        It 'captures the output of the command invoked if Quiet is disabled' {
+        It 'outputs the result if Quiet is disabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $tempFile = New-TemporaryFile
             $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
