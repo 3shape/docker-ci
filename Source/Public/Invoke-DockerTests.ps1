@@ -1,7 +1,7 @@
 function Invoke-DockerTests {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
-        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, Position = 0)]
         [String]
         $ImageName,
 
