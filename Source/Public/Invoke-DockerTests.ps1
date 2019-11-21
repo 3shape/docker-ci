@@ -21,7 +21,7 @@ function Invoke-DockerTests {
         $TreatTestFailuresAsExceptions = $false,
 
         [Switch]
-        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     if ($null -eq $ConfigFiles -or $ConfigFiles.Length -eq 0) {
         throw [System.ArgumentException]::new('$ConfigFiles must contain one more test configuration file paths.')

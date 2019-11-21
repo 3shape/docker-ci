@@ -14,7 +14,7 @@ function Set-GlobalVar {
 }
 
 # Set the module to quiet mode for testing purposes so we don't spam the test logs.
-$env:DOCKER_POSH_QUIET_MODE = $true
+$env:DOCKER_CI_QUIET_MODE = $true
 
 # Add any variables that are needed globally in test scope
 Set-GlobalVar -Variable TestDataDir -Value (Join-Path $PSScriptRoot '../Test-Data')

@@ -18,7 +18,7 @@ function Invoke-DockerPush {
         $Tag = 'latest',
 
         [Switch]
-        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $postfixedRegistry = Add-PostFix $Registry
     $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"

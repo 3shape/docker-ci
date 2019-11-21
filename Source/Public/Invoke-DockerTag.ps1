@@ -28,7 +28,7 @@ function Invoke-DockerTag {
         $NewTag = 'latest',
 
         [Switch]
-        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
 
     $postfixedRegistry = Add-Postfix -Value $Registry

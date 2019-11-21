@@ -16,7 +16,7 @@ function Invoke-DockerLogin {
         $Registry,
 
         [Switch]
-        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_POSH_QUIET_MODE)
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     [String] $plaintextPassword = [System.Net.NetworkCredential]::new("", $Password).Password
     $command = "Write-Output `"${plainTextPassword}`" | docker login --username `"${Username}`" --password-stdin ${Registry}".TrimEnd()
