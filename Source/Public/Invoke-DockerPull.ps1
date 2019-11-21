@@ -26,7 +26,6 @@ function Invoke-DockerPull {
 
         [Switch]
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
-
     )
 
     if ($ImageName.Contains(':') -or $ImageName.Contains('@')) {
