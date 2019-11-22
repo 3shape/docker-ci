@@ -1,7 +1,2 @@
-codecov:
-  ci:
-    - circleci.com
-    - travis-ci.com
-
 comment:
   layout: "header, diff, tree, changes"
