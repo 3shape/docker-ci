@@ -1,4 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+
 . "$PSScriptRoot\..\Source\Private\Test-IsSubdirectoryOf.ps1"
 . "$PSScriptRoot\..\Source\Private\Format-AsAbsolutePath.ps1"
 
