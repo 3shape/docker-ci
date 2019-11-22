@@ -5,10 +5,10 @@ function Find-DockerSocket {
         [String] $OsType = (Find-DockerOSType)
     )
 
-    if ($osType -ieq 'windows') {
-        '\\.\pipe\docker_engine'
-    } elseif ($osType -ieq 'linux') {
-        '/var/run/docker.sock'
+    if ($OsType -ieq 'windows') {
+        return '\\.\pipe\docker_engine'
+    } elseif ($OsType -ieq 'linux') {
+        return '/var/run/docker.sock'
     } else {
         throw "'$OsType' not supported"
     }
