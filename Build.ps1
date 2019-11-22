@@ -7,7 +7,10 @@ Properties {
     $SourceDir = "$PSScriptRoot\Source"
     # The name of your module should match the basename of the PSD1 file.
     $ModuleName = (Get-Item $SourceDir\*.psd1)[0].BaseName
-
+    # Unless it's set in the env vars, in which case that value is used.
+    if ($Env:Docker_CI_ModuleName) {
+        $ModuleName = $Env:Docker_CI_ModuleName
+    }
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = $null
 
@@ -36,8 +39,6 @@ Task PrePublish {
     Write-Debug "These functions will be included in the published module: ${functionScriptFiles}"
 
     [string[]]$functionNames = @($functionScriptFiles.BaseName)
-
-    $prerelease = $env:GitVersion_PreReleaseTagWithDash
 
     if (!$env:GitVersion_Version) {
         throw 'Module version not found in env:GitVersion_Version where it was expected. Bailing.'
@@ -72,13 +73,18 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
         $publishParams['Repository'] = $Repository
     }
 
+    $prerelease = $env:GitVersion_PreReleaseTagWithDash
     if ($prerelease) {
         $publishParams['Prerelease'] = $prerelease
     }
 
-    Write-Host "Publishing $ModuleName version $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
+    Write-Output "Publishing $ModuleName"
+    Write-Output "Version is $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
+    Write-Output "publishParams is: ${publishParams}"
 
     Publish-Module @publishParams
+
+    Write-Output "Publishing done"
 }
 
 Task Test -depends Build {
