@@ -3,18 +3,14 @@ Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
 Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
-. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
-. "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
-. "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
 . "$PSScriptRoot\New-RandomFolder.ps1"
 
-$DockerOsType = Find-DockerOSType
-$imageToTest = if ($DockerOsType -eq 'linux') {
+$imageToTest = if ($Global:DockerOsType -eq 'linux') {
     'ubuntu:latest'
-} elseif ($DockerOsType -eq 'windows') {
+} elseif ($Global:DockerOsType -eq 'windows') {
     'mcr.microsoft.com/windows/nanoserver:1809'
 } else {
-    throw "'$DockerOsType' is not supported"
+    throw "'$Global:DockerOsType' is not supported"
 }
 
 Describe 'Run docker tests using Google Structure' {

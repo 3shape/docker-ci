@@ -46,3 +46,9 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
     $result.ExitCode = 1
     return $result
 }
+
+. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
+. "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
+
+Set-GlobalVar -Variable DockerOsType -Value (Find-DockerOSType)
