@@ -21,7 +21,7 @@ function Invoke-DockerTests {
         $TreatTestFailuresAsExceptions = $false,
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     if ($null -eq $ConfigFiles -or $ConfigFiles.Length -eq 0) {
         throw [System.ArgumentException]::new('$ConfigFiles must contain one more test configuration file paths.')
@@ -58,17 +58,21 @@ function Invoke-DockerTests {
     }
 
     $testReportPath = Join-Path $absoluteTestReportDir $TestReportName
+    $testReportExists = Test-Path -Path $testReportPath -PathType Leaf
+    if ($testReportExists) {
+        $testResult = $(ConvertFrom-Json $(Get-Content $testReportPath))
+    }
 
     $result = [PSCustomObject]@{
         # Todo: Need to check if the test report folder is missing.
         # It should not crash when folder is not there, but should simply return nothing
-        'TestResult'     = $(ConvertFrom-Json $(Get-Content $testReportPath))
+        'TestResult'     = $testResult
         'TestReportPath' = $testReportPath
         'CommandResult'  = $commandResult
         'ImageName'      = $ImageName
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($result.TestResult)
     }
     return $result
 }

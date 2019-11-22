@@ -18,7 +18,7 @@ function Invoke-DockerPush {
         $Tag = 'latest',
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $postfixedRegistry = Add-PostFix $Registry
     $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
@@ -30,8 +30,8 @@ function Invoke-DockerPush {
         'Registry'      = $postfixedRegistry;
         'Tag'           = $Tag;
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

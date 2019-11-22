@@ -99,14 +99,22 @@ Describe 'Build docker images' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        It 'Captures the output of the command invoked' {
+        It 'outputs the result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
-            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Passthru 6> $tempFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet:$false 6> $tempFile
             $result = Get-Content $tempFile
 
             $result | Should -Be @('Hello', 'World')
+        }
+
+        It 'produces no output if quiet mode is enabled' {
+            $tempFile = New-TemporaryFile
+            Invoke-DockerBuild -ImageName "leeandrasmus" -Dockerfile $dockerFile -Quiet:$true 6> $tempFile
+            $result = Get-Content $tempFile
+
+            $result | Should -BeNullOrEmpty
         }
     }
 }

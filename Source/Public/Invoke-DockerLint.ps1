@@ -14,7 +14,7 @@ function Invoke-DockerLint {
         $TreatLintRemarksFoundAsException,
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $pathToDockerFile = Format-AsAbsolutePath $DockerFile
     $dockerFileExists = Test-Path -Path $pathToDockerFile -PathType Leaf
@@ -36,8 +36,8 @@ function Invoke-DockerLint {
         'CommandResult' = $commandResult
         'LintOutput'    = $lintedDockerfile
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($result.LintOutput)
     }
     return $result
 }

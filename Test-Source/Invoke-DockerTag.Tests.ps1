@@ -162,16 +162,27 @@ Describe 'Tag docker images' {
         }
     }
 
-    Context 'Passthru execution' {
+    Context 'Verbosity of execution' {
 
-        it 'can redirect output' {
+        It 'outputs result if Quiet is disabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
             $tempFile = New-TemporaryFile
 
-            Invoke-DockerTag -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' -Passthru 6> $tempFile
+            Invoke-DockerTag -Quiet:$false -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' 6> $tempFile
 
             $result = Get-Content $tempFile
             $result | Should -Be @('Hello', 'World')
         }
+
+        It 'suppresses output if Quiet is enabled' {
+            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+            $tempFile = New-TemporaryFile
+
+            Invoke-DockerTag -Quiet:$enable -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' 6> $tempFile
+
+            $result = Get-Content $tempFile
+            $result | Should -Be @('Hello', 'World')
+        }
+
     }
 }

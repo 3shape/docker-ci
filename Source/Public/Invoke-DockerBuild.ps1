@@ -31,7 +31,7 @@ function Invoke-DockerBuild {
         $ExtraParams = '',
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $postfixedRegistry = Add-Postfix -Value $Registry
     if ($ExtraParams) {
@@ -47,8 +47,8 @@ function Invoke-DockerBuild {
         'Tag'           = $Tag;
         'CommandResult' = $commandResult
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }

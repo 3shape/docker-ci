@@ -1,4 +1,4 @@
-function Write-PassThruOuput {
+function Write-CommandOuput {
     [CmdletBinding()]
     param (
         [String[]]

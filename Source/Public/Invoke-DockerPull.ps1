@@ -25,7 +25,7 @@ function Invoke-DockerPull {
         $Digest = '',
 
         [Switch]
-        $PassThru
+        $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
 
     if ($ImageName.Contains(':') -or $ImageName.Contains('@')) {
@@ -55,8 +55,8 @@ function Invoke-DockerPull {
         'Registry'      = $postfixedRegistry
         'Digest'        = $Digest
     }
-    if ($PassThru) {
-        Write-PassThruOuput $($commandResult.Output)
+    if (!$Quiet) {
+        Write-CommandOuput $($commandResult.Output)
     }
     return $result
 }
