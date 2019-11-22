@@ -50,11 +50,15 @@ function Invoke-DockerTests {
     }
 
     $testReportPath = Join-Path $absoluteTestReportDir $TestReportName
+    $testReportExists = Test-Path -Path $testReportPath -PathType Leaf
+    if ($testReportExists) {
+        $testResult = $(ConvertFrom-Json $(Get-Content $testReportPath))
+    }
 
     $result = [PSCustomObject]@{
         # Todo: Need to check if the test report folder is missing.
         # It should not crash when folder is not there, but should simply return nothing
-        'TestResult'     = $(ConvertFrom-Json $(Get-Content $testReportPath))
+        'TestResult'     = $testResult
         'TestReportPath' = $testReportPath
         'CommandResult'  = $commandResult
         'ImageName'      = $ImageName

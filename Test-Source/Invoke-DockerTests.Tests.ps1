@@ -9,6 +9,10 @@ Describe 'Run docker tests using Google Structure' {
 
     Context 'Running structure tests' {
 
+        BeforeAll {
+            Invoke-DockerPull -ImageName 'ubuntu' -Tag 'latest'
+        }
+
         BeforeEach {
             $script:backupLocation = Get-Location
             Set-Location $Global:TestDataDir
@@ -141,6 +145,7 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Fail | Should -Be 0
             $testResult.Results.Length | Should -Be 2
         }
+
     }
 
     Context 'Pipeline execution' {
