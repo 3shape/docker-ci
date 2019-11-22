@@ -1,16 +1,16 @@
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerPull {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $Registry = '',
 
         # Pull by name, by name + tag, by name + digest
-        [Parameter(mandatory = $true, ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true)]
-        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest', ValueFromPipelineByPropertyName = $true)]
-        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageOnly', ValueFromPipelineByPropertyName = $true, Position = 0)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndDigest', ValueFromPipelineByPropertyName = $true, Position = 0)]
+        [Parameter(mandatory = $true, ParameterSetName = 'WithImageAndTag', ValueFromPipelineByPropertyName = $true, Position = 0)]
         [String]
         $ImageName,
 
