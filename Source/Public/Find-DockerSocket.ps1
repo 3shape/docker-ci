@@ -5,12 +5,11 @@ function Find-DockerSocket {
         [String] $OsType = (Find-DockerOSType)
     )
 
-    $osType = $OsType.ToLower()
-    if ($osType -eq 'windows') {
+    if ($osType -ieq 'windows') {
         '\\.\pipe\docker_engine'
-    } elseif ($osType -eq 'linux') {
+    } elseif ($osType -ieq 'linux') {
         '/var/run/docker.sock'
     } else {
-        throw "'$osType' not supported"
+        throw "'$OsType' not supported"
     }
 }
