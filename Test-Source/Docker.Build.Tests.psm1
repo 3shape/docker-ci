@@ -1,4 +1,6 @@
 #Requires -Version 6
+
+Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 function Set-GlobalVar {
     [CmdletBinding()]
     param (
