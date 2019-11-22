@@ -28,7 +28,7 @@ Set-GlobalVar -Variable StructureTestsDir -Value (Join-Path $Global:TestDataDir 
 Set-GlobalVar -Variable StructureTestsPassDir -Value (Join-Path $Global:StructureTestsDir 'Pass')
 Set-GlobalVar -Variable StructureTestsFailDir -Value (Join-Path $Global:StructureTestsDir 'Fail')
 
-Set-GlobalVar -Variable ModuleName -Value 'Docker.Build'
+Set-GlobalVar -Variable ModuleName -Value 'Docker-CI'
 Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
 Set-GlobalVar -Variable InvokeCommandReturnValueKeyName -Value 'command'
