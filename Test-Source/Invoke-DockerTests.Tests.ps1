@@ -184,9 +184,8 @@ Describe 'Run docker tests using Google Structure' {
 
         It 'outputs result if Quiet is disabled' {
             $tempFile = New-TemporaryFile
-            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir 'testbash.yml'
+            $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
-            $imageToTest = 'ubuntu:latest'
 
             Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Quiet:$false 6> $tempFile
 
