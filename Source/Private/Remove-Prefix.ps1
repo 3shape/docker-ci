@@ -13,10 +13,7 @@ function Remove-Prefix {
     If ($Value.StartsWith($Prefix)) {
         $result = $Value.Substring($Prefix.Length)
         return $result
-    }
-    else {
+    } else {
         return $Value
     }
 }
-
-

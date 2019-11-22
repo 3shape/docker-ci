@@ -39,8 +39,7 @@ Describe 'Execute linting on a given docker image' {
                 for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
                     $lintedDockerFile[$i] | Should -Be $result[$i]
                 }
-            }
-            catch {
+            } catch {
             }
         }
 
@@ -54,8 +53,7 @@ Describe 'Execute linting on a given docker image' {
         It 'throws correct exception message if docker image does not exist' {
             try {
                 Invoke-DockerLint -DockerFile "not.here"
-            }
-            catch {
+            } catch {
                 $exception = $_.Exception
 
             }

@@ -85,8 +85,8 @@ Describe 'Use cases for this module' {
 
             # 2. Build and push image to latest tag, then grab it and see it's ok
             $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |
-                Invoke-DockerPush |
-                Invoke-DockerPull
+            Invoke-DockerPush |
+            Invoke-DockerPull
 
             $result.CommandResult.ExitCode | Should -Be 0
             $result.ImageName | Should -Be $imageName

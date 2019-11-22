@@ -7,8 +7,7 @@ Foreach ($import in @($Public + $Private)) {
     Try {
         Write-Debug "Importing ${import}"
         . $import.fullname # Rewrite to bundle all in scriptblock so types do don't go out of scope.
-    }
-    Catch {
+    } Catch {
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
