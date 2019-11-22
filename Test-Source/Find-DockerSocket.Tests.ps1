@@ -29,8 +29,8 @@ InModuleScope $Global:ModuleName {
         }
 
         It 'when MacOS is passed should throw exception' {
-            $dockerSocket = { Find-DockerSocket -OsType 'MacOS' }
-            $dockerSocket | Should -Throw "'MacOS' not supported" -ExceptionType ([System.Exception]) -PassThru
+            $theCode = { Find-DockerSocket -OsType 'MacOS' }
+            $theCode | Should -Throw "'MacOS' not supported" -ExceptionType ([System.Exception]) -PassThru
         }
 
         Context 'Case insensitive' {
