@@ -34,11 +34,12 @@ function Invoke-DockerTests {
     }
     $osType = Find-DockerOSType
     $dockerSocket = Find-DockerSocket -OsType $osType
-    $configs = '/configs'
-    $report = '/report'
     if ($osType -eq 'windows') {
         $configs = 'C:/configs'
         $report = 'C:/report'
+    } else {
+        $configs = '/configs'
+        $report = '/report'
     }
     $structureCommand = "docker run -i" + `
         " -v `"${here}:${configs}`"" + `
