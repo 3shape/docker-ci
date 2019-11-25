@@ -11,6 +11,10 @@ function Invoke-DockerLint {
         [String]
         $DockerFile = 'Dockerfile',
 
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $HadolintTag = 'v1.17.3',
+
         [Switch]
         $TreatLintRemarksFoundAsException,
 
@@ -23,7 +27,7 @@ function Invoke-DockerLint {
         $mesage = "No such file: ${pathToDockerFile}"
         throw [System.IO.FileNotFoundException]::new($mesage)
     }
-    $hadoLintImage = 'hadolint/hadolint:v1.17.3'
+    $hadoLintImage = "hadolint/hadolint:${HadolintTag}"
     [String[]] $code = Get-Content -Path $DockerFile
     $pullLintImageCommand = "docker pull ${hadoLintImage}"
     Invoke-Command $pullLintImageCommand
