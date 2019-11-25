@@ -1,4 +1,4 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
@@ -8,8 +8,7 @@ Describe 'Run external tools as commands' {
     Context 'Run a simple external command' {
         if ($IsWindows) {
             $commandName = "find /?"
-        }
-        elseif ($IsLinux) {
+        } elseif ($IsLinux) {
             $commandName = "grep --help"
         }
 

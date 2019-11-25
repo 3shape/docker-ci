@@ -1,13 +1,13 @@
 function Invoke-DockerTag {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
+        [Parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true, Position = 0)]
+        [String]
+        $ImageName,
+
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $Registry = '',
-
-        [Parameter(mandatory = $true, ValueFromPipelineByPropertyName = $true)]
-        [String]
-        $ImageName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]

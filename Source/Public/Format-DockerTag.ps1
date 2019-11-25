@@ -1,7 +1,7 @@
 function Format-DockerTag {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
-        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [Parameter(ValueFromPipelineByPropertyName = $true, Position = 0)]
         [ValidateNotNullOrEmpty()]
         [String]
         $Dockerfile = 'Dockerfile'

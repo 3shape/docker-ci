@@ -1,7 +1,7 @@
 
 function Test-DockerDigest {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String] $Digest
     )
 

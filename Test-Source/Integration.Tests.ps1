@@ -1,5 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
-Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
@@ -84,8 +84,8 @@ Describe 'Use cases for this module' {
             Invoke-DockerTests -ImageName $imageName
 
             # 2. Build and push image to latest tag, then grab it and see it's ok
-            $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName |
-                Invoke-DockerPush |
+            $result = Invoke-DockerBuild -Registry $localRegistryName -ImageName $imageName | `
+                Invoke-DockerPush | `
                 Invoke-DockerPull
 
             $result.CommandResult.ExitCode | Should -Be 0
