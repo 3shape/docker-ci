@@ -7,8 +7,7 @@ Describe 'Parse absolute path from input string' {
     Context 'When an absolute path is provided' {
         if ($IsWindows) {
             $absolutePath = 'C:\Windows\System32'
-        }
-        elseif ($IsLinux) {
+        } elseif ($IsLinux) {
             $absolutePath = '/usr/bin'
         }
 

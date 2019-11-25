@@ -35,5 +35,3 @@ Describe 'Parse context from git repository' {
         }
     }
 }
-
-

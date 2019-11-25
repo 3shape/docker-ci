@@ -8,8 +8,7 @@ Describe 'Run external tools as commands' {
     Context 'Run a simple external command' {
         if ($IsWindows) {
             $commandName = "find /?"
-        }
-        elseif ($IsLinux) {
+        } elseif ($IsLinux) {
             $commandName = "grep --help"
         }
 
