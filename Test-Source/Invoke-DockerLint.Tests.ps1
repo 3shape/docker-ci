@@ -89,7 +89,7 @@ Describe 'Execute linting on a given docker image' {
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeLike "*Dockerfile*"
+            $result | Should -BeLike "*docker pull hadolint/hadolint*"
         }
     }
 
