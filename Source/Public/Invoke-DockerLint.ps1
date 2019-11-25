@@ -25,7 +25,8 @@ function Invoke-DockerLint {
     }
     $hadoLintImage = 'hadolint/hadolint:v1.17.2'
     [String[]] $code = Get-Content -Path $DockerFile
-
+    $pullLintImageCommand = "docker pull ${hadoLintImage}"
+    Invoke-Command $pullLintImageCommand
     $lintCommand = "Get-Content `"${pathToDockerFile}`" | docker run -i ${hadoLintImage}"
     $commandResult = Invoke-Command $lintCommand
     if ($TreatLintRemarksFoundAsException) {
