@@ -91,7 +91,7 @@
             LicenseUri = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/3shapeAS/dockerbuild-pwsh'
+            ProjectUri = 'https://github.com/3shape/docker-ci'
 
             # A URL to an icon representing this module.
             # IconUri = ''
