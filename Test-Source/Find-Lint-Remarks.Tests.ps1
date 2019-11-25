@@ -38,9 +38,10 @@ Describe 'Parse context from git repository' {
             $input = $null
 
             $result = Find-LintRemarks $input
-            
+
             $test = ($result -is [Array])
             $test | Should -Be $true
+            $result.Length | Should -Be 0
         }
     }
 }
