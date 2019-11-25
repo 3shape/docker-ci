@@ -247,6 +247,14 @@ PS C:\docker> $LASTEXITCODE
 ```
 ##### Listing 6: Fail execution if there are lint remarks.
 
+If you would rather only fail once a certain threshold is met, you can do something like this to that effect (again based on the Dockerfile in listing 5):
+
+```powershell
+PS C:\docker> $result = Invoke-DockerLint -Quiet
+PS C:\docker> $result.LintRemarks.Length -gt 0
+True
+```
+
 This concludes the examples on linting. Whilst linting can help you improve parts of your Docker-style and quality of the images, it is no substitute for real testing.
 
 ### Testing a docker image
