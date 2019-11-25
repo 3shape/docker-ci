@@ -1,0 +1,15 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@1.0.0
+
+jobs:
+  build:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run: dotnet tool install --global PowerShell
+      - run: dotnet tool install --global Codecov.Tool
+      - run: pwsh ./Install-Prerequisites.ps1
+      - run: pwsh ./Invoke-Tests.ps1
+      - run: codecov -f coverage.json -t $ENV:CODECOV_TOKEN

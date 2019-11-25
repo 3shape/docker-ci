@@ -1,0 +1,7 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: "nonsense"
+    path: "c:/NotLicense.txt"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
