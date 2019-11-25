@@ -4,9 +4,10 @@
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerLint {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
         [ValidateNotNullOrEmpty()]
+        [Parameter(Position = 0)]
         [String]
         $DockerFile = 'Dockerfile',
 

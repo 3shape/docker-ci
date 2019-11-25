@@ -2,15 +2,15 @@
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerPush {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true, Position = 0)]
+        [String]
+        $ImageName,
+
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String]
         $Registry = '',
-
-        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
-        [String]
-        $ImageName,
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
