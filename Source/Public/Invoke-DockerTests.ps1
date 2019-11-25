@@ -34,7 +34,7 @@ function Invoke-DockerTests {
     }
     $osType = Find-DockerOSType
     $dockerSocket = Find-DockerSocket -OsType $osType
-    if ($osType -eq 'windows') {
+    if ($osType -ieq 'windows') {
         $configs = 'C:/configs'
         $report = 'C:/report'
     } else {

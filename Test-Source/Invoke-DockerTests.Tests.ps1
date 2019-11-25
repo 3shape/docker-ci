@@ -5,9 +5,9 @@ Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 . "$PSScriptRoot\..\Source\Private\Utilities.ps1"
 . "$PSScriptRoot\New-RandomFolder.ps1"
 
-$imageToTest = if ($Global:DockerOsType -eq 'linux') {
+$imageToTest = if ($Global:DockerOsType -ieq 'linux') {
     'ubuntu:latest'
-} elseif ($Global:DockerOsType -eq 'windows') {
+} elseif ($Global:DockerOsType -ieq 'windows') {
     'mcr.microsoft.com/windows/nanoserver:1809'
 } else {
     throw "'$Global:DockerOsType' is not supported"
