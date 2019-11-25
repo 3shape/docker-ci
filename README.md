@@ -245,6 +245,7 @@ At C:\Users\Rasmus Jelsgaard\Documents\PowerShell\Modules\Docker.Build\0.4.8\Pub
 PS C:\docker> $LASTEXITCODE
 1
 ```
+##### Listing 6: Fail execution if there are lint remarks.
 
 This concludes the examples on linting. Whilst linting can help you improve parts of your Docker-style and quality of the images, it is no substitute for real testing.
 
