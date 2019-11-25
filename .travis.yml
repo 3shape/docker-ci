@@ -11,7 +11,7 @@ cache:
     - "/home/travis/.local/share/powershell/Modules"
 
 if: |
-  repo != 3shapeAS/docker-ci OR \
+  repo != 3shape/docker-ci OR \
   type = pull_request OR \
   branch = master OR \
   tag IS present
