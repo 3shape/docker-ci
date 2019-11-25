@@ -34,6 +34,7 @@ function Invoke-DockerLint {
     $lintedDockerfile = Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
     $result = [PSCustomObject]@{
         'CommandResult' = $commandResult
+        'LintRemarks'   = $lintRemarks
         'LintOutput'    = $lintedDockerfile
     }
     if (!$Quiet) {
