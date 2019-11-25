@@ -1,3 +1,7 @@
 {
-  "powershell.codeFormatting.preset": "OTBS"
+  "powershell.codeFormatting.preset": "OTBS",
+  "[powershell]": {
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+  },
 }
