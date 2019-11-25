@@ -1,4 +1,6 @@
 #Requires -Version 6
+
+Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
 function Set-GlobalVar {
     [CmdletBinding()]
     param (
@@ -26,7 +28,7 @@ Set-GlobalVar -Variable StructureTestsDir -Value (Join-Path $Global:TestDataDir 
 Set-GlobalVar -Variable StructureTestsPassDir -Value (Join-Path $Global:StructureTestsDir 'Pass')
 Set-GlobalVar -Variable StructureTestsFailDir -Value (Join-Path $Global:StructureTestsDir 'Fail')
 
-Set-GlobalVar -Variable ModuleName -Value 'Docker.Build'
+Set-GlobalVar -Variable ModuleName -Value 'Docker-CI'
 Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
 Set-GlobalVar -Variable InvokeCommandReturnValueKeyName -Value 'command'
@@ -46,3 +48,9 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
     $result.ExitCode = 1
     return $result
 }
+
+. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
+. "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
+
+Set-GlobalVar -Variable DockerOsType -Value (Find-DockerOSType)

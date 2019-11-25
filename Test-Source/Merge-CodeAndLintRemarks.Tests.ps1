@@ -1,4 +1,4 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 . "$PSScriptRoot\..\Source\Private\Merge-CodeAndLintRemarks.ps1"

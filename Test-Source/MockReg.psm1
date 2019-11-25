@@ -15,7 +15,7 @@ function StoreMockValue {
 
 function Initialize-MockReg {
     Write-Debug "Clear store of values"
-    $script:KeyValuePair = @{}
+    $script:KeyValuePair = @{ }
 }
 
 function GetMockValue {

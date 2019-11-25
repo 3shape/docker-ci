@@ -1,4 +1,4 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 
 . "$PSScriptRoot\..\Source\Private\Find-LintRemarks.ps1"
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
@@ -35,5 +35,3 @@ Describe 'Parse context from git repository' {
         }
     }
 }
-
-
