@@ -1,6 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
-Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
-Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 

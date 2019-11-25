@@ -8,7 +8,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule           = 'Docker.Build.psm1'
+    RootModule           = 'Docker-CI.psm1'
 
     # Version number of this module. Will be updated by CI/CD but included here so it's possible to source the module locally.
     ModuleVersion        = '0.0.1'
@@ -91,7 +91,7 @@
             LicenseUri = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/3shapeAS/dockerbuild-pwsh'
+            ProjectUri = 'https://github.com/3shape/docker-ci'
 
             # A URL to an icon representing this module.
             # IconUri = ''
