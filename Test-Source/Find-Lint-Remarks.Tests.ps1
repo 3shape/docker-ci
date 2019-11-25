@@ -33,5 +33,14 @@ Describe 'Parse context from git repository' {
 
             $result.Length | Should -Be 1
         }
+
+        It 'returns an empty list on null input' {
+            $input = $null
+
+            $result = Find-LintRemarks $input
+            
+            $test = ($result -is [Array])
+            $test | Should -Be $true
+        }
     }
 }
