@@ -29,4 +29,8 @@ steps:
   - pwsh: |
       .\Invoke-Tests.ps1
     displayName: "Run tests and coverage"
-# Publish Tasks
+
+  # Publish Tasks
+  - pwsh: |
+      codecov -f coverage.json -t $env:CODECOV_TOKEN
+    displayName: "Publish code coverage"
