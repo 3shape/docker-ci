@@ -21,4 +21,7 @@ steps:
   - pwsh: |
       .\Invoke-Tests.ps1
     displayName: "Run tests and coverage"
-  
+    
+  - task: DockerInstaller@0
+    inputs:
+      dockerVersion: '19.03.5-ce'
