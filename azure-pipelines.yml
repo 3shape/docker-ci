@@ -5,7 +5,7 @@ trigger:
       # Any Pull Request merging into the master branch
       - master
 
-#Use the latest image with VS2019 on Windows Server 2019
+# Use the latest image with VS2019 on Windows Server 2019
 pool:
   vmImage: "windows-2019"
 
@@ -19,15 +19,17 @@ steps:
   - task: DockerInstaller@0
     inputs:
       dockerVersion: "17.09.0-ce"
-  # Build Tasks
-  - pwsh: |
+  # Build and test the project
+  - displayName: "Install prerequisites"
+    pwsh: |
       .\Install-Prerequisites.ps1
-    displayName: "Install prerequisites"
-  - pwsh: |
-      Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
-    displayName: "Run tests and coverage"
 
-  - script: |
-      codecov -f coverage.json -t $(CODECOV_TOKEN)
-    displayName: Upload coverage to codecov.io
+  - displayName: "Run tests and coverage"
+    pwsh: |
+      Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
+
+  # Publish code coverage to codecov.io always
+  - displayName: Upload coverage to codecov.io
     condition: always()
+    script: |
+      codecov -f coverage.json -t $(CODECOV_TOKEN)
