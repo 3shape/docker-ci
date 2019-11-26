@@ -24,7 +24,7 @@ steps:
       .\Install-Prerequisites.ps1
     displayName: "Install prerequisites"
   - pwsh: |
-      .\Invoke-Tests.ps1
+      Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
     displayName: "Run tests and coverage"
 
   - script: |
