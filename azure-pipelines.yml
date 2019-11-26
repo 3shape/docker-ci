@@ -16,7 +16,7 @@ pool:
 steps:
   - task: DockerInstaller@0
     inputs:
-      dockerVersion: "19.03.5-ce"
+      dockerVersion: "17.09.0-ce"
   # Build Tasks
   - pwsh: |
       .\Install-Prerequisites.ps1
