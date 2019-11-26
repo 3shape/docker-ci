@@ -1,8 +1,9 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
-Import-Module -Force $PSScriptRoot/Docker.Build.Tests.psm1
+Import-Module -Force $PSScriptRoot/../Source/Docker-CI.psm1
+Import-Module -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-ExecCommandCore.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
+. "$PSScriptRoot\..\Source\Private\New-Process.ps1"
 
 Describe 'Runs only external tools' {
 
@@ -12,8 +13,7 @@ Describe 'Runs only external tools' {
                 'Command'     = 'find'
                 'CommandArgs' = '/?'
             }
-        }
-        elseif ($IsLinux) {
+        } elseif ($IsLinux) {
             $command = [PSCustomObject]@{
                 'Command'     = 'grep'
                 'CommandArgs' = '--help'
@@ -29,28 +29,28 @@ Describe 'Runs only external tools' {
         }
 
         It 'returns correct output and exit code, silently' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -PassThru:$false 6> $tempFile
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$true 6> $tempFile
             $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'returns correct output and exit code, verbosely' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -PassThru:$true 6> $tempFile
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$false 6> $tempFile
             $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, silently' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -PassThru:$false 6> $tempFile
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$true 6> $tempFile
             $result.ExitCode | Should -Not -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, verbosely' {
-            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -PassThru:$true 6> $tempFile
+            $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$false 6> $tempFile
             $result.ExitCode | Should -Not -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty

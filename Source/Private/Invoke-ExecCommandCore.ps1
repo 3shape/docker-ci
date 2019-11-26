@@ -4,8 +4,11 @@ function Invoke-ExecCommandCore {
     param (
         [Parameter(mandatory = $true)]
         [string] $Command,
-        [string] $CommandArgs,
-        [switch] $PassThru = $true
+
+        [ValidateNotNullOrEmpty()]
+        [string] $CommandArgs = '',
+
+        [switch] $Quiet
     )
 
     $result = [CommandCoreResult]::new()
@@ -13,20 +16,7 @@ function Invoke-ExecCommandCore {
     $result.CommandArgs = $CommandArgs
     $result.ExitCode = -1
 
-    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $startInfo.FileName = $Command
-    $startInfo.Arguments = $CommandArgs
-
-    $startInfo.UseShellExecute = $false
-    $startInfo.WorkingDirectory = Get-Location
-
-    #   Always redirect output
-    $startInfo.RedirectStandardOutput = $true
-    $startInfo.RedirectStandardError = $true
-    $startInfo.CreateNoWindow = $true
-
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = $startInfo
+    $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location)
 
     try {
         $process.Start() | Out-Null
@@ -42,7 +32,7 @@ function Invoke-ExecCommandCore {
             $outLine = $out.ReadLine()
             $result.Output += $outLine
 
-            if ($PassThru) {
+            if (!$Quiet) {
                 Write-Information -InformationAction 'Continue' -MessageData $outLine
             }
         }
@@ -51,7 +41,7 @@ function Invoke-ExecCommandCore {
             $errLine = $err.ReadLine()
             $result.Output += $errLine
 
-            if ($PassThru) {
+            if (!$Quiet) {
                 Write-Information -InformationAction 'Continue' -MessageData $errLine
             }
         }
@@ -61,8 +51,7 @@ function Invoke-ExecCommandCore {
         }
 
         $finished = $true
-    }
-    finally {
+    } finally {
 
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
