@@ -66,6 +66,7 @@ VOLUME /configs
 
 ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
 ```
+##### Listing 1: Example Dockerfile
 
 ### Building an image from Dockerfile
 To build an image based on a Dockerfile, use the Invoke-DockerBuild CmdLet, like so:
@@ -107,6 +108,7 @@ Registry      :
 Tag           : latest
 CommandResult : CommandResult
 ```
+##### Listing 2: Output from building a docker image
 
 In this scenario, you will see the both the output from Docker and the result of the execution which is a PSCustomObject that holds:
 
@@ -148,6 +150,8 @@ Successfully built 6b9746ab76d8
 Successfully tagged structure:latest
 SECURITY WARNING: You are building a Docker image from Windows against a non-Windows Docker host. All files and directories added to build context will have '-rwxr-xr-x' permissions. It is recommended to double check and reset permissions for sensitive files and directories.
 ```
+##### Listing 3: Build docker image and store result in variable.
+
 in which case you will only see the output from Docker, the result object is stored in $result.
 
 You can verify the existence of the image you just created using `docker images`
@@ -189,6 +193,7 @@ PS C:\docker> $result = Invoke-DockerLint .\Dockerfile
 19:
 20: ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
 ```
+##### Listing 4: Build docker image and store result in variable.
 
 This Dockerfile in particular has no linting remarks, so it is just output in its entirety with line numbers. Imagine I omitted the instruction in line 3 on how to deal with commands that fail in a piped execution and run the linting again:
 
@@ -214,8 +219,41 @@ DL4006 Set the SHELL option -o pipefail before RUN with a pipe in it
 17:
 18: ENTRYPOINT [ "/usr/local/bin/container-structure-test" ]
 ```
+##### Listing 5: Lint docker file and store result in variable
 
 Now, the linter is no longer happy and it has added a remark just above line 10 instructing us on how to fix the problem. The first part of the message is a unique lint rule id that can be used to find the lint rationale and in-depth explanation on https://github.com/hadolint/hadolint.
+
+#### Failing the build when there are lint remarks
+In CI/CD contexts, you might want to fail a build or similar, if there are linting errors. Raising an exception when there are lint remarks found is straigt-forward:
+
+```
+Invoke-DockerLint -TreatLintRemarksFoundAsException
+```
+
+Going from the example Dockerfile in listing 5, we achieve an error:
+```powershell
+PS C:\docker> $result = Invoke-DockerLint -TreatLintRemarksFoundAsException
+Assert-ExitCodeOk : The command 'Get-Content "C:\docker\Dockerfile" | docker run -i hadolint/hadolint:v1.17.2' failed with exit code: 1.
+Command output:
+/dev/stdin:10 DL4006 Set the SHELL option -o pipefail before RUN with a pipe in it
+At C:\Users\Rasmus Jelsgaard\Documents\PowerShell\Modules\Docker.Build\0.4.8\Public\Invoke-DockerLint.ps1:31 char:9
++         Assert-ExitCodeOk $commandResult
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ CategoryInfo          : InvalidResult: (:) [Assert-ExitCodeOk], Exception
++ FullyQualifiedErrorId : 1000,Assert-ExitCodeOk
+
+PS C:\docker> $LASTEXITCODE
+1
+```
+##### Listing 6: Fail execution if there are lint remarks.
+
+If you would rather only fail once a certain threshold is met, you can do something like this to that effect (again based on the Dockerfile in listing 5):
+
+```powershell
+PS C:\docker> $result = Invoke-DockerLint -Quiet
+PS C:\docker> $result.LintRemarks.Length -gt 0
+True
+```
 
 This concludes the examples on linting. Whilst linting can help you improve parts of your Docker-style and quality of the images, it is no substitute for real testing.
 

@@ -6,7 +6,7 @@ function Find-LintRemarks {
         $LintLines
     )
     if ($null -eq $LintLines) {
-        return @()
+        return , @()
     }
 
     $lineNumber = "\B\/dev\/stdin:\d+\b"
