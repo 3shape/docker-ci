@@ -21,19 +21,13 @@ steps:
       dockerVersion: "17.09.0-ce"
 
   # Build and test the project
-  - pwsh: |
-      .\Install-Prerequisites.ps1
-
+  - pwsh: .\Install-Prerequisites.ps1
     displayName: "Install prerequisites"
 
-  - pwsh: |
-      Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
-
+  - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
     displayName: "Run tests and coverage"
 
   # Publish code coverage to codecov.io always
-  - script: |
-      codecov -f coverage.json -t $(CODECOV_TOKEN)
-
+  - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
     displayName: Upload coverage to codecov.io
     condition: always()
