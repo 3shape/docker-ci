@@ -15,9 +15,10 @@ pool:
 
 steps:
   # Build Tasks
-  - powershell: |
+  - pwsh: |
       .\Install-Prerequisites.ps1
     displayName: "Install prerequisites"
-  - powershell: |
+  - pwsh: |
       .\Invoke-Tests.ps1
     displayName: "Run tests and coverage"
+  
