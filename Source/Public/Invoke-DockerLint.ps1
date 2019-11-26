@@ -4,11 +4,16 @@
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerLint {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
         [ValidateNotNullOrEmpty()]
+        [Parameter(Position = 0)]
         [String]
         $DockerFile = 'Dockerfile',
+
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $HadolintTag = 'v1.17.3',
 
         [Switch]
         $TreatLintRemarksFoundAsException,
@@ -22,9 +27,10 @@ function Invoke-DockerLint {
         $mesage = "No such file: ${pathToDockerFile}"
         throw [System.IO.FileNotFoundException]::new($mesage)
     }
-    $hadoLintImage = 'hadolint/hadolint:v1.17.2'
+    $hadoLintImage = "hadolint/hadolint:${HadolintTag}"
     [String[]] $code = Get-Content -Path $DockerFile
-
+    $pullLintImageCommand = "docker pull ${hadoLintImage}"
+    Invoke-Command $pullLintImageCommand
     $lintCommand = "Get-Content `"${pathToDockerFile}`" | docker run -i ${hadoLintImage}"
     $commandResult = Invoke-Command $lintCommand
     if ($TreatLintRemarksFoundAsException) {
@@ -34,6 +40,7 @@ function Invoke-DockerLint {
     $lintedDockerfile = Merge-CodeAndLintRemarks -CodeLines $code -LintRemarks $lintRemarks
     $result = [PSCustomObject]@{
         'CommandResult' = $commandResult
+        'LintRemarks'   = $lintRemarks
         'LintOutput'    = $lintedDockerfile
     }
     if (!$Quiet) {

@@ -1,6 +1,5 @@
-Import-Module -Force $PSScriptRoot/../Source/Docker.Build.psm1
-Import-Module -Global -Force $PSScriptRoot/Docker.Build.Tests.psm1
-Import-Module -Global -Force $PSScriptRoot/MockReg.psm1
+Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
 
@@ -28,19 +27,15 @@ Describe 'Execute linting on a given docker image' {
             $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Linux.Dockerfile.Linted')
             $result = Invoke-DockerLint -DockerFile $dockerFile
             $lintedDockerFile | Should -Be $result.LintOutput
+            $result.LintRemarks.Length | Should -Be 1
         }
 
         It 'can find multiple rule violations' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile'
             [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile.Linted')
-
-            try {
-                [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
-                for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
-                    $lintedDockerFile[$i] | Should -Be $result[$i]
-                }
-            }
-            catch {
+            [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
+            for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
+                $lintedDockerFile[$i] | Should -Be $result[$i]
             }
         }
 
@@ -54,8 +49,7 @@ Describe 'Execute linting on a given docker image' {
         It 'throws correct exception message if docker image does not exist' {
             try {
                 Invoke-DockerLint -DockerFile "not.here"
-            }
-            catch {
+            } catch {
                 $exception = $_.Exception
 
             }
@@ -95,7 +89,7 @@ Describe 'Execute linting on a given docker image' {
 
             Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
             $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeLike "*Dockerfile*"
+            $result | Should -BeLike "*docker pull hadolint/hadolint*"
         }
     }
 
@@ -106,6 +100,7 @@ Describe 'Execute linting on a given docker image' {
             $result = Invoke-DockerLint -DockerFile $dockerFile
 
             $result.LintOutput | Should -Not -BeNullOrEmpty
+            $result.LintRemarks.Length | Should -Be 0
             $result.CommandResult.ExitCode | Should -Be 0
             $result.CommandResult | Should -Not -BeNullOrEmpty
         }

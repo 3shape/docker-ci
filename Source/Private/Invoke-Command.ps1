@@ -15,8 +15,7 @@ function Invoke-Command {
         $result.Success = $?
         $result.ExitCode = $lastexitcode
         $result.Output = $outputs
-    }
-    finally {
+    } finally {
         $script:ErrorActionPreference = $backupErrorActionPreference
     }
     return $result

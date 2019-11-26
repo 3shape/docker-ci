@@ -1,13 +1,13 @@
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
 function Invoke-DockerLogin {
-    [CmdletBinding()]
+    [CmdletBinding(PositionalBinding = $false)]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [String]
         $Username,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 1)]
         [Securestring]
         $Password,
 
