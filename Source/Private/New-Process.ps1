@@ -17,7 +17,6 @@ function New-Process {
     $startInfo.UseShellExecute = $false
     $startInfo.WorkingDirectory = $WorkingDirectory
 
-    #   Always redirect output
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.CreateNoWindow = $true
