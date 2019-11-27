@@ -5,7 +5,6 @@ function Invoke-ExecCommandCore {
         [Parameter(mandatory = $true)]
         [string] $Command,
 
-        [ValidateNotNullOrEmpty()]
         [string] $CommandArgs = '',
 
         [switch] $Quiet
@@ -16,18 +15,18 @@ function Invoke-ExecCommandCore {
     $result.CommandArgs = $CommandArgs
     $result.ExitCode = -1
 
-    $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location)
+    [System.Diagnostics.Process] $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location)
 
     try {
         $process.Start() | Out-Null
-
         $finished = $false
         # The OutputDataReceived event doesn't fire as events are sent by the
         # process in powershell.  Possibly due to subtleties of how Powershell
         # manages the thread pool that I'm not aware of.  Using blocking
         # reading here as an alternative which is fine since this blocks
         # on completion already.
-        $out = $process.StandardOutput
+        [System.IO.StreamReader] $out = $process.StandardOutput
+
         while (-not $out.EndOfStream) {
             $outLine = $out.ReadLine()
             $result.Output += $outLine
@@ -36,7 +35,7 @@ function Invoke-ExecCommandCore {
                 Write-Information -InformationAction 'Continue' -MessageData $outLine
             }
         }
-        $err = $process.StandardError
+        [System.IO.StreamReader] $err = $process.StandardError
         while (-not $err.EndOfStream) {
             $errLine = $err.ReadLine()
             $result.Output += $errLine

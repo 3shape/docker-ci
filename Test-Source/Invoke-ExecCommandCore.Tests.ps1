@@ -35,6 +35,11 @@ Describe 'Runs only external tools' {
             Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
+        It 'can run a command with no args' {
+            $result = Invoke-ExecCommandCore -Command $command.Command -Quiet:$true
+            $result.ExitCode | Should -Not -Be 0
+        }
+
         It 'returns correct output and exit code, verbosely' {
             $result = Invoke-ExecCommandCore -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$false 6> $tempFile
             $result.ExitCode | Should -Be 0
