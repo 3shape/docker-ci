@@ -1,10 +1,12 @@
 #   Borrowed from our friendly provider: https://github.com/dotnet/roslyn/blob/master/src/Setup/Installer/tools/utils.ps1
 
 function Invoke-ExecCommandCore {
+    [CmdletBinding(PositionalBinding = $false)]
     param (
-        [Parameter(mandatory = $true)]
+        [Parameter(mandatory = $true, Position = 0)]
         [string] $Command,
 
+        [Parameter(Position = 1)]
         [string] $CommandArgs = '',
 
         [switch] $Quiet
