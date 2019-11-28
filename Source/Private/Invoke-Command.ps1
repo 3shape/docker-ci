@@ -29,7 +29,7 @@ function Invoke-Command {
 
         $eventHandlerSource = 'if (! [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
-                if (WriteLogging) {
+                if ($WriteLogging) {
                     Write-Information -InformationAction "Continue" -MessageData $EventArgs.Data
                 }
             }'
