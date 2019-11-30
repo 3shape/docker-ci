@@ -1,8 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
-
 Describe 'docker push' {
 
     Context 'Push an image' {
@@ -89,6 +87,11 @@ Describe 'docker push' {
     }
 
     Context 'Verbosity of execution' {
+
+        BeforeEach {
+            Initialize-MockReg
+            Mock -CommandName 'Invoke-Command' $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
+        }
 
         It 'outputs result if Quiet is disabled' {
             $tempFile = New-TemporaryFile

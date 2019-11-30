@@ -1,5 +1,4 @@
 . "$PSScriptRoot\..\Private\LintRemark.ps1"
-. "$PSScriptRoot\..\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Private\Format-AsAbsolutePath.ps1"
 . "$PSScriptRoot\..\Private\Write-PassThruOutput.ps1"
 
@@ -29,10 +28,11 @@ function Invoke-DockerLint {
     }
     $hadoLintImage = "hadolint/hadolint:${HadolintTag}"
     [String[]] $code = Get-Content -Path $DockerFile
-    $pullLintImageCommand = "docker pull ${hadoLintImage}"
-    Invoke-Command $pullLintImageCommand
-    $lintCommand = "Get-Content `"${pathToDockerFile}`" | docker run -i ${hadoLintImage}"
-    $commandResult = Invoke-Command $lintCommand
+    Invoke-DockerCommand "pull ${hadoLintImage}"
+    [String[]] $dockerFileContents = Get-Content -Path $pathToDockerFile
+    $lintCommandArgs = "run -i ${hadoLintImage}"
+    $commandResult = Invoke-DockerCommand $lintCommandArgs -InputLines $dockerFileContents
+
     if ($TreatLintRemarksFoundAsException) {
         Assert-ExitCodeOk $commandResult
     }

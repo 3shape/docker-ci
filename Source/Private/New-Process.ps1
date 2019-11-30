@@ -7,7 +7,10 @@ function New-Process {
         [String] $Arguments = '',
 
         [ValidateNotNullOrEmpty()]
-        [String] $WorkingDirectory = (Get-Location)
+        [String] $WorkingDirectory = (Get-Location),
+
+        [Switch]
+        $RedirectStdIn
     )
 
     $startInfo = New-Object System.Diagnostics.ProcessStartInfo
@@ -19,6 +22,10 @@ function New-Process {
 
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
+    if ($RedirectStdIn) {
+        $startInfo.RedirectStandardInput = $true
+    }
+
     $startInfo.CreateNoWindow = $true
 
     $process = New-Object System.Diagnostics.Process

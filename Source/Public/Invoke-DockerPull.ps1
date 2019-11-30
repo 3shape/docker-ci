@@ -46,7 +46,7 @@ function Invoke-DockerPull {
         $imageToPull = "${postfixedRegistry}${ImageName}@${Digest}"
     }
 
-    $commandResult = Invoke-Command "docker pull ${imageToPull}"
+    $commandResult = Invoke-DockerCommand "pull ${imageToPull}"
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
         'CommandResult' = $commandResult

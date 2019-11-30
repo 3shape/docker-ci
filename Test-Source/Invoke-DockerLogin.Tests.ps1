@@ -1,8 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
-
 Describe 'Login failure' {
 
     Context 'Login failure should not expose sensitive password in the logs' {
@@ -18,11 +16,15 @@ Describe 'Login failure' {
             Mock -CommandName "Assert-ExitCodeOK" $assertExitCodeOkMocked -Verifiable -ModuleName $Global:ModuleName
         }
 
-        it 'should mask password from the logs when login fails after thrown exception' {
-            $loginCode = { Invoke-DockerLogin -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force) }
-            $loginCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
-            $result = GetMockValue -Key 'maskedCommand'
-            $result | Should -BeExactly 'Write-Output "*********" | docker login --username "Mocked" --password-stdin'
+        It 'should mask password from the logs when login fails after thrown exception' {
+            try {
+                Invoke-DockerLogin -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force)
+            } catch [System.Exception] {
+                $exception = $PSItem.Exception
+            }
+            $exception.Message | Should -Be "Exception of type 'System.Exception' was thrown."
+            $maskedCommand = GetMockValue -Key 'maskedCommand'
+            $maskedCommand | Should -Not -Contain 'MockedPassword'
         }
     }
 }
@@ -38,8 +40,8 @@ Describe 'Docker login ' {
 
         It 'produced the correct command to invoke' {
             Invoke-DockerLogin -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force)
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin'
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
+            $result | Should -BeExactly 'login --username "Mocked" --password-stdin'
         }
     }
 
@@ -47,14 +49,14 @@ Describe 'Docker login ' {
 
         It 'produced the correct command to invoke' {
             Invoke-DockerLogin -Registry 'my.docker.registry' -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force)
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin my.docker.registry'
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
+            $result | Should -BeExactly 'login --username "Mocked" --password-stdin my.docker.registry'
         }
 
         It 'produced the correct command to invoke, with $null registry parameter' {
             Invoke-DockerLogin -Registry $null -Username "Mocked" -Password (ConvertTo-SecureString 'MockedPassword' –asplaintext –force)
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeExactly 'Write-Output "MockedPassword" | docker login --username "Mocked" --password-stdin'
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
+            $result | Should -BeExactly 'login --username "Mocked" --password-stdin'
         }
     }
 

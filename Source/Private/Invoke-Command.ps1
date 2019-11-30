@@ -10,6 +10,9 @@ function Invoke-Command {
         [String]
         $CommandArgs = '',
 
+        [String[]]
+        $InputLines = '',
+
         [Switch]
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
@@ -19,30 +22,23 @@ function Invoke-Command {
     $result.CommandArgs = $CommandArgs
     $result.ExitCode = -1
 
-    [System.Diagnostics.Process] $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location)
+    [System.Diagnostics.Process] $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location) -RedirectStdIn
 
     try {
-        $oStdOutBuilder = [System.Text.StringBuilder]::new()
-        $oStdErrBuilder = [System.Text.StringBuilder]::new()
+        $oStdOutBuilder = New-Object Collections.Generic.List[String]
+        $oStdErrBuilder = New-Object Collections.Generic.List[String]
 
         $finished = $false
 
         $eventHandlerSource = 'if (! [String]::IsNullOrEmpty($EventArgs.Data)) {
-                $Event.MessageData.AppendLine($EventArgs.Data)
+                $Event.MessageData.Add($EventArgs.Data)
                 if ($WriteLogging) {
                     Write-Information -InformationAction "Continue" -MessageData $EventArgs.Data
                 }
             }'
         $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet)
 
-        [scriptblock] $eventHandler = [scriptblock]::Create($eventHandlerSource)
-        $sScripBlock = {
-            if (! [String]::IsNullOrEmpty($EventArgs.Data)) {
-                $Event.MessageData.AppendLine($EventArgs.Data)
-                Write-Information -InformationAction 'Continue' -MessageData $EventArgs.Data
-            }
-        }
-
+        [ScriptBlock] $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
 
         $stdOutEventHandler = Register-ObjectEvent -InputObject $process `
             -Action $eventHandler -EventName 'OutputDataReceived' `
@@ -53,28 +49,41 @@ function Invoke-Command {
             -MessageData $oStdErrBuilder
 
         $process.Start() | Out-Null
+
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
 
+        if ($InputLines) {
+            $inputStream = $process.StandardInput
+            $inputStream.AutoFlush = $true
+            foreach ($line in $inputLines) {
+                $inputStream.WriteLine($line)
+            }
+            $process.StandardInput.Close()
+        }
 
         while (-not $process.WaitForExit(100)) {
             # Allow interrupts like CTRL + C
         }
         $finished = $true
-    } catch {
-        Write-Debug 'bad'
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
         Unregister-Event -SourceIdentifier $stdErrEventHandler.Name
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
-        if (-not $finished -and -not $process.HasExited) {
-            Write-Debug "Cleanup, kill the process with id $($process.Id)"
-            $process.Kill()
+        try {
+            if (-not $finished -and -not $process.HasExited) {
+                Write-Debug "Cleanup, kill the process with id $($process.Id)"
+                $process.Kill()
+            }
+        } catch {
+            # This can happen if the process was never started in which case HasExited throws an exception.
         }
     }
-    $result.Output = $oStdOutBuilder.ToString().Trim()
-    $errors = $oStdErrBuilder.ToString().Trim()
+
+    $result.StdOut = $oStdOutBuilder.ToArray()
+    $result.StdErr = $oStdErrBuilder.ToArray()
+    $result.Output = $oStdOutBuilder.ToArray() + $oStdErrBuilder.ToArray()
     $result.ExitCode = $process.ExitCode
     return $result
 }

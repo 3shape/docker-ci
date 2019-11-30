@@ -34,7 +34,8 @@ Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
 Set-GlobalVar -Variable InvokeCommandReturnValueKeyName -Value 'command'
 Set-GlobalVar -Variable InvokeCommandArgsReturnValueKeyName -Value 'commandargs'
-
+Set-GlobalVar -Variable InvokeCommandAndReturnOneKeyName -Value 'command'
+Set-GlobalVar -Variable InvokeCommandAndReturnOneArgsKeyName -Value 'commandargs'
 # Global scriptblocks
 Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
     StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
