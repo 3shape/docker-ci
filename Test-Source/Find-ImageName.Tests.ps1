@@ -45,7 +45,7 @@ Describe 'Parse context from git repository' {
             $gitReposWithUppercase = Join-Path $tempFolder 'ThisIsNotUsefulAsAnImageName'
             New-FakeGitRepository -Path $gitReposWithUppercase
             $mockCode = {
-                $invocationResult = [CommandResult]::new();
+                $invocationResult = [CommandCoreResult]::new();
                 $invocationResult.Output = "https://github.com/3shapeAS/DOCKERBUILD-pwsh.git"
                 $invocationResult
             }
