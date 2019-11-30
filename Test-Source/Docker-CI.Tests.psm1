@@ -33,25 +33,31 @@ Set-GlobalVar -Variable ModuleName -Value 'Docker-CI'
 Set-GlobalVar -Variable LocalDockerRegistry -Value 'localhost:5000'
 Set-GlobalVar -Variable LocalDockerRegistryName -Value 'registry'
 Set-GlobalVar -Variable InvokeCommandReturnValueKeyName -Value 'command'
+Set-GlobalVar -Variable InvokeCommandArgsReturnValueKeyName -Value 'commandargs'
 
 # Global scriptblocks
 Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
     StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
-    $result = [CommandResult]::new()
+    StoreMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName -Value $CommandArgs
+    $result = [CommandCoreResult]::new()
     $result.Output = @("Hello", "World")
     $result.ExitCode = 0
     return $result
 }
 
 Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
-    StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
-    $result = [CommandResult]::new()
+    StoreMockValue -Key $Global:InvokeCommandAndReturnOneKeyName -Value $Command
+    StoreMockValue -Key $Global:InvokeCommandAndReturnOneArgsKeyName -Value $CommandArgs
+    $result = [CommandCoreResult]::new()
     $result.ExitCode = 1
     return $result
 }
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
+. "$PSScriptRoot\..\Source\Private\Invoke-DockerCommand.ps1"
 . "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
 . "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
+. "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
+. "$PSScriptRoot\..\Source\Private\New-Process.ps1"
 
 Set-GlobalVar -Variable DockerOsType -Value (Find-DockerOSType)
