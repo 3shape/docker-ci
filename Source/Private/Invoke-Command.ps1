@@ -25,8 +25,8 @@ function Invoke-Command {
     [System.Diagnostics.Process] $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location) -RedirectStdIn
 
     try {
-        $oStdOutBuilder = New-Object Collections.Generic.List[String]
-        $oStdErrBuilder = New-Object Collections.Generic.List[String]
+        $stdOutMessages = New-Object Collections.Generic.List[String]
+        $stdErrMessages = New-Object Collections.Generic.List[String]
 
         $finished = $false
 
@@ -38,15 +38,15 @@ function Invoke-Command {
             }'
         $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet)
 
-        [ScriptBlock] $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
+        $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
 
         $stdOutEventHandler = Register-ObjectEvent -InputObject $process `
             -Action $eventHandler -EventName 'OutputDataReceived' `
-            -MessageData $oStdOutBuilder
+            -MessageData $stdOutMessages
 
         $stdErrEventHandler = Register-ObjectEvent -InputObject $process `
             -Action $eventHandler -EventName 'ErrorDataReceived' `
-            -MessageData $oStdErrBuilder
+            -MessageData $stdErrMessages
 
         $process.Start() | Out-Null
 
@@ -81,9 +81,9 @@ function Invoke-Command {
         }
     }
 
-    $result.StdOut = $oStdOutBuilder.ToArray()
-    $result.StdErr = $oStdErrBuilder.ToArray()
-    $result.Output = $oStdOutBuilder.ToArray() + $oStdErrBuilder.ToArray()
+    $result.StdOut = $stdOutMessages.ToArray()
+    $result.StdErr = $stdErrMessages.ToArray()
+    $result.Output = $stdOutMessages.ToArray() + $stdErrMessages.ToArray()
     $result.ExitCode = $process.ExitCode
     return $result
 }
