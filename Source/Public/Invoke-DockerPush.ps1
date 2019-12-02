@@ -21,8 +21,8 @@ function Invoke-DockerPush {
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $postfixedRegistry = Add-PostFix $Registry
-    $command = "docker push ${postfixedRegistry}${ImageName}:${Tag}"
-    $commandResult = Invoke-Command $command
+    $args = "push ${postfixedRegistry}${ImageName}:${Tag}"
+    $commandResult = Invoke-DockerCommand $args
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
         'CommandResult' = $commandResult;
