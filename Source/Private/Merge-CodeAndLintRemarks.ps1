@@ -11,8 +11,6 @@ function Merge-CodeAndLintRemarks {
     )
     [String[]] $result = @()
 
-    # TODO Sorth the lint remarks to ensure consistent ordering.
-
     $codeIndex = 0
     $lintIndex = 0
     while ($lintIndex -lt $LintRemarks.Length) {
