@@ -37,7 +37,6 @@ function Invoke-DockerBuild {
     if ($ExtraParams) {
         $extraParameters = " ${ExtraParams}"
     }
-    $dockerBuildCommand = "docker"
     $dockerBuildCommandArgs = "build `"${Context}`" -t ${postfixedRegistry}${ImageName}:${Tag} -f `"${Dockerfile}`"${extraParameters}"
     $commandResult = Invoke-DockerCommand -CommandArgs $dockerBuildCommandArgs
     Assert-ExitCodeOK $commandResult
