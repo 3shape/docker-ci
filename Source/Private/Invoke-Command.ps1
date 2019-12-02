@@ -65,6 +65,8 @@ function Invoke-Command {
         while (-not $process.WaitForExit(100)) {
             # Allow interrupts like CTRL + C
         }
+        # Allow all event handlers to finish up
+        $process.WaitForExit()
         $finished = $true
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
