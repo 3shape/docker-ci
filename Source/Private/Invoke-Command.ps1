@@ -17,7 +17,7 @@ function Invoke-Command {
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
 
-    $result = [CommandCoreResult]::new()
+    $result = [CommandResult]::new()
     $result.Command = $Command
     $result.CommandArgs = $CommandArgs
     $result.ExitCode = -1

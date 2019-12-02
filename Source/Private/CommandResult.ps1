@@ -1,4 +1,4 @@
-class CommandCoreResult {
+class CommandResult {
     [String] $Command
     [String] $CommandArgs
     [int] $ExitCode

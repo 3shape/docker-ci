@@ -2,7 +2,7 @@ Import-Module -Force $PSScriptRoot/../Source/Docker-CI.psm1
 Import-Module -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
-. "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
+. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Source\Private\New-Process.ps1"
 
 Describe 'Runs only external tools' {

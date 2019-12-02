@@ -40,7 +40,7 @@ Set-GlobalVar -Variable InvokeCommandAndReturnOneArgsKeyName -Value 'commandargs
 Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
     StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
     StoreMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName -Value $CommandArgs
-    $result = [CommandCoreResult]::new()
+    $result = [CommandResult]::new()
     $result.Output = @("Hello", "World")
     $result.ExitCode = 0
     return $result
@@ -49,7 +49,7 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeZero -Value {
 Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
     StoreMockValue -Key $Global:InvokeCommandAndReturnOneKeyName -Value $Command
     StoreMockValue -Key $Global:InvokeCommandAndReturnOneArgsKeyName -Value $CommandArgs
-    $result = [CommandCoreResult]::new()
+    $result = [CommandResult]::new()
     $result.ExitCode = 1
     return $result
 }
@@ -58,7 +58,7 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
 . "$PSScriptRoot\..\Source\Private\Invoke-DockerCommand.ps1"
 . "$PSScriptRoot\..\Source\Private\Assert-ExitCodeOk.ps1"
 . "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
-. "$PSScriptRoot\..\Source\Private\CommandCoreResult.ps1"
+. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Source\Private\New-Process.ps1"
 
 Set-GlobalVar -Variable DockerOsType -Value (Find-DockerOSType)
