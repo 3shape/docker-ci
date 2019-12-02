@@ -1,8 +1,8 @@
 DL3006 Always tag the version of an image explicitly
 1: FROM debian
-SC2154 node_verion is referenced but not assigned (did you mean 'node_version'?).
 DL3009 Delete the apt-get lists after installing something
 DL3015 Avoid additional packages by specifying `--no-install-recommends`
+SC2154 node_verion is referenced but not assigned (did you mean 'node_version'?).
 2: RUN export node_version="0.10" \
 3: && apt-get update && apt-get -y install nodejs="$node_verion"
 4: COPY package.json usr/src/app

@@ -24,5 +24,5 @@ function Find-LintRemarks {
         }
         $lintRemarks += $remark
     }
-    return $lintRemarks
+    return $lintRemarks | Sort-Object LintRule | Sort-Object LineNumber
 }
