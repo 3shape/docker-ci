@@ -60,5 +60,8 @@ Set-GlobalVar -Variable CodeThatReturnsExitCodeOne -Value {
 . "$PSScriptRoot\..\Source\Private\Find-DockerOSType.ps1"
 . "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
 . "$PSScriptRoot\..\Source\Private\New-Process.ps1"
+. "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
+. "$PSScriptRoot\..\Source\Private\Utilities.ps1"
+. "$PSScriptRoot\New-RandomFolder.ps1"
 
 Set-GlobalVar -Variable DockerOsType -Value (Find-DockerOSType)

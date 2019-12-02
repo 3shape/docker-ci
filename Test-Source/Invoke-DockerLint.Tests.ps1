@@ -1,8 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
-
 Describe 'Execute linting on a given docker image' {
 
     Context 'When full path to a docker image is specified' {
@@ -34,7 +32,7 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile'
             [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile.Linted')
             [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
-            
+
             for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
                 $lintedDockerFile[$i] | Should -Be $result[$i]
             }
