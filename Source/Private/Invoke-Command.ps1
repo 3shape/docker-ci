@@ -74,12 +74,13 @@ function Invoke-Command {
         # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
         # way kill the process
         try {
+            $process.WaitForExit()
             if (-not $finished -and -not $process.HasExited) {
                 Write-Debug "Cleanup, kill the process with id $($process.Id)"
                 $process.Kill()
             }
         } catch {
-            # This can happen if the process was never started in which case HasExited throws an exception.
+            # This can happen if the process was never started in which case WaitForExit or HasExited throws an exception.
         }
     }
 
