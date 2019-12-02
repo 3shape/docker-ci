@@ -15,27 +15,23 @@ Describe 'Use cases for this module' {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $exampleRepos = Join-Path $testData 'ExampleRepos'
-            $removeImageCommand = 'docker'
             $removeImageCommandArgs = 'image rm --force localhost:5000/integration-testcase-2:latest'
-            $pruneImageCommand = 'docker'
             $pruneImageCommandArgs = 'system prune --force'
-
-            $startRegistryCommand = "docker"
             $startRegistryCommandArgs = "run -d -p 5000:5000 --name registry" + `
                 " -v `"$($Global:LocalDockerRegistryDir):/auth`"" + `
-                " -e 'REGISTRY_AUTH=htpasswd'" + `
-                " -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm'" + `
-                " -e 'REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd'" + `
+                " -e `"REGISTRY_AUTH=htpasswd`"" + `
+                " -e `"REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm`"" + `
+                " -e `"REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd`"" + `
                 " registry:2"
 
-            Invoke-Command $removeImageCommand $removeImageCommandArgs
-            Invoke-Command $pruneImageCommand $pruneImageCommandArgs
-            Invoke-Command $startRegistryCommand $startRegistryCommandArgs
+            Invoke-DockerCommand $removeImageCommandArgs
+            Invoke-DockerCommand $pruneImageCommandArgs
+            Invoke-DockerCommand $startRegistryCommandArgs
         }
 
         AfterAll {
-            Invoke-Command 'docker' 'container stop registry'
-            Invoke-Command 'docker' 'container rm -v registry'
+            Invoke-DockerCommand 'container stop registry'
+            Invoke-DockerCommand 'container rm -v registry'
         }
 
         BeforeEach {
