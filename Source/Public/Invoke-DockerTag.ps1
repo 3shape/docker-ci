@@ -36,7 +36,7 @@ function Invoke-DockerTag {
     $source = "${postfixedRegistry}${ImageName}:${Tag}"
     $target = "${postfixedNewRegistry}${NewImageName}:${NewTag}"
 
-    $commandResult = Invoke-Command "docker tag ${source} ${target}"
+    $commandResult = Invoke-DockerCommand "tag ${source} ${target}"
     Assert-ExitCodeOk $commandResult
     $result = [PSCustomObject]@{
         'Registry'      = $postfixedNewRegistry

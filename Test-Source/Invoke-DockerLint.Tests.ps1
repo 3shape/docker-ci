@@ -1,8 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\LintRemark.ps1"
-
 Describe 'Execute linting on a given docker image' {
 
     Context 'When full path to a docker image is specified' {
@@ -26,7 +24,7 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Linux.Dockerfile'
             $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Linux.Dockerfile.Linted')
             $result = Invoke-DockerLint -DockerFile $dockerFile
-            $lintedDockerFile | Should -Be $result.LintOutput
+            $result.LintOutput | Should -Be $lintedDockerFile
             $result.LintRemarks.Length | Should -Be 1
         }
 
@@ -34,6 +32,7 @@ Describe 'Execute linting on a given docker image' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile'
             [string[]] $lintedDockerFile = Get-Content -Path (Join-Path $Global:DockerImagesDir 'Poorly.Written.Dockerfile.Linted')
             [string[]] $result = (Invoke-DockerLint -DockerFile $dockerFile).LintOutput
+
             for ($i = 0; $i -lt $lintedDockerFile.Length; $i++) {
                 $lintedDockerFile[$i] | Should -Be $result[$i]
             }
@@ -67,32 +66,6 @@ Describe 'Execute linting on a given docker image' {
         }
     }
 
-    Context 'When no path to docker image is specified' {
-
-        BeforeEach {
-            Initialize-MockReg
-            $script:currentLocation = Get-Location
-        }
-
-        AfterEach {
-            Set-Location $script:currentLocation
-        }
-
-        It "Defaults to `'Dockerfile`'" {
-            $code = {
-                StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value "$Command"
-            }
-            Mock -CommandName "Invoke-Command" $code -Verifiable -ModuleName $Global:ModuleName
-            Set-Location -Path $Global:DockerImagesDir
-
-            Invoke-DockerLint
-
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
-            $result | Should -BeLike "*docker pull hadolint/hadolint*"
-        }
-    }
-
     Context 'Pipeline execution' {
         It 'returns the expected pscustomobject' {
             $dockerFile = Join-Path $Global:DockerImagesDir 'Windows.Dockerfile'
@@ -107,6 +80,10 @@ Describe 'Execute linting on a given docker image' {
     }
 
     Context 'Verbosity of execution' {
+
+        BeforeAll {
+            Initialize-MockReg
+        }
 
         It 'outputs the result if Quiet is disabled' {
             Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName

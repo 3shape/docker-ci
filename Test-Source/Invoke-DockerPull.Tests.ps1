@@ -1,8 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
-
 Describe 'Pull docker images' {
 
     BeforeEach {
@@ -18,51 +16,51 @@ Describe 'Pull docker images' {
 
         It 'pulls public docker image by image name only' {
             Invoke-DockerPull -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
+            $result | Should -BeLikeExactly "pull ubuntu:latest"
         }
 
         It 'pulls public docker image by image name and tag' {
             Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
+            $result | Should -BeLikeExactly "pull ubuntu:bionic"
         }
 
         It 'pulls public docker image by registry and image name' {
             Invoke-DockerPull -Registry 'not.docker.hub' -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull not.docker.hub/ubuntu:latest"
+            $result | Should -BeLikeExactly "pull not.docker.hub/ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with $null registry value and image name' {
             Invoke-DockerPull -Registry $null -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
+            $result | Should -BeLikeExactly "pull ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with whitespace registry value and image name' {
             Invoke-DockerPull -Registry '   ' -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu:latest"
+            $result | Should -BeLikeExactly "pull ubuntu:latest"
         }
 
         It 'pulls explicit public docker image with empty registry value, image name and tag' {
             Invoke-DockerPull -Registry '' -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu:bionic"
+            $result | Should -BeLikeExactly "pull ubuntu:bionic"
         }
 
         It 'pulls public docker image by image name and digest' {
             Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152'
-            $result = GetMockValue -Key $Global:InvokeCommandReturnValueKeyName
+            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
             Write-Debug $result
-            $result | Should -BeLikeExactly "docker pull ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
+            $result | Should -BeLikeExactly "pull ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
         }
 
         It 'pulls public docker image by image name, with both tag and digest; and fails' {

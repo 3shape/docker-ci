@@ -41,7 +41,7 @@ function Invoke-DockerTests {
         $configs = '/configs'
         $report = '/report'
     }
-    $structureCommand = "docker run -i" + `
+    $structureCommand = "run -i" + `
         " -v `"${here}:${configs}`"" + `
         " -v `"${absoluteTestReportDir}:${report}`"" + `
         " -v `"${dockerSocket}:${dockerSocket}`"" + `
@@ -53,7 +53,7 @@ function Invoke-DockerTests {
             $structureCommand = -join ($structureCommand, " -c ${configs}/${configName}")
         }
     )
-    $commandResult = Invoke-Command $structureCommand
+    $commandResult = Invoke-DockerCommand $structureCommand
     if ($TreatTestFailuresAsExceptions) {
         Assert-ExitCodeOk $commandResult
     }
@@ -65,8 +65,6 @@ function Invoke-DockerTests {
     }
 
     $result = [PSCustomObject]@{
-        # Todo: Need to check if the test report folder is missing.
-        # It should not crash when folder is not there, but should simply return nothing
         'TestResult'     = $testResult
         'TestReportPath' = $testReportPath
         'CommandResult'  = $commandResult

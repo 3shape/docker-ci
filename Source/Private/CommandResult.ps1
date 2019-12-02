@@ -1,6 +1,8 @@
 class CommandResult {
     [String] $Command
-    [bool] $Success
+    [String] $CommandArgs
     [int] $ExitCode
+    [String[]] $StdOut
+    [String[]] $StdErr
     [String[]] $Output
 }

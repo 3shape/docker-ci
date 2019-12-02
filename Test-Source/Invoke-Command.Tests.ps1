@@ -1,60 +1,94 @@
-Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+Import-Module -Force $PSScriptRoot/../Source/Docker-CI.psm1
+Import-Module -Force -Global $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
-. "$PSScriptRoot\..\Source\Private\CommandResult.ps1"
+Describe 'Runs only external tools' {
 
-Describe 'Run external tools as commands' {
-
-    Context 'Run a simple external command' {
+    Context 'Runs a simple external command' {
         if ($IsWindows) {
-            $commandName = "find /?"
+            $command = [PSCustomObject]@{
+                'Command'     = 'find'
+                'CommandArgs' = '/?'
+            }
         } elseif ($IsLinux) {
-            $commandName = "grep --help"
+            $command = [PSCustomObject]@{
+                'Command'     = 'grep'
+                'CommandArgs' = '--help'
+            }
         }
 
-        It 'returns correct output and error information' {
-            $result = Invoke-Command $commandName
+        BeforeEach {
+            $tempFile = New-TemporaryFile
+        }
+
+        AfterEach {
+            Remove-Item $tempFile -Force
+        }
+
+        It 'returns correct output and exit code, silently' {
+            $result = Invoke-Command -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$true 6> $tempFile
             $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
-        It 'Returns the error output for failing commands' {
-            $result = Invoke-Command "find ---nope-this-is-clearly-wrong"
+        It 'can run a command with no args' {
+            $result = Invoke-Command -Command $command.Command -Quiet:$true
             $result.ExitCode | Should -Not -Be 0
         }
-    }
 
-    Context 'Run a PS CmdLet' {
-        It 'returns correct result information' {
-            $commandName = 'Get-Verb'
-            $result = Invoke-Command $commandName
-            $result.Success | Should -Be $true
+        It 'returns correct output and exit code, verbosely' {
+            $result = Invoke-Command -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$false 6> $tempFile
+            $result.ExitCode | Should -Be 0
             $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -Not -BeNullOrEmpty
+        }
+
+        It 'returns the exit code for failing commands, silently' {
+            $result = Invoke-Command -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$true 6> $tempFile
+            $result.ExitCode | Should -Not -Be 0
+            $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
+        }
+
+        It 'returns the exit code for failing commands, verbosely' {
+            $result = Invoke-Command -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$false 6> $tempFile
+            $result.ExitCode | Should -Not -Be 0
+            $result.Output | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
     }
 
-    Context 'Run a nonexisting command' {
-        It 'throws an exception' {
-            $theCode = {
-                Invoke-Command 'GibberishGoo'
-            }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.CommandNotFoundException]) -PassThru
+    Context 'Run a mocked command' {
+
+    }
+
+    Context 'Runs a non-existent command, throws an exception' {
+
+        It 'throws MethodInvocationException instead of CommandNotFoundException' {
+            $theCode = { Invoke-Command -Command 'GibberishGoo' }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
         }
     }
 
-    Context 'Run a null or empty command' {
-        It 'throws an exception if a null command is passed' {
-            $theCode = {
-                Invoke-Command $null
-            }
+    Context 'Runs a PS CmdLet, throws an exception just like running a non-existent command' {
+
+        It 'throws MethodInvocationException instead of CommandNotFoundException' {
+            $theCode = { Invoke-Command -Command 'Get-Verb' }
+            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
+        }
+    }
+
+    Context 'Runs a null or empty command' {
+
+        It 'throws ParameterBindingException if a null command is passed' {
+            $theCode = { Invoke-Command $null }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
 
-        It 'throws an exception if an empty command is passed' {
-            $theCode = {
-                Invoke-Command ""
-            }
+        It 'throws ParameterBindingException if an empty command is passed' {
+            $theCode = { Invoke-Command -Command "" }
             $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
         }
     }
+
 }

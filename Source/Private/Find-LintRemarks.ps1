@@ -2,7 +2,7 @@ function Find-LintRemarks {
     [CmdletBinding()]
     param (
         [AllowEmptyString()]
-        [string[]]
+        [String[]]
         $LintLines
     )
     if ($null -eq $LintLines) {
@@ -16,7 +16,6 @@ function Find-LintRemarks {
     [LintRemark[]] $lintRemarks = @()
     $LintLines | Select-String -Pattern $pattern | ForEach-Object {
         $lineNumber, $lintRule, $lintRemark = $_.Matches[0].Groups['linenumbergroup', 'lintrule', 'lintremark'].Value
-
         $remark = [LintRemark] @{
             LineNumber  = [int] $lineNumber.Substring($lineNumber.LastIndexOf(':') + 1)
             LintRule    = $lintRule.Trim()
@@ -24,5 +23,5 @@ function Find-LintRemarks {
         }
         $lintRemarks += $remark
     }
-    return $lintRemarks
+    return $lintRemarks | Sort-Object LintRule | Sort-Object LineNumber
 }

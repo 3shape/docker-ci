@@ -15,24 +15,23 @@ Describe 'Use cases for this module' {
             $testData = Join-Path (Split-Path -Parent $PSScriptRoot) "Test-Data"
             $htpasswdPath = Join-Path $testData 'DockerRegistry'
             $exampleRepos = Join-Path $testData 'ExampleRepos'
-            $removeImageCommand = 'docker image rm --force localhost:5000/integration-testcase-2:latest'
-            $pruneImageCommand = 'docker system prune --force'
-
-            $startRegistryCommand = "docker run -d -p 5000:5000 --name registry" + `
+            $removeImageCommandArgs = 'image rm --force localhost:5000/integration-testcase-2:latest'
+            $pruneImageCommandArgs = 'system prune --force'
+            $startRegistryCommandArgs = "run -d -p 5000:5000 --name registry" + `
                 " -v `"$($Global:LocalDockerRegistryDir):/auth`"" + `
-                " -e 'REGISTRY_AUTH=htpasswd'" + `
-                " -e 'REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm'" + `
-                " -e 'REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd'" + `
+                " -e `"REGISTRY_AUTH=htpasswd`"" + `
+                " -e `"REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm`"" + `
+                " -e `"REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd`"" + `
                 " registry:2"
 
-            Invoke-Command $removeImageCommand
-            Invoke-Command $pruneImageCommand
-            Invoke-Command $startRegistryCommand
+            Invoke-DockerCommand $removeImageCommandArgs
+            Invoke-DockerCommand $pruneImageCommandArgs
+            Invoke-DockerCommand $startRegistryCommandArgs
         }
 
         AfterAll {
-            Invoke-Command 'docker container stop registry'
-            Invoke-Command 'docker container rm -v registry'
+            Invoke-DockerCommand 'container stop registry'
+            Invoke-DockerCommand 'container rm -v registry'
         }
 
         BeforeEach {
@@ -47,8 +46,8 @@ Describe 'Use cases for this module' {
 
         It 'can build an image and tag it' {
             Invoke-DockerBuild . -ImageName 'integration-testcase-1'
-            $findImageCommand = 'docker images integration-testcase-1'
-            $result = Invoke-Command $findImageCommand
+            $findImageArgs = 'images integration-testcase-1'
+            $result = Invoke-DockerCommand $findImageArgs
             ([regex]::Matches($result.Output, "integration-testcase-1" )).Count | Should -BeExactly 1
         }
 

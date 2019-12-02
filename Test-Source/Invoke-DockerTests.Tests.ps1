@@ -1,9 +1,6 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-. "$PSScriptRoot\..\Source\Private\Utilities.ps1"
-. "$PSScriptRoot\New-RandomFolder.ps1"
-
 $imageToTest = if ($Global:DockerOsType -ieq 'linux') {
     'ubuntu:latest'
 } elseif ($Global:DockerOsType -ieq 'windows') {
