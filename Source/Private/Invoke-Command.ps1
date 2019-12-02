@@ -36,7 +36,7 @@ function Invoke-Command {
                     Write-Information -InformationAction "Continue" -MessageData $EventArgs.Data
                 }
             }'
-        $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet)
+        $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet.IsPresent)
 
         $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
 
