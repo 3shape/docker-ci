@@ -26,40 +26,52 @@ Describe 'Runs only external tools' {
 
         It 'returns correct output and exit code, silently' {
             $result = Invoke-Command -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$true 6> $tempFile
+
             $result.ExitCode | Should -Be 0
+            $result.StdOut | Should -Not -BeNullOrEmpty
+            $result.StdErr | Should -BeNullOrEmpty
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'can run a command with no args' {
             $result = Invoke-Command -Command $command.Command -Quiet:$true
+
             $result.ExitCode | Should -Not -Be 0
+            $result.StdOut | Should -BeNullOrEmpty
+            $result.StdErr | Should -Not -BeNullOrEmpty
+            $result.Output | Should -Not -BeNullOrEmpty
         }
 
         It 'returns correct output and exit code, verbosely' {
             $result = Invoke-Command -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$false 6> $tempFile
+
             $result.ExitCode | Should -Be 0
+            $result.StdOut | Should -Not -BeNullOrEmpty
+            $result.StdErr | Should -BeNullOrEmpty
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, silently' {
             $result = Invoke-Command -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$true 6> $tempFile
+
             $result.ExitCode | Should -Not -Be 0
+            $result.StdOut | Should -BeNullOrEmpty
+            $result.StdErr | Should -Not -BeNullOrEmpty
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -BeNullOrEmpty
         }
 
         It 'returns the exit code for failing commands, verbosely' {
             $result = Invoke-Command -Command $command.Command -CommandArgs "---nope-this-is-clearly-wrong" -Quiet:$false 6> $tempFile
+
             $result.ExitCode | Should -Not -Be 0
+            $result.StdOut | Should -BeNullOrEmpty
+            $result.StdErr | Should -Not -BeNullOrEmpty
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
-    }
-
-    Context 'Run a mocked command' {
-
     }
 
     Context 'Runs a non-existent command, throws an exception' {
