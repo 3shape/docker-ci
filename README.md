@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/3shape/docker-ci/branch/master/graph/badge.svg)](https://codecov.io/gh/3shape/docker-ci)
 [![PS Gallery](https://img.shields.io/badge/install-PS%20Gallery-blue.svg)](https://www.powershellgallery.com/packages/Docker-CI/)
 
-# dockerbuild-pwsh
+# docker-ci
 
 PowerShell Core script to build and test Docker images.
 The module comes with CmdLets to perform the most commonly used tasks with regards to building docker images:
@@ -34,11 +34,14 @@ PS C:\docker> Invoke-DockerBuild .
 ```
 and so on.
 
+## Prerequisite
+
+PowerShell core >= 6.0 is needed.
 
 ## Installation
 
 ```powershell
-PS C:\docker> Install-Module Docker.Build -Repository PSGallery
+PS C:\docker> Install-Module Docker-ci -Repository PSGallery
 ```
 
 ## Examples
