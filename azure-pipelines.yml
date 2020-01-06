@@ -34,11 +34,8 @@ stages:
 
     # Build and test the project
 
-    - pwsh: Get-ChildItem Env:GitVersion*
-      displayName: List GitVersion variables
-      env:
-        GitVersion_Version: "$(GitVersion.Version)"
-        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
+    - pwsh: Write-Output "$ENV:GITVERSION_VERSION"
+    - pwsh: Write-Output $(GitVersion.Version)
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
