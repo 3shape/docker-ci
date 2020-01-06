@@ -20,16 +20,15 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList GitVersion
+    - pwsh: dotnet gitversion /output buildserver /nofetch
+      name: Version
       condition: eq(variables['Agent.OS'], 'Linux')
 
     # Build and test the project
 
     - pwsh: Write-Output "$ENV:GITVERSION_MAJORMINORPATCH"
-    - pwsh: Write-Output "$ENV:GITVERSION_PRERELEASETAGWITHDASH"
-    - pwsh: Write-Output "$ENV:GITVERSION_VERSION"
       env:
-        GITVERSION_VERSION: $(GitVersion.MajorMinorPatch)
+        GitVersion_MajorMinorPatch: $(Version.GitVersion.MajorMinorPatch)
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
