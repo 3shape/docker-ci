@@ -1,21 +1,21 @@
 steps:
 - task: UseDotNet@2
   inputs:
-  packageType: 'sdk'
-  version: '2.1.510'
+    packageType: 'sdk'
+    version: '2.1.510'
 - task: DotNetCoreCLI@2
   inputs:
-  command: "custom"
-  custom: "tool"
-  arguments: "install --global Codecov.Tool"
+    command: "custom"
+    custom: "tool"
+    arguments: "install --global Codecov.Tool"
 - task: DotNetCoreCLI@2
   inputs:
-  command: "custom"
-  custom: "tool"
-  arguments: "install --global GitVersion.Tool --version 5.1.4-beta1.37"
+    command: "custom"
+    custom: "tool"
+    arguments: "install --global GitVersion.Tool --version 5.1.4-beta1.37"
 - task: DockerInstaller@0
   inputs:
-  dockerVersion: "17.09.0-ce"
+    dockerVersion: "17.09.0-ce"
 
 - pwsh: .\Install-Prerequisites.ps1
   displayName: "Install prerequisites"
