@@ -6,28 +6,40 @@ trigger:
       - master
 
 # Use the latest image with VS2019 on Windows Server 2019
-pool:
-  vmImage: "windows-2019"
 
-steps:
-  # Install the prereqs
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: "custom"
-      custom: "tool"
-      arguments: "install --global Codecov.Tool"
-  - task: DockerInstaller@0
-    inputs:
-      dockerVersion: "17.09.0-ce"
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    strategy:
+      matrix:
+        'Windows':
+          VM_IMAGE: 'windows-latest'
+        'Linux':
+          VM_IMAGE: 'ubuntu-latest'
+        'macOS':
+          VM_IMAGE: 'macOS-latest'
+    pool:
+      vmImage: $(VM_IMAGE)
+    steps:
+    # Install the prereqs
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: "custom"
+        custom: "tool"
+        arguments: "install --global Codecov.Tool"
+    - task: DockerInstaller@0
+      inputs:
+        dockerVersion: "17.09.0-ce"
 
-  # Build and test the project
-  - pwsh: .\Install-Prerequisites.ps1
-    displayName: "Install prerequisites"
+    # Build and test the project
+    - pwsh: .\Install-Prerequisites.ps1
+      displayName: "Install prerequisites"
 
-  - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
-    displayName: "Run tests and coverage"
+    - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
+      displayName: "Run tests and coverage"
 
-  # Publish code coverage to codecov.io always
-  - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
-    displayName: Upload coverage to codecov.io
-    condition: always()
+    # Publish code coverage to codecov.io always
+    - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
+      displayName: Upload coverage to codecov.io
+      condition: always()
