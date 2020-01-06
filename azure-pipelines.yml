@@ -20,8 +20,12 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - script: dotnet gitversion /output buildserver /nofetch
+    - task: DotNetCoreCLI@2
       displayName: Calculate GitVersion
+      inputs:
+        command: 'custom'
+        custom: 'gitversion'
+        arguments: '/output buildserver /nofetch'
       condition: eq(variables['Agent.OS'], 'Linux')
 
     # Build and test the project
@@ -32,8 +36,11 @@ stages:
         GitVersion_Version: "$(GitVersion.Version)"
         GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
 
-    - pwsh: echo "$env:GitVersion.Version"; echo "$env:GitVersion.PreReleaseTagWithDash"
-      displayName: echo GitVersion variables
+    - pwsh: Get-ChildItem Env:GitVersion*
+      displayName: List GitVersion variables v2
+      env:
+        GitVersion_Version: variables['GitVersion.Version']
+        GitVersion_PreReleaseTagWithDash: variables['GitVersion.PreReleaseTagWithDash']
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
