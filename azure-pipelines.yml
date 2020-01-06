@@ -19,22 +19,12 @@ stages:
       vmImage: $(VM_IMAGE)
     steps:
     # Install the prereqs
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '2.1.510'
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: "custom"
-        custom: "tool"
-        arguments: "install --global Codecov.Tool"
-    - task: DockerInstaller@0
-      inputs:
-        dockerVersion: "17.09.0-ce"
+    - template: build/common-steps.yml
+    - script: dotnet gitversion /output buildserver /nofetch
+      displayName: Calculate GitVersion
+      condition: eq(variables['Agent.OS'], 'Linux')
 
     # Build and test the project
-    - pwsh: .\Install-Prerequisites.ps1
-      displayName: "Install prerequisites"
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
@@ -43,3 +33,35 @@ stages:
     - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
       displayName: Upload coverage to codecov.io
       condition: always()
+
+    - publish: $(System.DefaultWorkingDirectory)
+      displayName: Upload pipeline artifacts
+      condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
+      artifact: storage
+
+- stage: Publish
+  dependsOn: Build
+  condition: and(succeeded(), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
+  jobs:
+  - job: Publish
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    # Install the prereqs
+    - template: build/common-steps.yml
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download pipeline artifacts'
+      inputs:
+        source: current
+        path: $(Build.SourcesDirectory)
+        artifact: storage
+    - pwsh: ./Invoke-Publish.ps1
+      condition: succeeded()
+      env:
+        POWERSHELL_GALLERY_API_TOKEN: $(POWERSHELL_GALLERY_API_TOKEN)
+
+    - pwsh: ./Notify-Slack.ps1
+      condition: succeeded()
+      env:
+        SLACK_TOKEN: $(SLACK_TOKEN)
+        SLACK_URL: $(SLACK_URL)
