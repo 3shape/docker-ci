@@ -43,14 +43,12 @@ stages:
       name: Version
       displayName: GitVersion
 
-    - pwsh: Get-ChildItem Env:*
-      env:
-        GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
-        GitVersion_PreReleaseTagWithDash: $(Version.GitVersion.PreReleaseTagWithDash)
     - pwsh: ./Invoke-Publish.ps1
       displayName: Publish to PowerShell Gallery
       condition: succeeded()
       env:
+        GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
+        GitVersion_PreReleaseTagWithDash: $(Version.GitVersion.PreReleaseTagWithDash)
         POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
         SLACK_TOKEN: "$(SLACK_TOKEN)"
         SLACK_URL: "$(SLACK_URL)"

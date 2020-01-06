@@ -34,6 +34,9 @@ Properties {
 # Customize these tasks for performing operations before and/or after publish.
 ###############################################################################
 Task PrePublish {
+
+    Get-ChildItem Env:GitVersion* | Format-List
+
     $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Public\*.ps1 -ErrorAction SilentlyContinue)
 
     Write-Debug "These functions will be included in the published module: ${functionScriptFiles}"
@@ -86,7 +89,7 @@ Task PostPublish {
 ###############################################################################
 Task default -depends Build
 
-Task Publish -depends Test, PrePublish, PublishImpl, PostPublish {
+Task Publish -depends Build, PrePublish, PublishImpl, PostPublish {
 }
 
 Task PublishImpl -depends Test -requiredVariables PublishDir {
