@@ -15,8 +15,6 @@ stages:
           VM_IMAGE: 'windows-latest'
         'Linux':
           VM_IMAGE: 'ubuntu-latest'
-        'macOS':
-          VM_IMAGE: 'macOS-latest'
     pool:
       vmImage: $(VM_IMAGE)
     steps:
