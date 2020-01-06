@@ -28,6 +28,9 @@ stages:
 
     - pwsh: Get-ChildItem Env:GitVersion*
       displayName: List GitVersion variables
+      env:
+        GitVersion_Version: $(GitVersion_Version)
+        GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
@@ -49,6 +52,10 @@ stages:
   - job: Publish
     pool:
       vmImage: ubuntu-latest
+    env:
+      GitVersion_Version: $(GitVersion_Version)
+      GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
+
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
