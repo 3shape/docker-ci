@@ -20,31 +20,19 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - pwsh: dotnet gitversion /output buildserver /nofetch
-      name: Version
-      condition: eq(variables['Agent.OS'], 'Linux')
 
     # Build and test the project
-
-    - pwsh: Get-ChildItem Env:Version*
-    - pwsh: Write-Output "$env:VERSION_GITVERSION_MAJORMINORPATCH"
-
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
 
-    # Publish code coverage to codecov.io for windows
+    # Publish code coverage to codecov.io
     - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
       displayName: Upload coverage to codecov.io
       condition: always()
 
-    - publish: $(System.DefaultWorkingDirectory)
-      displayName: Upload pipeline artifacts
-      condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
-      artifact: storage
-
 - stage: Publish
   dependsOn: Build
-  condition: and(succeeded(), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
+  condition: succeeded()
   jobs:
   - job: Publish
     pool:
@@ -53,25 +41,14 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download pipeline artifacts'
-      inputs:
-        source: current
-        path: $(Build.SourcesDirectory)
-        artifact: storage
+    - pwsh: dotnet gitversion /output buildserver /nofetch
+      name: Version
+    - pwsh: Get-ChildItem Env:Version*
+    - pwsh: Get-ChildItem Env:*
     - pwsh: ./Invoke-Publish.ps1
       displayName: Publish to PowerShell Gallery
       condition: succeeded()
       env:
-        GitVersion_Version: "$(GitVersion.Version)"
-        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
         POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
-
-    - pwsh: ./Notify-Slack.ps1
-      displayName: Notify on Slack when successfully published
-      condition: succeeded()
-      env:
-        GitVersion_Version: $(GitVersion.Version)
-        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
         SLACK_TOKEN: "$(SLACK_TOKEN)"
         SLACK_URL: "$(SLACK_URL)"

@@ -44,6 +44,10 @@ Task PrePublish {
         throw 'Module version not found in env:GitVersion_Version where it was expected. Bailing.'
     }
 
+    if (!$env:POWERSHELL_GALLERY_API_TOKEN) {
+        throw 'env:POWERSHELL_GALLERY_API_TOKEN is not present'
+    }
+
     Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 `
         -ModuleVersion "$env:GitVersion_Version" `
         -FunctionsToExport $functionNames
