@@ -42,7 +42,8 @@ stages:
     # Install the prereqs
     - template: build/common-steps.yml
     - pwsh: dotnet gitversion /output buildserver /nofetch
-      name: Version
+      displayName: GitVersion
+
     - pwsh: Get-ChildItem Env:Version*
     - pwsh: Get-ChildItem Env:*
     - pwsh: ./Invoke-Publish.ps1
