@@ -20,7 +20,7 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - script: dotnet gitversion /output buildserver /nofetch
+    - script: dotnet gitversion /l console /output buildserver /nofetch
       displayName: Calculate GitVersion
       condition: eq(variables['Agent.OS'], 'Linux')
 
