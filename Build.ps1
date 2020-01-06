@@ -8,8 +8,8 @@ Properties {
     # The name of your module should match the basename of the PSD1 file.
     $ModuleName = (Get-Item $SourceDir\*.psd1)[0].BaseName
     # Unless it's set in the env vars, in which case that value is used.
-    if ($Env:Docker_CI_ModuleName) {
-        $ModuleName = $Env:Docker_CI_ModuleName
+    if ($Env:MODULE_NAME) {
+        $ModuleName = $Env:MODULE_NAME
     }
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = $null
@@ -62,7 +62,7 @@ Task Publish -depends Test, PrePublish, PublishImpl, PostPublish {
 }
 
 Task PublishImpl -depends Test -requiredVariables PublishDir {
-    $NuGetApiKey = $env:PSGalleryAPIToken
+    $NuGetApiKey = $env:POWERSHELL_GALLERY_API_TOKEN
 
     $publishParams = @{
         Path        = $PublishDir
