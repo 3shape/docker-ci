@@ -5,6 +5,10 @@ trigger:
       # Any Pull Request merging into the master branch
       - master
 
+variables:
+  GitVersion.Version: ''
+  GitVersion.PreReleaseTagWithDash: ''
+
 stages:
 - stage: Build
   jobs:
@@ -35,12 +39,6 @@ stages:
       env:
         GitVersion_Version: "$(GitVersion.Version)"
         GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
-
-    - pwsh: Get-ChildItem Env:GitVersion*
-      displayName: List GitVersion variables v2
-      env:
-        GitVersion_Version: variables['GitVersion.Version']
-        GitVersion_PreReleaseTagWithDash: variables['GitVersion.PreReleaseTagWithDash']
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
