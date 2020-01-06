@@ -5,10 +5,6 @@ trigger:
       # Any Pull Request merging into the master branch
       - master
 
-variables:
-  GitVersion.Version: ''
-  GitVersion.PreReleaseTagWithDash: ''
-
 stages:
 - stage: Build
   jobs:
@@ -34,8 +30,11 @@ stages:
 
     # Build and test the project
 
+    - pwsh: Write-Output "$ENV:GITVERSION_MAJORMINORPATCH"
+    - pwsh: Write-Output $(GitVersion.MajorMinorPatch)
     - pwsh: Write-Output "$ENV:GITVERSION_VERSION"
-    - pwsh: Write-Output $(GitVersion.Version)
+      env:
+        GITVERSION_VERSION: $(GitVersion.MajorMinorPatch)
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
