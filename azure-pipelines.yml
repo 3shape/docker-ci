@@ -20,7 +20,7 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - script: dotnet gitversion /l console /output buildserver /nofetch
+    - script: dotnet gitversion /output buildserver /nofetch
       displayName: Calculate GitVersion
       condition: eq(variables['Agent.OS'], 'Linux')
 
@@ -32,7 +32,7 @@ stages:
         GitVersion_Version: "$(GitVersion.Version)"
         GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
 
-    - pwsh: echo "$(GitVersion.Version)"; echo "$(GitVersion.PreReleaseTagWithDash)"
+    - pwsh: echo "$env:GitVersion.Version"; echo "$env:GitVersion.PreReleaseTagWithDash"
       displayName: echo GitVersion variables
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
