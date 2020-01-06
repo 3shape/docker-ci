@@ -5,8 +5,6 @@ trigger:
       # Any Pull Request merging into the master branch
       - master
 
-# Use the latest image with VS2019 on Windows Server 2019
-
 stages:
 - stage: Build
   jobs:
@@ -24,6 +22,7 @@ stages:
     steps:
     # Install the prereqs
     - task: DotNetCoreCLI@2
+      condition: eq( variables['Agent.OS'], 'Windows_NT' )
       inputs:
         command: "custom"
         custom: "tool"
@@ -39,7 +38,12 @@ stages:
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
 
-    # Publish code coverage to codecov.io always
+    # Publish code coverage to codecov.io for windows
     - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
       displayName: Upload coverage to codecov.io
-      condition: always()
+      condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+    # Publish code coverage to codecov.io for unix
+    - script: bash <(curl -s https://codecov.io/bash) -t $(CODECOV_TOKEN)
+      displayName: Upload coverage to codecov.io
+      condition: ne( variables['Agent.OS'], 'Windows_NT' )
