@@ -29,8 +29,11 @@ stages:
     - pwsh: Get-ChildItem Env:GitVersion*
       displayName: List GitVersion variables
       env:
-        GitVersion_Version: $(GitVersion.Version)
-        GitVersion_PreReleaseTagWithDash: $(GitVersion.PreReleaseTagWithDash)
+        GitVersion_Version: "$(GitVersion.Version)"
+        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
+
+    - pwsh: echo "$(GitVersion.Version)"; echo "$(GitVersion.PreReleaseTagWithDash)"
+      displayName: echo GitVersion variables
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
@@ -66,15 +69,15 @@ stages:
       displayName: Publish to PowerShell Gallery
       condition: succeeded()
       env:
-        GitVersion_Version: $(GitVersion.Version)
-        GitVersion_PreReleaseTagWithDash: $(GitVersion.PreReleaseTagWithDash)
-        POWERSHELL_GALLERY_API_TOKEN: $(POWERSHELL_GALLERY_API_TOKEN)
+        GitVersion_Version: "$(GitVersion.Version)"
+        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
+        POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
 
     - pwsh: ./Notify-Slack.ps1
       displayName: Notify on Slack when successfully published
       condition: succeeded()
       env:
         GitVersion_Version: $(GitVersion.Version)
-        GitVersion_PreReleaseTagWithDash: $(GitVersion.PreReleaseTagWithDash)
-        SLACK_TOKEN: $(SLACK_TOKEN)
-        SLACK_URL: $(SLACK_URL)
+        GitVersion_PreReleaseTagWithDash: "$(GitVersion.PreReleaseTagWithDash)"
+        SLACK_TOKEN: "$(SLACK_TOKEN)"
+        SLACK_URL: "$(SLACK_URL)"
