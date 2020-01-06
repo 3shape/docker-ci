@@ -92,7 +92,7 @@ Task default -depends Build
 Task Publish -depends Build, PrePublish, PublishImpl, PostPublish {
 }
 
-Task PublishImpl -depends Test -requiredVariables PublishDir {
+Task PublishImpl -requiredVariables PublishDir {
     $NuGetApiKey = $env:POWERSHELL_GALLERY_API_TOKEN
 
     $publishParams = @{
