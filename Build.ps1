@@ -119,6 +119,15 @@ Task Clean -depends Init -requiredVariables PublishDir {
     }
 }
 
+Task GitVersion {
+    $_GitVersionMajorMinorMatch = dotnet gitversion -output json -showvariable majorminorpatch
+    $_GitVersionPreReleaseTagWithDash = dotnet gitversion -output json -showvariable PreReleaseTagWithDash
+    Write-Output "GitVersion says version is : ${_GitVersionMajorMinorMatch}"
+    Write-Output "##vso[task.setvariable variable=GitVersion.MajorMinorMatch;isOutput=true]${_GitVersionMajorMinorMatch}"
+    Write-Output "GitVersion says prerelease tag is: ${_GitVersionPreReleaseTagWithDash}"
+    Write-Output "##vso[task.setvariable variable=GitVersion.PreReleaseTagWithDash;isOutput=true]${_GitVersionPreReleaseTagWithDash}"
+}
+
 Task Init -requiredVariables PublishDir {
     if (!(Test-Path $PublishDir)) {
         $null = New-Item $PublishDir -ItemType Directory

@@ -20,18 +20,13 @@ stages:
     steps:
     # Install the prereqs
     - template: build/common-steps.yml
-    - task: DotNetCoreCLI@2
-      displayName: Calculate GitVersion
-      inputs:
-        command: 'custom'
-        custom: 'gitversion'
-        arguments: '/output buildserver /nofetch'
+    - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList GitVersion
       condition: eq(variables['Agent.OS'], 'Linux')
 
     # Build and test the project
 
     - pwsh: Write-Output "$ENV:GITVERSION_MAJORMINORPATCH"
-    - pwsh: Write-Output $(GitVersion.MajorMinorPatch)
+    - pwsh: Write-Output "$ENV:GITVERSION_PRERELEASETAGWITHDASH"
     - pwsh: Write-Output "$ENV:GITVERSION_VERSION"
       env:
         GITVERSION_VERSION: $(GitVersion.MajorMinorPatch)
