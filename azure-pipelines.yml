@@ -40,10 +40,13 @@ stages:
     # Install the prereqs
     - template: build/common-steps.yml
     - pwsh: dotnet gitversion /output buildserver /nofetch
+      name: Version
       displayName: GitVersion
 
-    - pwsh: Get-ChildItem Env:Version*
     - pwsh: Get-ChildItem Env:*
+      env:
+        GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
+        GitVersion_PreReleaseTagWithDash: $(Version.GitVersion.PreReleaseTagWithDash)
     - pwsh: ./Invoke-Publish.ps1
       displayName: Publish to PowerShell Gallery
       condition: succeeded()
