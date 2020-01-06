@@ -22,7 +22,7 @@ stages:
     - template: build/common-steps.yml
 
     # Build and test the project
-    - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
+    - pwsh: ./Invoke-Tests.ps1
       displayName: "Run tests and coverage"
 
     # Publish code coverage to codecov.io
