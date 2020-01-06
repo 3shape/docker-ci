@@ -48,13 +48,13 @@ stages:
 - stage: Publish
   dependsOn: Build
   condition: and(succeeded(), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
+  env:
+    GitVersion_Version: $(GitVersion_Version)
+    GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
   jobs:
   - job: Publish
     pool:
       vmImage: ubuntu-latest
-    env:
-      GitVersion_Version: $(GitVersion_Version)
-      GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
 
     steps:
     # Install the prereqs
