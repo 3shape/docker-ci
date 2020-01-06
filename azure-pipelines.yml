@@ -31,8 +31,6 @@ stages:
       condition: always()
 
 - stage: Publish
-  dependsOn: Build
-  condition: succeeded()
   jobs:
   - job: Publish
     pool:
