@@ -40,6 +40,8 @@ Describe 'Runs only external tools' {
             # Flaky test fix
             Start-Sleep -Seconds 1
 
+            Start-Sleep -Seconds 1
+
             $result.ExitCode | Should -Not -Be 0
             $result.StdOut | Should -BeNullOrEmpty
             $result.StdErr | Should -Not -BeNullOrEmpty
