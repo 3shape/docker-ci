@@ -1,19 +1,23 @@
 steps:
 - task: UseDotNet@2
+  displayName: Install DotNet Core SDK
   inputs:
     packageType: 'sdk'
     version: '2.1.510'
 - task: DotNetCoreCLI@2
+  displayName: Install CodeCov Tool
   inputs:
     command: "custom"
     custom: "tool"
     arguments: "install --global Codecov.Tool"
 - task: DotNetCoreCLI@2
+  displayName: Install GitVersion Tool
   inputs:
     command: "custom"
     custom: "tool"
     arguments: "install --global GitVersion.Tool --version 5.1.4-beta1.37"
 - task: DockerInstaller@0
+  displayName: Install Docker CLI
   inputs:
     dockerVersion: "17.09.0-ce"
 

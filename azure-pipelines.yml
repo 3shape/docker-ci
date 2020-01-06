@@ -59,11 +59,13 @@ stages:
         path: $(Build.SourcesDirectory)
         artifact: storage
     - pwsh: ./Invoke-Publish.ps1
+      displayName: Publish to PowerShell Gallery
       condition: succeeded()
       env:
         POWERSHELL_GALLERY_API_TOKEN: $(POWERSHELL_GALLERY_API_TOKEN)
 
     - pwsh: ./Notify-Slack.ps1
+      displayName: Notify on Slack when successfully published
       condition: succeeded()
       env:
         SLACK_TOKEN: $(SLACK_TOKEN)
