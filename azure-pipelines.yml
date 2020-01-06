@@ -26,9 +26,8 @@ stages:
 
     # Build and test the project
 
-    - pwsh: Write-Output "$ENV:GITVERSION_MAJORMINORPATCH"
-      env:
-        GitVersion_MajorMinorPatch: $(Version.GitVersion.MajorMinorPatch)
+    - pwsh: Get-ChildItem Env:Version*
+    - pwsh: Write-Output "$env:VERSION_GITVERSION_MAJORMINORPATCH"
 
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
