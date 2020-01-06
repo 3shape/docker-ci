@@ -48,9 +48,6 @@ stages:
 - stage: Publish
   dependsOn: Build
   condition: and(succeeded(), startsWith(variables['build.sourceBranch'], 'refs/tags/'))
-  env:
-    GitVersion_Version: $(GitVersion_Version)
-    GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
   jobs:
   - job: Publish
     pool:
@@ -69,11 +66,15 @@ stages:
       displayName: Publish to PowerShell Gallery
       condition: succeeded()
       env:
+        GitVersion_Version: $(GitVersion_Version)
+        GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
         POWERSHELL_GALLERY_API_TOKEN: $(POWERSHELL_GALLERY_API_TOKEN)
 
     - pwsh: ./Notify-Slack.ps1
       displayName: Notify on Slack when successfully published
       condition: succeeded()
       env:
+        GitVersion_Version: $(GitVersion_Version)
+        GitVersion_PreReleaseTagWithDash: $(GitVersion_PreReleaseTagWithDash)
         SLACK_TOKEN: $(SLACK_TOKEN)
         SLACK_URL: $(SLACK_URL)
