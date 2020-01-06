@@ -26,6 +26,9 @@ stages:
 
     # Build and test the project
 
+    - pwsh: Get-ChildItem Env:GitVersion*
+      displayName: List GitVersion variables
+
     - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
       displayName: "Run tests and coverage"
 
