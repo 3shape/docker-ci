@@ -54,6 +54,7 @@ Task PrePublish {
     $UpdateManifest = @{
         Path              = "$PublishDir\${ModuleName}.psd1"
         FunctionsToExport = $functionNames
+        ModuleVersion     = "$env:GitVersion_Version"
     }
 
     if ($env:GitVersion_PreReleaseTag) {
