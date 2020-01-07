@@ -48,7 +48,7 @@ stages:
       condition: succeeded()
       env:
         GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
-        GitVersion_PreReleaseTagWithDash: $(Version.GitVersion.PreReleaseTagWithDash)
+        GitVersion_PreReleaseTag: $(Version.GitVersion.PreReleaseTag)
         POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
         SLACK_TOKEN: "$(SLACK_TOKEN)"
         SLACK_URL: "$(SLACK_URL)"

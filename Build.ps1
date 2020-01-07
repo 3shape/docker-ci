@@ -56,9 +56,9 @@ Task PrePublish {
         FunctionsToExport = $functionNames
     }
 
-    if ($env:GitVersion_PreReleaseTagWithDash) {
-        $env:Prerelease = $env:GitVersion_PreReleaseTagWithDash -replace '[^a-zA-Z0-9-]', '-'
-        $UpdateManifest.Prerelease = "$env:Prerelease"
+    if ($env:GitVersion_PreReleaseTag) {
+        $env:Prerelease = $env:GitVersion_PreReleaseTag -replace '[^a-zA-Z0-9]', ''
+        $UpdateManifest.Prerelease = "-$env:Prerelease"
     }
 
     Update-ModuleManifest @UpdateManifest
@@ -76,7 +76,7 @@ Task PostPublish {
     if (!$module) {
         throw ("module name not set, cannot publish to slack.")
     }
-    $version = "${env:GitVersion_Version}${env:Prerelease}"
+    $version = "${env:GitVersion_Version}-${env:Prerelease}"
     $slackChannel = 'batcave'
     $slackMessage = "${module}-${version} has been released`n`n" + `
         "The new version is available from https://www.powershellgallery.com/packages/${module}/${version}"
@@ -120,7 +120,7 @@ Task PublishImpl -requiredVariables PublishDir {
     }
 
     Write-Output "Publishing $ModuleName"
-    Write-Output "Version is $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
+    Write-Output "Version is $env:GitVersion_Version (prerelease: $env:Prerelease)"
     Write-Output "publishParams is: ${publishParams}"
 
     Publish-Module @publishParams
