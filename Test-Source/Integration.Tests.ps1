@@ -1,3 +1,9 @@
+
+# Skip Integration tests as they require Linux docker containers to run the registry.
+if ($IsWindows) {
+    return
+}
+
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
