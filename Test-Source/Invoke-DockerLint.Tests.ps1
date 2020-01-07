@@ -1,6 +1,6 @@
 
 # Need hadolint windows docker container (doable as they release windows executable)
-if ($IsWindows) {
+if ($IsWindows -and $env:TF_BUILD -ieq 'true') {
     return
 }
 

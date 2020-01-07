@@ -1,6 +1,6 @@
 
 # Skip Integration tests as they require Linux docker containers to run the registry.
-if ($IsWindows) {
+if ($IsWindows -and $env:TF_BUILD -ieq 'true') {
     return
 }
 

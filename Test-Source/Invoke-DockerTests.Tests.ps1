@@ -1,3 +1,9 @@
+
+# Fails due to drive permission
+if ($IsWindows -and $env:TF_BUILD -ieq 'true') {
+    return
+}
+
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
@@ -36,8 +42,6 @@ Describe 'Run docker tests using Google Structure' {
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
-            $commandResult | ConvertTo-Json -Depth 100 | Write-Host
-
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 1
             $testResult.Pass | Should -Be 1
@@ -54,8 +58,6 @@ Describe 'Run docker tests using Google Structure' {
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir (Join-Path (New-RandomFolder) (New-Guid))
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
-
-            $commandResult | ConvertTo-Json -Depth 100 | Write-Host
 
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 1
@@ -74,8 +76,6 @@ Describe 'Run docker tests using Google Structure' {
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
-            $commandResult | ConvertTo-Json -Depth 100 | Write-Host
-
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 1
             $testResult.Pass | Should -Be 1
@@ -93,8 +93,6 @@ Describe 'Run docker tests using Google Structure' {
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
-
-            $commandResult | ConvertTo-Json -Depth 100 | Write-Host
 
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 2
@@ -145,8 +143,6 @@ Describe 'Run docker tests using Google Structure' {
             $result = Invoke-DockerTests -ImageName $imageToTest
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
-
-            $commandResult | ConvertTo-Json -Depth 100 | Write-Host
 
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 2
