@@ -9,12 +9,14 @@ $imageToTest = if ($Global:DockerOsType -ieq 'linux') {
     throw "'$Global:DockerOsType' is not supported"
 }
 
+$Image, $Tag = $imageToTest -split ':'
+
 Describe 'Run docker tests using Google Structure' {
 
     Context 'Running structure tests' {
 
         BeforeAll {
-            Invoke-DockerPull -ImageName 'ubuntu' -Tag 'latest'
+            Invoke-DockerPull -ImageName $Image -Tag $Tag
         }
 
         BeforeEach {
