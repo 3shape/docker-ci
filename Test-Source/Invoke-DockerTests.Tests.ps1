@@ -36,6 +36,8 @@ Describe 'Run docker tests using Google Structure' {
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
+            $commandResult | ConvertTo-Json -Depth 1000 | Write-Output
+
             $commandResult.ExitCode | Should -Be 0
             $testResult.Total | Should -Be 1
             $testResult.Pass | Should -Be 1
