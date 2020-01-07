@@ -72,15 +72,18 @@ Task PostPublish {
     $slackChannel = 'batcave'
     $slackMessage = "${module}-${version} has been released`n`n" + `
         "The new version is available from https://www.powershellgallery.com/packages/${module}/${version}"
-
-    $body = @{
+    $Request = @{
+        Uri     = "$Env:SLACK_URL"
+        Headers = @{
+            'Authorization' = "Bearer $ENV:SLACK_TOKEN"
+        }
+        Body    = @{
         'text'    = $slackMessage;
         'channel' = $slackChannel;
     }
-    $headers = @{
-        'Authorization' = "Bearer $ENV:SLACK_TOKEN"
+        Method  = 'POST'
     }
-    Invoke-WebRequest -Uri "$Env:SLACK_URL" -Headers $headers -Body $body -Method POST
+    Invoke-WebRequest @Request
 }
 
 ###############################################################################
