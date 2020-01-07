@@ -51,9 +51,21 @@ Task PrePublish {
         throw 'env:POWERSHELL_GALLERY_API_TOKEN is not present'
     }
 
-    Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 `
-        -ModuleVersion "$env:GitVersion_Version" `
-        -FunctionsToExport $functionNames
+    $UpdateManifest = @{
+        Path              = "$PublishDir\${ModuleName}.psd1"
+        FunctionsToExport = $functionNames
+    }
+
+    if ($env:GitVersion_PreReleaseTagWithDash) {
+        $UpdateManifest.Prerelease = "$env:GitVersion_PreReleaseTagWithDash"
+        $UpdateManifest.PrivateData = @{
+            PSData = @{
+                Prerelease = "$env:GitVersion_PreReleaseTagWithDash"
+            }
+        }
+    }
+
+    Update-ModuleManifest @UpdateManifest
 }
 
 Task PostPublish {
@@ -78,9 +90,9 @@ Task PostPublish {
             'Authorization' = "Bearer $ENV:SLACK_TOKEN"
         }
         Body    = @{
-        'text'    = $slackMessage;
-        'channel' = $slackChannel;
-    }
+            'text'    = $slackMessage;
+            'channel' = $slackChannel;
+        }
         Method  = 'POST'
     }
     Invoke-WebRequest @Request
@@ -109,7 +121,7 @@ Task PublishImpl -requiredVariables PublishDir {
 
     $prerelease = $env:GitVersion_PreReleaseTagWithDash
     if ($prerelease) {
-        $publishParams['Prerelease'] = $prerelease
+        $publishParams['AllowPrerelease'] = $true
     }
 
     Write-Output "Publishing $ModuleName"
