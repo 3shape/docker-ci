@@ -115,10 +115,6 @@ Task PublishImpl -requiredVariables PublishDir {
         $publishParams['Repository'] = $Repository
     }
 
-    if ($env:Prerelease) {
-        $publishParams['AllowPrerelease'] = $true
-    }
-
     Write-Output "Publishing $ModuleName"
     Write-Output "Version is $env:GitVersion_Version (prerelease: $env:Prerelease)"
     Write-Output "publishParams is: ${publishParams}"
