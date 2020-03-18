@@ -8,8 +8,8 @@ Properties {
     # The name of your module should match the basename of the PSD1 file.
     $ModuleName = (Get-Item $SourceDir\*.psd1)[0].BaseName
     # Unless it's set in the env vars, in which case that value is used.
-    if ($Env:Docker_CI_ModuleName) {
-        $ModuleName = $Env:Docker_CI_ModuleName
+    if ($Env:MODULE_NAME) {
+        $ModuleName = $Env:MODULE_NAME
     }
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = $null
@@ -34,6 +34,9 @@ Properties {
 # Customize these tasks for performing operations before and/or after publish.
 ###############################################################################
 Task PrePublish {
+
+    Get-ChildItem Env:GitVersion* | Format-List
+
     $functionScriptFiles = @(Get-ChildItem -Path $PublishDir\Public\*.ps1 -ErrorAction SilentlyContinue)
 
     Write-Debug "These functions will be included in the published module: ${functionScriptFiles}"
@@ -44,12 +47,52 @@ Task PrePublish {
         throw 'Module version not found in env:GitVersion_Version where it was expected. Bailing.'
     }
 
-    Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 `
-        -ModuleVersion "$env:GitVersion_Version" `
-        -FunctionsToExport $functionNames
+    if (!$env:POWERSHELL_GALLERY_API_TOKEN) {
+        throw 'env:POWERSHELL_GALLERY_API_TOKEN is not present'
+    }
+
+    $UpdateManifest = @{
+        Path              = "$PublishDir\${ModuleName}.psd1"
+        FunctionsToExport = $functionNames
+        ModuleVersion     = "$env:GitVersion_Version"
+    }
+
+    if ($env:GitVersion_PreReleaseTag) {
+        $env:Prerelease = $env:GitVersion_PreReleaseTag -replace '[^a-zA-Z0-9]', ''
+        $UpdateManifest.Prerelease = "-$env:Prerelease"
+    }
+
+    Update-ModuleManifest @UpdateManifest
 }
 
 Task PostPublish {
+    $module = "$Env:MODULE_NAME"
+
+    if (!$Env:SLACK_TOKEN) {
+        throw ("token not set, cannot publish to slack.")
+    }
+    if (!$Env:SLACK_URL) {
+        thow ("Slack integration endpoint not set, cannot publish to slack.")
+    }
+    if (!$module) {
+        throw ("module name not set, cannot publish to slack.")
+    }
+    $version = "${env:GitVersion_Version}-${env:Prerelease}"
+    $slackChannel = 'batcave'
+    $slackMessage = "${module}-${version} has been released`n`n" + `
+        "The new version is available from https://www.powershellgallery.com/packages/${module}/${version}"
+    $Request = @{
+        Uri     = "$Env:SLACK_URL"
+        Headers = @{
+            'Authorization' = "Bearer $ENV:SLACK_TOKEN"
+        }
+        Body    = @{
+            'text'    = $slackMessage;
+            'channel' = $slackChannel;
+        }
+        Method  = 'POST'
+    }
+    Invoke-WebRequest @Request
 }
 
 ###############################################################################
@@ -58,11 +101,11 @@ Task PostPublish {
 ###############################################################################
 Task default -depends Build
 
-Task Publish -depends Test, PrePublish, PublishImpl, PostPublish {
+Task Publish -depends Build, PrePublish, PublishImpl, PostPublish {
 }
 
-Task PublishImpl -depends Test -requiredVariables PublishDir {
-    $NuGetApiKey = $env:PSGalleryAPIToken
+Task PublishImpl -requiredVariables PublishDir {
+    $NuGetApiKey = $env:POWERSHELL_GALLERY_API_TOKEN
 
     $publishParams = @{
         Path        = $PublishDir
@@ -73,16 +116,11 @@ Task PublishImpl -depends Test -requiredVariables PublishDir {
         $publishParams['Repository'] = $Repository
     }
 
-    $prerelease = $env:GitVersion_PreReleaseTagWithDash
-    if ($prerelease) {
-        $publishParams['Prerelease'] = $prerelease
-    }
-
     Write-Output "Publishing $ModuleName"
-    Write-Output "Version is $env:GitVersion_Version (prerelease: $($prerelease -ne $null))"
+    Write-Output "Version is $env:GitVersion_Version (prerelease: $env:Prerelease)"
     Write-Output "publishParams is: ${publishParams}"
 
-    Publish-Module @publishParams
+    Publish-Module -Force @publishParams
 
     Write-Output "Publishing done"
 }
@@ -117,6 +155,15 @@ Task Clean -depends Init -requiredVariables PublishDir {
     if ($PublishDir.Contains($PSScriptRoot)) {
         Remove-Item $PublishDir\* -Recurse -Force
     }
+}
+
+Task GitVersion {
+    $_GitVersionMajorMinorMatch = dotnet gitversion -output json -showvariable majorminorpatch
+    $_GitVersionPreReleaseTagWithDash = dotnet gitversion -output json -showvariable PreReleaseTagWithDash
+    Write-Output "GitVersion says version is : ${_GitVersionMajorMinorMatch}"
+    Write-Output "##vso[task.setvariable variable=GitVersion.MajorMinorMatch;isOutput=true]${_GitVersionMajorMinorMatch}"
+    Write-Output "GitVersion says prerelease tag is: ${_GitVersionPreReleaseTagWithDash}"
+    Write-Output "##vso[task.setvariable variable=GitVersion.PreReleaseTagWithDash;isOutput=true]${_GitVersionPreReleaseTagWithDash}"
 }
 
 Task Init -requiredVariables PublishDir {

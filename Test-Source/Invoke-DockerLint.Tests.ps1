@@ -1,3 +1,9 @@
+
+# Need hadolint windows docker container (doable as they release windows executable)
+if ($IsWindows -and $env:TF_BUILD -ieq 'true') {
+    return
+}
+
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 

@@ -1,3 +1,9 @@
+
+# Fails due to drive permission
+if ($IsWindows -and $env:TF_BUILD -ieq 'true') {
+    return
+}
+
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
@@ -9,12 +15,14 @@ $imageToTest = if ($Global:DockerOsType -ieq 'linux') {
     throw "'$Global:DockerOsType' is not supported"
 }
 
+$Image, $Tag = $imageToTest -split ':'
+
 Describe 'Run docker tests using Google Structure' {
 
     Context 'Running structure tests' {
 
         BeforeAll {
-            Invoke-DockerPull -ImageName 'ubuntu' -Tag 'latest'
+            Invoke-DockerPull -ImageName $Image -Tag $Tag
         }
 
         BeforeEach {

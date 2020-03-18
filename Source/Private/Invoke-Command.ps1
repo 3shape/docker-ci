@@ -23,7 +23,6 @@ function Invoke-Command {
     $result.ExitCode = -1
 
     [System.Diagnostics.Process] $process = New-Process -Command $Command -Arguments $CommandArgs -WorkingDirectory (Get-Location) -RedirectStdIn
-
     try {
         $stdOutMessages = New-Object Collections.Generic.List[String]
         $stdErrMessages = New-Object Collections.Generic.List[String]
@@ -54,28 +53,31 @@ function Invoke-Command {
         $process.BeginErrorReadLine()
 
         if ($InputLines) {
-            $inputStream = $process.StandardInput
-            $inputStream.AutoFlush = $true
-            foreach ($line in $inputLines) {
-                $inputStream.WriteLine($line)
+            try {
+                $inputStream = $process.StandardInput
+                $inputStream.AutoFlush = $true
+                foreach ($line in $inputLines) {
+                    $inputStream.WriteLine($line)
+                }
+            } finally {
+                $process.StandardInput.Close()
             }
-            $process.StandardInput.Close()
         }
 
         while (-not $process.WaitForExit(100)) {
-            # Allow interrupts like CTRL + C
+            # Allow interrupts like CTRL + C by doing a non-blocking wait
         }
-        # Allow all event handlers to finish up
+        # Allow all async event handlers to finish up by doing a blocking wait
         $process.WaitForExit()
         $finished = $true
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
         Unregister-Event -SourceIdentifier $stdErrEventHandler.Name
-        # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
+        # If we didn't finish then an error occurred or the user hit ctrl-c. Either
         # way kill the process
         try {
             $process.WaitForExit()
-            if (-not $finished -and -not $process.HasExited) {
+            if (-not $finished -or -not $process.HasExited) {
                 Write-Debug "Cleanup, kill the process with id $($process.Id)"
                 $process.Kill()
             }

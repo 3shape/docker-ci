@@ -5,29 +5,50 @@ trigger:
       # Any Pull Request merging into the master branch
       - master
 
-# Use the latest image with VS2019 on Windows Server 2019
-pool:
-  vmImage: "windows-2019"
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    strategy:
+      matrix:
+        'Windows':
+          VM_IMAGE: 'windows-latest'
+        'Linux':
+          VM_IMAGE: 'ubuntu-latest'
+    pool:
+      vmImage: $(VM_IMAGE)
+    steps:
+    # Install the prereqs
+    - template: build/common-steps.yml
 
-steps:
-  # Install the prereqs
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: "custom"
-      custom: "tool"
-      arguments: "install --global Codecov.Tool"
-  - task: DockerInstaller@0
-    inputs:
-      dockerVersion: "17.09.0-ce"
+    # Build and test the project
+    - pwsh: ./Invoke-Tests.ps1
+      displayName: "Run tests and coverage"
 
-  # Build and test the project
-  - pwsh: .\Install-Prerequisites.ps1
-    displayName: "Install prerequisites"
+    # Publish code coverage to codecov.io
+    - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
+      displayName: Upload coverage to codecov.io
+      condition: always()
 
-  - pwsh: Invoke-Psake -buildFile .\Build.ps1 -taskList build, test
-    displayName: "Run tests and coverage"
+- stage: Publish
+  jobs:
+  - job: Publish
+    pool:
+      vmImage: ubuntu-latest
 
-  # Publish code coverage to codecov.io always
-  - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
-    displayName: Upload coverage to codecov.io
-    condition: always()
+    steps:
+    # Install the prereqs
+    - template: build/common-steps.yml
+    - pwsh: dotnet gitversion /output buildserver /nofetch
+      name: Version
+      displayName: GitVersion
+
+    - pwsh: ./Invoke-Publish.ps1
+      displayName: Publish to PowerShell Gallery
+      condition: succeeded()
+      env:
+        GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
+        GitVersion_PreReleaseTag: $(Version.GitVersion.PreReleaseTag)
+        POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
+        SLACK_TOKEN: "$(SLACK_TOKEN)"
+        SLACK_URL: "$(SLACK_URL)"
