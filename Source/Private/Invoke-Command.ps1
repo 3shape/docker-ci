@@ -48,6 +48,7 @@ function Invoke-Command {
             -Action $eventHandler -EventName 'ErrorDataReceived' `
             -MessageData $stdErrMessages
 
+        $process.Refresh()
         $process.Start() | Out-Null
 
         $process.BeginOutputReadLine()
