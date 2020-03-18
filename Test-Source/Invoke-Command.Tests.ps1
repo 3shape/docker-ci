@@ -16,6 +16,7 @@ Describe 'Runs only external tools' {
             }
         }
 
+
         BeforeEach {
             $tempFile = New-TemporaryFile
         }
@@ -36,11 +37,6 @@ Describe 'Runs only external tools' {
 
         It 'can run a command with no args' {
             $result = Invoke-Command -Command $command.Command -Quiet:$true
-
-            # Flaky test fix
-            Start-Sleep -Seconds 1
-
-            # Start-Sleep -Seconds 1
 
             $result.Output | Should -Not -BeNullOrEmpty
         }
@@ -75,37 +71,33 @@ Describe 'Runs only external tools' {
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
     }
-
-    Context 'Runs a non-existent command, throws an exception' {
-
-        It 'throws MethodInvocationException instead of CommandNotFoundException' {
-            $theCode = { Invoke-Command -Command 'GibberishGoo' }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
-        }
-    }
-
-    Context 'Runs a PS CmdLet, throws an exception just like running a non-existent command' {
-
-        It 'throws MethodInvocationException instead of CommandNotFoundException' {
-            $theCode = { Invoke-Command -Command 'Get-Verb' }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
-        }
-    }
-
-    Context 'Runs a null or empty command' {
-
-        It 'throws ParameterBindingException if a null command is passed' {
-            $theCode = { Invoke-Command $null }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-
-        It 'throws ParameterBindingException if an empty command is passed' {
-            $theCode = { Invoke-Command -Command "" }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-    }
-
 }
+
+Context 'Runs a non-existent command, throws an exception' {
+
+    It 'throws MethodInvocationException instead of CommandNotFoundException' {
+        $theCode = { Invoke-Command -Command 'GibberishGoo' }
+        $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
+    }
+}
+
+Context 'Runs a PS CmdLet, throws an exception just like running a non-existent command' {
+
+    It 'throws MethodInvocationException instead of CommandNotFoundException' {
+        $theCode = { Invoke-Command -Command 'Get-Verb' }
+        $theCode | Should -Throw -ExceptionType ([System.Management.Automation.MethodInvocationException]) -PassThru
+    }
+}
+
+Context 'Runs a null or empty command' {
+
+    It 'throws ParameterBindingException if a null command is passed' {
+        $theCode = { Invoke-Command $null }
+        $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
     }
 
+    It 'throws ParameterBindingException if an empty command is passed' {
+        $theCode = { Invoke-Command -Command "" }
+        $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
+    }
 }
