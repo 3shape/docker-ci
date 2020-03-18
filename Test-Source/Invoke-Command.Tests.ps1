@@ -37,11 +37,6 @@ Describe 'Runs only external tools' {
         It 'can run a command with no args' {
             $result = Invoke-Command -Command $command.Command -Quiet:$true
 
-            # Flaky test fix
-            Start-Sleep -Seconds 1
-
-            Start-Sleep -Seconds 1
-
             $result.ExitCode | Should -Not -Be 0
             $result.StdOut | Should -BeNullOrEmpty
             $result.StdErr | Should -Not -BeNullOrEmpty
