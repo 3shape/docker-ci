@@ -47,8 +47,10 @@ function Invoke-Command {
         $stdErrEventHandler = Register-ObjectEvent -InputObject $process `
             -Action $eventHandler -EventName 'ErrorDataReceived' `
             -MessageData $stdErrMessages
+        $process.Refresh()
+        $newProcessStarted = $process.Start()
 
-        $process.Start() | Out-Null
+        Write-Debug "New process started: $newProcessStarted"
 
         $process.BeginOutputReadLine()
         $process.BeginErrorReadLine()
@@ -71,7 +73,7 @@ function Invoke-Command {
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
         Unregister-Event -SourceIdentifier $stdErrEventHandler.Name
-        # If we didn't finish then an error occurred or the user hit ctrl-c.  Either
+        # If we didn't finish then an error occurred or the user hit ctrl-c. Either
         # way kill the process
         try {
             $process.WaitForExit()
