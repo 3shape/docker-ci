@@ -74,6 +74,7 @@ function Invoke-Command {
         $processId = $process.Id
         $result.ExitCode = $process.ExitCode
         $process.Close()
+
         $finished = $true
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
@@ -82,12 +83,20 @@ function Invoke-Command {
         # way kill the process
         try {
             if (-not $finished -or -not $process.HasExited) {
-                Write-Debug "Cleanup, kill the process with id $processId"
+                $message = "Cleanup, kill the process with id $processId"
+                Write-Debug $message
+                if (!$Quiet) {
+                    Write-CommandOuput $message
+                }
                 $process.Kill()
             }
         } catch {
             # This can happen if the process was never started in which case WaitForExit or HasExited throws an exception.
-            Write-Debug "Exception caught while trying to kill process id $processId, exception: $_"
+            $message = "Exception caught while trying to kill process id $processId, exception: $_"
+            Write-Debug $message
+            if (!$Quiet) {
+                Write-CommandOuput $message
+            }
         }
     }
     $result.StdOut = $stdOutMessages.ToArray()
