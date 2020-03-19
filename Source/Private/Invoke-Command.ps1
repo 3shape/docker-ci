@@ -37,14 +37,15 @@ function Invoke-Command {
             }'
         $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet.IsPresent)
 
-        $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
+        $stdOutHandlerSource = [ScriptBlock]::Create($eventHandlerSource)
+        $stdErrHandlerSource = [ScriptBlock]::Create($eventHandlerSource)
 
         $stdOutEventHandler = Register-ObjectEvent -InputObject $process `
-            -Action $eventHandler -EventName 'OutputDataReceived' `
+            -Action $stdOutHandlerSource -EventName 'OutputDataReceived' `
             -MessageData $stdOutMessages
 
         $stdErrEventHandler = Register-ObjectEvent -InputObject $process `
-            -Action $eventHandler -EventName 'ErrorDataReceived' `
+            -Action $stdErrHandlerSource -EventName 'ErrorDataReceived' `
             -MessageData $stdErrMessages
 
         $process.Start() | Out-Null
