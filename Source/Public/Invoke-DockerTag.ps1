@@ -45,7 +45,7 @@ function Invoke-DockerTag {
         'CommandResult' = $commandResult
     }
     if (!$Quiet) {
-        Write-CommandOuput ("tagged ${source} as ${target}")
+        Write-CommandOuput ("tagged '${source}' as '${target}'")
     }
     return $result
 }
