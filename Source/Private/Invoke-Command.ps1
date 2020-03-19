@@ -67,8 +67,12 @@ function Invoke-Command {
         while (-not $process.WaitForExit(100)) {
             # Allow interrupts like CTRL + C by doing a non-blocking wait
         }
-        # Allow all async event handlers to finish up by doing a blocking wait
+        # Allow all async event handlers to finish up by doing a blocking wait, then free up the resources
+        # associated with that process on OS level.
         $process.WaitForExit()
+        $processId = $process.Id
+        $result.ExitCode = $process.ExitCode
+        $process.Close()
         $finished = $true
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
@@ -76,19 +80,17 @@ function Invoke-Command {
         # If we didn't finish then an error occurred or the user hit ctrl-c. Either
         # way kill the process
         try {
-            $process.WaitForExit()
             if (-not $finished -or -not $process.HasExited) {
-                Write-Debug "Cleanup, kill the process with id $($process.Id)"
+                Write-Debug "Cleanup, kill the process with id $processId"
                 $process.Kill()
             }
         } catch {
             # This can happen if the process was never started in which case WaitForExit or HasExited throws an exception.
+            Write-Debug "Exception caught while trying to kill process id $processId, exception: $_"
         }
     }
-
     $result.StdOut = $stdOutMessages.ToArray()
     $result.StdErr = $stdErrMessages.ToArray()
     $result.Output = $stdOutMessages.ToArray() + $stdErrMessages.ToArray()
-    $result.ExitCode = $process.ExitCode
     return $result
 }
