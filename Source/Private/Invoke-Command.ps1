@@ -1,5 +1,5 @@
 # Copied from here: https://github.com/dotnet/roslyn/blob/master/src/Setup/Installer/tools/utils.ps1
-
+. "$PSScriptRoot\Write-PassThruOutput.ps1"
 function Invoke-Command {
     [CmdletBinding(PositionalBinding = $false)]
     param (
