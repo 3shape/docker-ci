@@ -183,7 +183,7 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -Quiet:$false -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' 6> $tempFile
 
             $result = Get-Content $tempFile
-            $result | Should -Be @('Hello', 'World')
+            $result | Should -Be @("tagged 'artifactoryfqdn/oldname:latest' as 'newimage:latest'")
         }
 
         It 'suppresses output if Quiet is enabled' {
@@ -193,7 +193,7 @@ Describe 'Tag docker images' {
             Invoke-DockerTag -Quiet:$enable -Registry 'artifactoryfqdn' -ImageName 'oldname' -NewImageName 'newimage' 6> $tempFile
 
             $result = Get-Content $tempFile
-            $result | Should -Be @('Hello', 'World')
+            $result | Should -Be @("tagged 'artifactoryfqdn/oldname:latest' as 'newimage:latest'")
         }
 
     }

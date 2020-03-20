@@ -1,5 +1,5 @@
 # Copied from here: https://github.com/dotnet/roslyn/blob/master/src/Setup/Installer/tools/utils.ps1
-
+. "$PSScriptRoot\Write-PassThruOutput.ps1"
 function Invoke-Command {
     [CmdletBinding(PositionalBinding = $false)]
     param (
@@ -37,14 +37,15 @@ function Invoke-Command {
             }'
         $eventHandlerSource = $eventHandlerSource.Replace("WriteLogging", !$Quiet.IsPresent)
 
-        $eventHandler = [ScriptBlock]::Create($eventHandlerSource)
+        $stdOutHandlerSource = [ScriptBlock]::Create($eventHandlerSource)
+        $stdErrHandlerSource = [ScriptBlock]::Create($eventHandlerSource)
 
         $stdOutEventHandler = Register-ObjectEvent -InputObject $process `
-            -Action $eventHandler -EventName 'OutputDataReceived' `
+            -Action $stdOutHandlerSource -EventName 'OutputDataReceived' `
             -MessageData $stdOutMessages
 
         $stdErrEventHandler = Register-ObjectEvent -InputObject $process `
-            -Action $eventHandler -EventName 'ErrorDataReceived' `
+            -Action $stdErrHandlerSource -EventName 'ErrorDataReceived' `
             -MessageData $stdErrMessages
 
         $process.Start() | Out-Null
@@ -67,8 +68,13 @@ function Invoke-Command {
         while (-not $process.WaitForExit(100)) {
             # Allow interrupts like CTRL + C by doing a non-blocking wait
         }
-        # Allow all async event handlers to finish up by doing a blocking wait
+        # Allow all async event handlers to finish up by doing a blocking wait, then free up the resources
+        # associated with that process on OS level.
         $process.WaitForExit()
+        $processId = $process.Id
+        $result.ExitCode = $process.ExitCode
+        $process.Close()
+
         $finished = $true
     } finally {
         Unregister-Event -SourceIdentifier $stdOutEventHandler.Name
@@ -76,19 +82,25 @@ function Invoke-Command {
         # If we didn't finish then an error occurred or the user hit ctrl-c. Either
         # way kill the process
         try {
-            $process.WaitForExit()
             if (-not $finished -or -not $process.HasExited) {
-                Write-Debug "Cleanup, kill the process with id $($process.Id)"
+                $message = "Cleanup, kill the process with id $processId"
+                Write-Debug $message
+                if (!$Quiet) {
+                    Write-CommandOuput $message
+                }
                 $process.Kill()
             }
         } catch {
             # This can happen if the process was never started in which case WaitForExit or HasExited throws an exception.
+            $message = "Exception caught while trying to kill process id $processId, exception: $_"
+            Write-Debug $message
+            if (!$Quiet) {
+                Write-CommandOuput $message
+            }
         }
     }
-
     $result.StdOut = $stdOutMessages.ToArray()
     $result.StdErr = $stdErrMessages.ToArray()
     $result.Output = $stdOutMessages.ToArray() + $stdErrMessages.ToArray()
-    $result.ExitCode = $process.ExitCode
     return $result
 }
