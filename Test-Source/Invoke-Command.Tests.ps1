@@ -44,7 +44,7 @@ Describe 'Runs only external tools' {
         }
 
         It 'returns correct output and exit code, verbosely' {
-            if ($IsWindows) {
+            if ($IsLinux) {
                 Set-ItResult -Skipped -Because 'There is a bug in the Linux implementation of Process.WaitForExit() that seems to not wait for all async event handlers. This results in this test sometimes failing with a empty result from stdout or stderr.'
             }
             $result = Invoke-Command -Command $command.Command -CommandArgs $command.CommandArgs -Quiet:$false 6> $tempFile
