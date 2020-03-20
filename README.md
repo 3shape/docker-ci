@@ -1,5 +1,4 @@
 [![Build Status](https://dev.azure.com/3ShapeOld/Docker-CI/_apis/build/status/3shape.docker-ci?branchName=master)](https://dev.azure.com/3ShapeOld/Docker-CI/_build/latest?definitionId=10&branchName=master)
-[![Build Status](https://img.shields.io/travis/com/3shape/docker-ci?logo=travis)](https://travis-ci.com/3shape/docker-ci)
 [![codecov](https://codecov.io/gh/3shape/docker-ci/branch/master/graph/badge.svg)](https://codecov.io/gh/3shape/docker-ci)
 [![PS Gallery](https://img.shields.io/badge/install-PS%20Gallery-blue.svg)](https://www.powershellgallery.com/packages/Docker-CI/)
 
@@ -312,6 +311,5 @@ TestResult                                          TestReportPath            Co
 This concludes the section with examples. Let us know if there is something missing, that is not clear from the documentation.
 
 # Development environment setup
-
-* Install PowerShell Core 6.x latest
+* Install PowerShell Core 6.x or newer.
 * Run `.\Install-Prerequisites.ps1`
