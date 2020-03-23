@@ -66,6 +66,10 @@ Task PrePublish {
 }
 
 Task PostPublish {
+    if ($env:Prerelease) {
+        Write-Output 'Skipping notifications to slack because this is a pre-release.'
+        return
+    }
     $module = "$Env:MODULE_NAME"
 
     if (!$Env:SLACK_TOKEN) {
@@ -77,7 +81,7 @@ Task PostPublish {
     if (!$module) {
         throw ("module name not set, cannot publish to slack.")
     }
-    $version = "${env:GitVersion_Version}-${env:Prerelease}"
+    $version = "${env:GitVersion_Version}"
     $slackChannel = 'batcave'
     $slackMessage = "${module}-${version} has been released`n`n" + `
         "The new version is available from https://www.powershellgallery.com/packages/${module}/${version}"
@@ -120,7 +124,7 @@ Task PublishImpl -requiredVariables PublishDir {
     Write-Output "Version is $env:GitVersion_Version (prerelease: $env:Prerelease)"
     Write-Output "publishParams is: ${publishParams}"
 
-    Publish-Module -Force @publishParams
+    Publish-Module @publishParams
 
     Write-Output "Publishing done"
 }
