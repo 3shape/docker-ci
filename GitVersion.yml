@@ -1,4 +1,17 @@
-mode: ContinuousDelivery
-branches: {}
-ignore:
-  sha: []
+mode: ContinuousDeployment
+branches:
+  # Merge/Pull requests
+  pull-request:
+    regex: '(MR-\d+-merge)|^(pull|pull\-requests|pr)[/-]'
+    increment: Inherit
+    tag: PR
+    source-branches:
+      - master
+      - feature
+      - hotfix
+    mode: ContinuousDelivery
+    prevent-increment-of-merged-branch-version: false
+    tag-number-pattern: '[/-](?<number>\d+)[-/]'
+    track-merge-target: true
+    tracks-release-branches: false
+    is-release-branch: false
