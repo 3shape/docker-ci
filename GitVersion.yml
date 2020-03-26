@@ -1,4 +1,6 @@
 mode: ContinuousDeployment
+continuous-delivery-fallback-tag: ""
+
 branches:
   # Merge/Pull requests
   pull-request:
