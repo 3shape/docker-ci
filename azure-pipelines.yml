@@ -4,51 +4,54 @@ trigger:
     include:
       # Any Pull Request merging into the master branch
       - master
+  tags:
+    include:
+      - v*
 
 stages:
-- stage: Build
-  jobs:
-  - job: Build
-    strategy:
-      matrix:
-        'Windows':
-          VM_IMAGE: 'windows-latest'
-        'Linux':
-          VM_IMAGE: 'ubuntu-latest'
-    pool:
-      vmImage: $(VM_IMAGE)
-    steps:
-    # Install the prereqs
-    - template: build/common-steps.yml
+  - stage: Build
+    jobs:
+      - job: Build
+        strategy:
+          matrix:
+            "Windows":
+              VM_IMAGE: "windows-latest"
+            "Linux":
+              VM_IMAGE: "ubuntu-latest"
+        pool:
+          vmImage: $(VM_IMAGE)
+        steps:
+          # Install the prereqs
+          - template: build/common-steps.yml
 
-    # Build and test the project
-    - pwsh: ./Invoke-Tests.ps1
-      displayName: "Run tests and coverage"
+          # Build and test the project
+          - pwsh: ./Invoke-Tests.ps1
+            displayName: "Run tests and coverage"
 
-    # Publish code coverage to codecov.io
-    - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
-      displayName: Upload coverage to codecov.io
-      condition: always()
+          # Publish code coverage to codecov.io
+          - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
+            displayName: Upload coverage to codecov.io
+            condition: always()
 
-- stage: Publish
-  jobs:
-  - job: Publish
-    pool:
-      vmImage: ubuntu-latest
+  - stage: Publish
+    jobs:
+      - job: Publish
+        pool:
+          vmImage: ubuntu-latest
 
-    steps:
-    # Install the prereqs
-    - template: build/common-steps.yml
-    - pwsh: dotnet gitversion /output buildserver /nofetch
-      name: Version
-      displayName: GitVersion
+        steps:
+          # Install the prereqs
+          - template: build/common-steps.yml
+          - pwsh: dotnet gitversion /output buildserver /nofetch
+            name: Version
+            displayName: GitVersion
 
-    - pwsh: ./Invoke-Publish.ps1
-      displayName: Publish to PowerShell Gallery
-      condition: succeeded()
-      env:
-        GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
-        GitVersion_PreReleaseTag: $(Version.GitVersion.PreReleaseTag)
-        POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
-        SLACK_TOKEN: "$(SLACK_TOKEN)"
-        SLACK_URL: "$(SLACK_URL)"
+          - pwsh: ./Invoke-Publish.ps1
+            displayName: Publish to PowerShell Gallery
+            condition: succeeded()
+            env:
+              GitVersion_Version: $(Version.GitVersion.MajorMinorPatch)
+              GitVersion_PreReleaseTag: $(Version.GitVersion.PreReleaseTag)
+              POWERSHELL_GALLERY_API_TOKEN: "$(POWERSHELL_GALLERY_API_TOKEN)"
+              SLACK_TOKEN: "$(SLACK_TOKEN)"
+              SLACK_URL: "$(SLACK_URL)"
