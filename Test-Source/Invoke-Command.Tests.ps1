@@ -89,18 +89,12 @@ Describe 'Runs only external tools' {
         }
 
         it 'Can pass input text to the command run' {
-            if ($IsWindows) {
-                $command = [PSCustomObject]@{
-                    'Command'     = 'help'
-                    'CommandArgs' = 'start'
-                }
-            }
             $result = Invoke-Command $command.Command `
                 -CommandArgs $command.CommandArgs `
-                -InputLines @('a') `
+                -InputLines @('anytext') `
                 -Quiet:$true 6> $tempFile
 
-            $result.ExitCode | Should -Not -Be 0
+            $result.ExitCode | Should -Be 0
             $result.StdErr | Should -BeNullOrEmpty
             $result.StdOut | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -BeNullOrEmpty
