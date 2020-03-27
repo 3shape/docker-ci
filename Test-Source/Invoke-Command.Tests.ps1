@@ -87,6 +87,24 @@ Describe 'Runs only external tools' {
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
+
+        it 'Can pass input text to the command run' {
+            if ($IsWindows) {
+                $command = [PSCustomObject]@{
+                    'Command'     = 'help'
+                    'CommandArgs' = 'start'
+                }
+            }
+            $result = Invoke-Command $command.Command `
+                -CommandArgs $command.CommandArgs `
+                -InputLines @('a') `
+                -Quiet:$true 6> $tempFile
+
+            $result.ExitCode | Should -Not -Be 0
+            $result.StdErr | Should -BeNullOrEmpty
+            $result.StdOut | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
+        }
     }
 
     Context 'Runs a non-existent command, throws an exception' {
