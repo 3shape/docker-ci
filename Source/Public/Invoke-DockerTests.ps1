@@ -24,7 +24,7 @@ function Invoke-DockerTests {
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
     $allYamlFiles = '*.y*ml'
-    $configFiles = (Get-ChildItem -Path $ConfigPath -Filter $allYamlFiles | Select-Object FullName | ForEach-Object { $_.FullNAme })
+    $configFiles = (Get-ChildItem -Recurse -Path $ConfigPath -Filter $allYamlFiles | Select-Object FullName | ForEach-Object { $_.FullNAme })
 
     if (0 -eq $configFiles.Length) {
         throw [System.ArgumentException]::new("No yaml files found at ${ConfigPath}, did you point to a directory with config files?")

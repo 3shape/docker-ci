@@ -101,6 +101,19 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Results.Length | Should -Be 2
         }
 
+        It 'Can pick up tests in a nested folder structure' {
+            $allPassingTestsDir = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $allPassingTestsDir
+            $commandResult = $result.CommandResult
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 3
+            $testResult.Pass | Should -Be 3
+            $testResult.Fail | Should -Be 0
+            $testResult.Results.Length | Should -Be 3
+        }
+
         It 'can execute multiple failing tests' {
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
             $structureExistConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'fileexistence.yaml'
@@ -118,10 +131,9 @@ Describe 'Run docker tests using Google Structure' {
         }
 
         It 'can detect when there are no test configs and throw exception.' {
-            Set-Location $Global:StructureTestsDir
+            Set-Location (New-RandomFolder)
 
             $theCode = {
-
                 Invoke-DockerTests -ImageName $imageToTest -TestReportDir (New-RandomFolder)
             }
 
@@ -146,14 +158,14 @@ Describe 'Run docker tests using Google Structure' {
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 0
-            $testResult.Total | Should -Be 2
-            $testResult.Pass | Should -Be 2
+            $testResult.Total | Should -Be 3
+            $testResult.Pass | Should -Be 3
             $testResult.Fail | Should -Be 0
-            $testResult.Results.Length | Should -Be 2
+            $testResult.Results.Length | Should -Be 3
         }
 
         It 'throws if ConfigPath set to a directory with no yaml files.' {
-            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath $Global:StructureTestsDir }
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath (New-RandomFolder) }
             $theCode | Should -Throw -ExceptionType 'System.ArgumentException'
         }
     }
