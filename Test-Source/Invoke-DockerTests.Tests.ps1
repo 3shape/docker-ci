@@ -70,7 +70,7 @@ Describe 'Run docker tests using Google Structure' {
 
         It 'can execute 1 succesful test' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'testshell.yml'
-            $configs = @($structureCommandConfig)
+            $configs = $structureCommandConfig
 
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs
             $commandResult = $result.CommandResult
