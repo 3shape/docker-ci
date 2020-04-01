@@ -1,4 +1,3 @@
-mode: ContinuousDeployment
 continuous-delivery-fallback-tag: ""
 
 branches:
