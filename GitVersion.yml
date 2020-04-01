@@ -1,7 +1,7 @@
-mode: ContinuousDeployment
-continuous-delivery-fallback-tag: ""
-
 branches:
+  master:
+    tag: beta
+
   # Merge/Pull requests
   pull-request:
     regex: '(MR-\d+-merge)|^(pull|pull\-requests|pr)[/-]'
