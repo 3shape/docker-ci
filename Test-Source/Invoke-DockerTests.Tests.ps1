@@ -68,7 +68,7 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
         }
 
-        It 'can execute 1 succesful test' {
+        It 'can execute 1 successful test' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'testshell.yml'
             $configs = $structureCommandConfig
 
