@@ -38,7 +38,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir './'
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -TestReportDir './'
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -55,7 +55,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TestReportDir (Join-Path (New-RandomFolder) (New-Guid))
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -TestReportDir (Join-Path (New-RandomFolder) (New-Guid))
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -68,11 +68,11 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Results[0].StdOut | Should -Be "hello`nworld`n"
         }
 
-        It 'can execute 1 succesful test' {
+        It 'can execute 1 successful test' {
             $structureCommandConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'testshell.yml'
-            $configs = @($structureCommandConfig)
+            $configs = $structureCommandConfig
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -90,7 +90,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureExistConfig = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType 'fileexistence.yaml'
             $configs = @($structureCommandConfig, $structureExistConfig)
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -101,12 +101,25 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Results.Length | Should -Be 2
         }
 
+        It 'Can pick up tests in a nested folder structure' {
+            $allPassingTestsDir = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $allPassingTestsDir
+            $commandResult = $result.CommandResult
+            $testResult = $result.TestResult
+
+            $commandResult.ExitCode | Should -Be 0
+            $testResult.Total | Should -Be 3
+            $testResult.Pass | Should -Be 3
+            $testResult.Fail | Should -Be 0
+            $testResult.Results.Length | Should -Be 3
+        }
+
         It 'can execute multiple failing tests' {
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
             $structureExistConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'fileexistence.yaml'
             $configs = @($structureCommandConfig, $structureExistConfig)
 
-            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs
+            $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
@@ -118,10 +131,9 @@ Describe 'Run docker tests using Google Structure' {
         }
 
         It 'can detect when there are no test configs and throw exception.' {
-            Set-Location $Global:StructureTestsDir
+            Set-Location (New-RandomFolder)
 
             $theCode = {
-
                 Invoke-DockerTests -ImageName $imageToTest -TestReportDir (New-RandomFolder)
             }
 
@@ -132,25 +144,30 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
 
-            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -TreatTestFailuresAsExceptions -TestReportDir (New-RandomFolder) }
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -TreatTestFailuresAsExceptions -TestReportDir (New-RandomFolder) }
 
             $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
         }
 
-        It 'picks up all yaml files at the current location if ConfigFiles argument is not supplied' {
-            Set-Location (Join-Path $Global:StructureTestsPassDir $Global:DockerOsType)
+        It 'picks up all yaml files at the current location if ConfigPath argument is omitted' {
+            $testsDir = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType
+            Set-Location $testsDir
 
             $result = Invoke-DockerTests -ImageName $imageToTest
             $commandResult = $result.CommandResult
             $testResult = $result.TestResult
 
             $commandResult.ExitCode | Should -Be 0
-            $testResult.Total | Should -Be 2
-            $testResult.Pass | Should -Be 2
+            $testResult.Total | Should -Be 3
+            $testResult.Pass | Should -Be 3
             $testResult.Fail | Should -Be 0
-            $testResult.Results.Length | Should -Be 2
+            $testResult.Results.Length | Should -Be 3
         }
 
+        It 'throws if ConfigPath set to a directory with no yaml files.' {
+            $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath (New-RandomFolder) }
+            $theCode | Should -Throw -ExceptionType 'System.ArgumentException'
+        }
     }
 
     Context 'Pipeline execution' {
@@ -162,8 +179,8 @@ Describe 'Run docker tests using Google Structure' {
 
             $pipedInput = {
                 $input = [PSCustomObject]@{
-                    "ImageName"   = "myimage";
-                    'ConfigFiles' = $configs
+                    "ImageName"  = "myimage";
+                    'ConfigPath' = $configs
                 }
                 return $input
             }
@@ -187,7 +204,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
 
-            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Quiet:$false 6> $tempFile
+            Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -Quiet:$false 6> $tempFile
 
             $result = Get-Content $tempFile
             Write-Debug "Result: $result"
@@ -199,7 +216,7 @@ Describe 'Run docker tests using Google Structure' {
             $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
             $configs = @($structureCommandConfig)
 
-            Invoke-DockerTests -ImageName $imageToTest -ConfigFiles $configs -Quiet:$true 6> $tempFile
+            Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -Quiet:$true 6> $tempFile
 
             $result = Get-Content $tempFile
             Write-Debug "Result: $result"

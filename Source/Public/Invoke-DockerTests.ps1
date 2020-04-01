@@ -7,7 +7,7 @@ function Invoke-DockerTests {
 
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String[]]
-        $ConfigFiles = ((Get-ChildItem -Path . -Filter *.y*ml | Select-Object Name) | ForEach-Object { $_.Name }),
+        $ConfigPath = (Format-AsAbsolutePath (Get-Location)),
 
         [ValidateNotNullOrEmpty()]
         [String]
@@ -23,8 +23,11 @@ function Invoke-DockerTests {
         [Switch]
         $Quiet = [System.Convert]::ToBoolean($env:DOCKER_CI_QUIET_MODE)
     )
-    if ($null -eq $ConfigFiles -or $ConfigFiles.Length -eq 0) {
-        throw [System.ArgumentException]::new('$ConfigFiles must contain one more test configuration file paths.')
+    $allYamlFiles = '*.y*ml'
+    $configFiles = (Get-ChildItem -Recurse -Path $ConfigPath -Filter $allYamlFiles | Select-Object FullName | ForEach-Object { $_.FullNAme })
+
+    if (0 -eq $configFiles.Length) {
+        throw [System.ArgumentException]::new("No yaml files found at ${ConfigPath}, did you point to a directory with config files?")
     }
 
     $here = Format-AsAbsolutePath (Get-Location)
@@ -47,12 +50,14 @@ function Invoke-DockerTests {
         " -v `"${dockerSocket}:${dockerSocket}`"" + `
         " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report ${report}/${TestReportName}"
 
-    $ConfigFiles.ForEach( {
-            $configFile = Convert-ToUnixPath (Resolve-Path -Path $_  -Relative)
+    $configFiles.ForEach( {
+            $relativePath = Resolve-Path -Path $_ -Relative
+            $configFile = Convert-ToUnixPath ($relativePath)
             $configName = Remove-Prefix -Value $configFile -Prefix './'
             $structureCommand = -join ($structureCommand, " -c ${configs}/${configName}")
         }
     )
+
     $commandResult = Invoke-DockerCommand $structureCommand
     if ($TreatTestFailuresAsExceptions) {
         Assert-ExitCodeOk $commandResult

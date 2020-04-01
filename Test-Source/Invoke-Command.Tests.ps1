@@ -87,6 +87,21 @@ Describe 'Runs only external tools' {
             $result.Output | Should -Not -BeNullOrEmpty
             Get-Content $tempFile | Should -Not -BeNullOrEmpty
         }
+
+        It 'Can pass input text to the command run' {
+            if ($IsLinux) {
+                Set-ItResult -Skipped -Because 'There is a bug in the Linux implementation of Process.WaitForExit() that seems to not wait for all async event handlers. This results in this test sometimes failing with a empty result from stdout or stderr.'
+            }
+            $result = Invoke-Command $command.Command `
+                -CommandArgs $command.CommandArgs `
+                -InputLines @('anytext') `
+                -Quiet:$true 6> $tempFile
+
+            $result.ExitCode | Should -Be 0
+            $result.StdErr | Should -BeNullOrEmpty
+            $result.StdOut | Should -Not -BeNullOrEmpty
+            Get-Content $tempFile | Should -BeNullOrEmpty
+        }
     }
 
     Context 'Runs a non-existent command, throws an exception' {
