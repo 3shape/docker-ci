@@ -124,7 +124,7 @@ Task PublishImpl -requiredVariables PublishDir {
     Write-Output "Version is $env:GitVersion_Version (prerelease: $env:Prerelease)"
     Write-Output "publishParams is: ${publishParams}"
 
-    Publish-Module @publishParams
+    Publish-Module -Force @publishParams
 
     Write-Output "Publishing done"
 }
