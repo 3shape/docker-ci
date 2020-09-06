@@ -83,18 +83,20 @@ function Invoke-Command {
         # way kill the process
         try {
             if (-not $finished -or -not $process.HasExited) {
-                $message = "Cleanup, kill the process with id $processId"
-                Write-Debug $message
-                if (!$Quiet) {
+                if (!$Quiet.IsPresent) {
                     Write-CommandOuput $message
                 }
-                $process.Kill()
+                if ($null -ne $process) {
+                    $message = "Cleanup, kill the process with id $processId"
+                    Write-Debug $message
+                    $process.Kill()
+                }
             }
         } catch {
             # This can happen if the process was never started in which case WaitForExit or HasExited throws an exception.
             $message = "Exception caught while trying to kill process id $processId, exception: $_"
             Write-Debug $message
-            if (!$Quiet) {
+            if (!$Quiet.IsPresent) {
                 Write-CommandOuput $message
             }
         }
