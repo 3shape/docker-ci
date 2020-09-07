@@ -84,11 +84,11 @@ function Invoke-Command {
         try {
             # $process.HasExited and its other properties becomes null after successful Close().
             if (-not $finished -or -not ($process.HasExited -ne $false -and $process.HasExited -ne $true)) {
+                $message = "Cleanup, kill the process with id $processId"
+                Write-Debug $message
                 if (!$Quiet.IsPresent) {
                     Write-CommandOuput $message
                 }
-                $message = "Cleanup, kill the process with id $processId"
-                Write-Debug $message
                 $process.Kill()
             }
         } catch {
