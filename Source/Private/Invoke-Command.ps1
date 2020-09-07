@@ -82,6 +82,7 @@ function Invoke-Command {
         # If we didn't finish then an error occurred or the user hit ctrl-c. Either
         # way kill the process
         try {
+            # $process.HasExited and its other properties becomes null after successful Close().
             if (-not $finished -or -not ($process.HasExited -ne $false -and $process.HasExited -ne $true)) {
                 if (!$Quiet.IsPresent) {
                     Write-CommandOuput $message
