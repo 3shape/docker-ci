@@ -239,7 +239,7 @@ PS C:\docker> $result = Invoke-DockerLint -TreatLintRemarksFoundAsException
 Assert-ExitCodeOk : The command 'Get-Content "C:\docker\Dockerfile" | docker run -i hadolint/hadolint:v1.17.2' failed with exit code: 1.
 Command output:
 /dev/stdin:10 DL4006 Set the SHELL option -o pipefail before RUN with a pipe in it
-At C:\Users\Rasmus Jelsgaard\Documents\PowerShell\Modules\Docker.Build\0.4.8\Public\Invoke-DockerLint.ps1:31 char:9
+At C:\Users\Rasmus Jelsgaard\Documents\PowerShell\Modules\Docker-CI\0.4.8\Public\Invoke-DockerLint.ps1:31 char:9
 +         Assert-ExitCodeOk $commandResult
 +         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 + CategoryInfo          : InvalidResult: (:) [Assert-ExitCodeOk], Exception
