@@ -109,6 +109,11 @@ Task Publish -depends Build, PrePublish, PublishImpl, PostPublish {
 }
 
 Task PublishImpl -requiredVariables PublishDir {
+
+    if ($env:POWERSHELL_GALLERY_API_TOKEN -ne $null) {
+        Write-Host 'POWERSHELL_GALLERY_API_TOKEN env var exists.'
+    }
+
     $NuGetApiKey = $env:POWERSHELL_GALLERY_API_TOKEN
 
     $publishParams = @{
