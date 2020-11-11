@@ -1,5 +1,5 @@
 function Find-DockerOSType {
-    $commandResult = Invoke-DockerCommand "info --format {{.OSType}}"
+    $commandResult = Invoke-DockerCommand 'info --format "{{.OSType}}"'
     Assert-ExitCodeOk $commandResult
     return $commandResult.Output
 }

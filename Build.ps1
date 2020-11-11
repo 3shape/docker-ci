@@ -109,6 +109,7 @@ Task Publish -depends Build, PrePublish, PublishImpl, PostPublish {
 }
 
 Task PublishImpl -requiredVariables PublishDir {
+
     $NuGetApiKey = $env:POWERSHELL_GALLERY_API_TOKEN
 
     $publishParams = @{
