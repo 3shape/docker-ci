@@ -9,29 +9,29 @@ trigger:
       - v*
 
 stages:
-  # - stage: Build
-  #   jobs:
-  #     - job: Build
-  #       strategy:
-  #         matrix:
-  #           "Windows":
-  #             VM_IMAGE: "windows-latest"
-  #           "Linux":
-  #             VM_IMAGE: "ubuntu-latest"
-  #       pool:
-  #         vmImage: $(VM_IMAGE)
-  #       steps:
-  #         # Install the prereqs
-  #         - template: build/common-steps.yml
+  - stage: Build
+    jobs:
+      - job: Build
+        strategy:
+          matrix:
+            "Windows":
+              VM_IMAGE: "windows-latest"
+            "Linux":
+              VM_IMAGE: "ubuntu-latest"
+        pool:
+          vmImage: $(VM_IMAGE)
+        steps:
+          # Install the prereqs
+          - template: build/common-steps.yml
 
-  #         # Build and test the project
-  #         - pwsh: ./Invoke-Tests.ps1
-  #           displayName: "Run tests and coverage"
+          # Build and test the project
+          - pwsh: ./Invoke-Tests.ps1
+            displayName: "Run tests and coverage"
 
-  #         # Publish code coverage to codecov.io
-  #         - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
-  #           displayName: Upload coverage to codecov.io
-  #           condition: always()
+          # Publish code coverage to codecov.io
+          - script: codecov -f coverage.json -t $(CODECOV_TOKEN)
+            displayName: Upload coverage to codecov.io
+            condition: always()
 
   - stage: Publish
     jobs:
