@@ -7,10 +7,10 @@ function Convert-ToDockerHostPath {
     )
 
     $pathOnDockerHost = $Path
-    if ( (Invoke-DockerCommand 'ps').StdOut | Select-String $(hostname) ) { 
+    if ( (Invoke-DockerCommand 'ps' -Quiet).StdOut | Select-String $(hostname) ) { 
         # executed inside docker container $(hostname)
         $dockerCommand = "inspect -f ""{{ range .Mounts }}{{ .Source }}:{{ .Destination }}{{ println }} {{ end }}"" $(hostname)"
-        $mounts = (Invoke-DockerCommand $dockerCommand ).StdOut.trim() | Where-Object {  $_ -NotMatch "/var/lib/docker" -and $_ -NotMatch "docker.sock" -and $_ -ne '' }
+        $mounts = (Invoke-DockerCommand $dockerCommand -Quiet).StdOut.trim() | Where-Object {  $_ -NotMatch "/var/lib/docker" -and $_ -NotMatch "docker.sock" -and $_ -ne '' }
         if ($mounts) {
             $mounts | ForEach-Object {
                 if ($_.split(':')[0] -ne $_.split(':')[1]) {
