@@ -1,170 +1,70 @@
 Import-Module -Force (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).FullName
+. "$PSScriptRoot\..\Source\Private\Convert-ToDockerHostPath.ps1"
+
 Import-Module -Global -Force $PSScriptRoot/Docker-CI.Tests.psm1
 
-# CONTAINER ID        IMAGE                  COMMAND             CREATED             STATUS              PORTS               NAMES               SIZE
-# fcac150e3686        jenkins.agent:bionic   "/bin/bash"         2 minutes ago       Up 2 minutes                            zealous_driscoll    0B (virtual 1.33GB)
-# /home/devops/workspace:/home/jenkins/workspace
-#  /var/run/docker.sock:/var/run/docker.sock
-#  /var/lib/docker/volumes/5c15f2a0ff099e4a6d59a863a9dfa4580e5615798987200bed2e98acd26fd3f8/_data:/home/jenkins/.jenkins
-#  /var/lib/docker/volumes/b29f5bbedd3a667ee45f0dde717a2c9b8092af81e0b9da92f9499f5c10a6c12e/_data:/home/jenkins/agent
+Describe 'Convert absolute path to path on docker host with Convert-ToDockerHostPath' {
 
-#   CONTAINER ID        IMAGE                  COMMAND             CREATED             STATUS              PORTS               NAMES
-#   a28e1ca69345        jenkins.agent:bionic   "jenkins-agent"     41 minutes ago      Up 41 minutes                           jenkins.agent
-#   /home/devops/workspace:/home/jenkins/workspace
-#    /var/run/docker.sock:/var/run/docker.sock
-#    /var/lib/docker/volumes/1a370219fb850732be17f2e0b56599b55541d6831894addd4f1d7c12c1c437cb/_data:/home/jenkins/.jenkins
-#    /var/lib/docker/volumes/362d0e59897a73814d2d63db9108f2a5c7f62b4709b692317ae120f6b5c3d6d9/_data:/home/jenkins/agent
+    $moduleName = (Get-ChildItem -Path $PSScriptRoot/../Source -Recurse -Include *.psm1 -File).BaseName
 
-Describe 'Pull docker images' {
+    InModuleScope $moduleName {
+        
+        Context 'Verify we can mock' {
 
-    BeforeEach {
-        Initialize-MockReg
-        Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:moduleName
-    }
-
-    AfterEach {
-        Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:moduleName
-    }
-
-    Context 'Docker pulls docker images' {
-
-        It 'pulls public docker image by image name only' {
-            Invoke-DockerPull -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu:latest"
-        }
-
-        It 'pulls public docker image by image name and tag' {
-            Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu:bionic"
-        }
-
-        It 'pulls public docker image by registry and image name' {
-            Invoke-DockerPull -Registry 'not.docker.hub' -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull not.docker.hub/ubuntu:latest"
-        }
-
-        It 'pulls explicit public docker image with $null registry value and image name' {
-            Invoke-DockerPull -Registry $null -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu:latest"
-        }
-
-        It 'pulls explicit public docker image with whitespace registry value and image name' {
-            Invoke-DockerPull -Registry '   ' -ImageName 'ubuntu'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu:latest"
-        }
-
-        It 'pulls explicit public docker image with empty registry value, image name and tag' {
-            Invoke-DockerPull -Registry '' -ImageName 'ubuntu' -Tag 'bionic'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu:bionic"
-        }
-
-        It 'pulls public docker image by image name and digest' {
-            Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152'
-            $result = GetMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName
-            Write-Debug $result
-            $result | Should -BeLikeExactly "pull ubuntu@sha256:a7b8b7b33e44b123d7f997bd4d3d0a59fafc63e203d17efedf09ff3f6f516152"
-        }
-
-        It 'pulls public docker image by image name, with both tag and digest; and fails' {
-            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Tag 'bionic' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -PassThru
-        }
-
-        It 'pulls public docker image by image name with invalid digest, missing sha256: prefix; and fails' {
-            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Digest 'f5c0a8d225a4b7556db2b26753a7f4c4de3b090c1a8852983885b80694ca9840' }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
-        }
-
-        It 'pulls public docker image by image name with invalid digest, wrong digest length; and fails' {
-            $theCode = { Invoke-DockerPull -ImageName 'ubuntu' -Digest 'sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' }
-            $theCode | Should -Throw -ExceptionType ([System.Management.Automation.RuntimeException]) -PassThru
-        }
-
-        It 'does not allow colons in imagename, force use of tag' {
-            $theCode = { Invoke-DockerPull -ImageName 'ubuntu:bionic' }
-            $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
-        }
-
-        It 'does not allow at signs in imagename, force use of tag' {
-            $theCode = { Invoke-DockerPull -ImageName 'ubuntu@sha256:f5c0a8d225a4b7556db2b26753a7f4c4d' }
-            $theCode | Should -Throw -ExceptionType ([System.ArgumentException]) -PassThru
-        }
-
-        It 'cannot pull the requested docker image, throws exception on non-zero exit code' {
-            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeOne  -Verifiable -ModuleName $Global:ModuleName
-            $theCode = { Invoke-DockerPull -ImageName 'mcr.microsoft.com/ubuntu' }
-            $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
-        }
-    }
-
-    Context 'Pipeline execution' {
-
-        BeforeEach {
-            Initialize-MockReg
-            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
-        }
-
-        AfterEach {
-            Assert-MockCalled -CommandName "Invoke-Command" -ModuleName $Global:ModuleName
-        }
-        BeforeAll {
-            $pipedInput = {
-                $input = [PSCustomObject]@{
-                    "ImageName" = "myimage";
-                    "Registry"  = "localhost";
-                    "Tag"       = "v1.0.2"
-                }
-                return $input
+            It 'Hostname can be mocked' {
+                Mock -CommandName "hostname" -MockWith {return $Global:DockerContainerHostname} -Verifiable
+                $result = hostname
+                $result | Should -Be $Global:DockerContainerHostname
+                Assert-MockCalled -CommandName "hostname" -Times 1
+            }
+            It 'Invoke-DockerCommand can be mocked (ps)' {
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                $result = Invoke-DockerCommand 'ps'
+                $result.Output | Should -Be $Global:DockerPsOutput
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+            }
+            It 'Invoke-DockerCommand can be mocked (inspect)' {
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerInspectMockCode -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+                $result = Invoke-DockerCommand 'inspect -f'
+                $result.Output | Should -Be $Global:DockerInspectOutput
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
             }
         }
 
-        It 'can consume arguments from pipeline' {
-            & $pipedInput | Invoke-DockerPull
+        Context 'When run NOT inside docker container' {
+
+            It 'returns the provided path' {
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                Mock -CommandName "hostname" -MockWith {return 'someHostname'} -Verifiable
+                $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
+                $result | Should -Be $Global:WorkspaceAbsolutePath
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                Assert-MockCalled -CommandName "hostname" -Times 1
+            }
         }
 
-        It 'returns the expected pscustomobject' {
-            $result = & $pipedInput | Invoke-DockerPull
+        Context 'When run inside docker container' {
 
-            $result.ImageName | Should -Be 'myimage'
-            $result.Registry | Should -Be 'localhost/'
-            $result.Tag | Should -Be 'v1.0.2'
-            $result.CommandResult | Should -Not -BeNullOrEmpty
+            It 'returns the path on docker host if folder belongs to mapped volume' {
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                Mock -CommandName "hostname" -MockWith {return $Global:DockerContainerHostname} -Verifiable
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerInspectMockCode -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+                $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
+                $result | Should -Be $Global:DockerHostAbsolutePath
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                Assert-MockCalled -CommandName "hostname" -Times 1
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
+            }
+            It 'returns the provided path otherwise' {
+                Mock -CommandName "Invoke-DockerCommand" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                Mock -CommandName "hostname" -MockWith {return $Global:DockerContainerHostname} -Verifiable
+                Mock -CommandName "Invoke-DockerCommand" -MockWith {$result = [CommandResult]::new(); $result.StdOut = ''; $result.ExitCode = 0; return $result} -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable #-ModuleName $Global:ModuleName
+                $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
+                $result | Should -Be $Global:WorkspaceAbsolutePath
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 2
+                Assert-MockCalled -CommandName "hostname" -Times 2
+                Assert-MockCalled -CommandName "Invoke-DockerCommand" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 2
+            }
         }
-    }
-
-    Context 'Verbosity of execution' {
-
-        It 'outputs results if Quiet is disabled' {
-            $tempFile = New-TemporaryFile
-            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
-
-            Invoke-DockerPull -ImageName 'ubuntu' -Quiet:$false 6> $tempFile
-
-            $result = Get-Content $tempFile
-            $result | Should -Be @('Hello', 'World')
-        }
-
-        It 'suppresses results if Quiet is enabled' {
-            $tempFile = New-TemporaryFile
-            Mock -CommandName "Invoke-Command" $Global:CodeThatReturnsExitCodeZero -Verifiable -ModuleName $Global:ModuleName
-
-            Invoke-DockerPull -ImageName 'ubuntu' -Quiet:$true 6> $tempFile
-
-            $result = Get-Content $tempFile
-            $result | Should -BeNullOrEmpty
-        }
-
     }
 }
