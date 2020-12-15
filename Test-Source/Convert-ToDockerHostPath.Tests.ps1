@@ -96,5 +96,26 @@ Describe 'Convert absolute path to path on docker host with Convert-ToDockerHost
                 Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 2
             }
         }
+
+        Context 'When docker ps or docker inspect command fails' {
+
+            It 'cannot proceed further when docker ps command fails, throws exception on non-zero exit code' {
+                Mock -CommandName "Invoke-Command" -MockWith $Global:CodeThatReturnsExitCodeOne -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                $theCode = { Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath }
+                $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+            }
+
+            It 'cannot proceed further when docker inspect command fails, throws exception on non-zero exit code' {
+                Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
+                Mock -CommandName "Invoke-Command" -MockWith $Global:CodeThatReturnsExitCodeOne -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+                $theCode = { Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath }
+                $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                Assert-MockCalled -CommandName "hostname" -Times 2
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
+            }
+        }
     }
 }
