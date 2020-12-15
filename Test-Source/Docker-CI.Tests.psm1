@@ -58,7 +58,10 @@ Set-GlobalVar -Variable DockerPsOutput -Value @(
     'CONTAINER ID        IMAGE                  COMMAND             CREATED             STATUS              PORTS               NAMES',
     'a28e1ca69345        jenkins.agent:bionic   "jenkins-agent"     41 minutes ago      Up 41 minutes                           jenkins.agent'
 )
+
 Set-GlobalVar -Variable DockerPsMockCode -Value {
+    StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
+    StoreMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName -Value $CommandArgs
     $result = [CommandResult]::new()
     $result.Output = $Global:DockerPsOutput
     $result.StdOut = $Global:DockerPsOutput
@@ -76,6 +79,8 @@ Set-GlobalVar -Variable DockerInspectOutput -Value @(
 )
 
 Set-GlobalVar -Variable DockerInspectMockCode -Value {
+    StoreMockValue -Key $Global:InvokeCommandReturnValueKeyName -Value $Command
+    StoreMockValue -Key $Global:InvokeCommandArgsReturnValueKeyName -Value $CommandArgs
     $result = [CommandResult]::new()
     $result.Output = $Global:DockerInspectOutput
     $result.StdOut = $Global:DockerInspectOutput
@@ -92,7 +97,6 @@ if ($IsWindows) {
     Set-GlobalVar -Variable WorkspaceAbsolutePath -Value '/home/jenkins/workspace/mybuild'
     Set-GlobalVar -Variable DockerHostAbsolutePath -Value '/home/devops/workspace/mybuild'
 }
-
 
 . "$PSScriptRoot\..\Source\Private\Invoke-Command.ps1"
 . "$PSScriptRoot\..\Source\Private\Invoke-DockerCommand.ps1"

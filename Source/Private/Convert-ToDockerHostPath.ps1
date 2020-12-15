@@ -7,15 +7,19 @@ function Convert-ToDockerHostPath {
     )
 
     $pathOnDockerHost = $Path
-    if ( (Invoke-DockerCommand 'ps' -Quiet).StdOut | Select-String $(hostname) ) { 
+    $commandResultPS = Invoke-DockerCommand 'ps' -Quiet -ErrorAction Stop
+
+    if ( ($commandResultPS).StdOut | Select-String $(hostname) ) {
         # executed inside docker container $(hostname)
         $dockerCommand = "inspect -f ""{{ range .Mounts }}{{ .Source }}={{ .Destination }}{{ println }} {{ end }}"" $(hostname)"
-        $mounts = (Invoke-DockerCommand $dockerCommand -Quiet).StdOut.trim() | Where-Object {  $_ -NotMatch "/var/lib/docker" -and $_ -NotMatch "docker.sock" -and $_ -NotMatch "\\pipe\\" -and $_ -ne '' }
-        if ($mounts) {
+        $commandResultInspect = Invoke-DockerCommand $dockerCommand -Quiet -ErrorAction Stop
+        $mounts = ($commandResultInspect).StdOut.trim() | Where-Object { $_ -NotMatch "/var/lib/docker" -and $_ -NotMatch "docker.sock" -and $_ -NotMatch "\\pipe\\" -and $_ -ne '' }
+
+        if ($mounts.Length -gt 0) {
             $mounts | ForEach-Object {
                 if ($_.split('=')[0] -ne $_.split('=')[1]) {
                     # Replace container path with host path
-                    $pathOnDockerHost = $pathOnDockerHost.Replace($_.split('=')[1],$_.split('=')[0])
+                    $pathOnDockerHost = $pathOnDockerHost.Replace($_.split('=')[1], $_.split('=')[0])
                 }
             }
         }
