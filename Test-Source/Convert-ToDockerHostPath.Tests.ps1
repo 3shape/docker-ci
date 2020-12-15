@@ -48,7 +48,7 @@ Describe 'Convert absolute path to path on docker host with Convert-ToDockerHost
 
         Context 'When run inside docker container' {
 
-            It 'returns the path on docker host if folder belongs to mapped volume' {
+            It 'returns the path on docker host if folder belongs to mapped volume generic' {
                 Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
                 Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
                 Mock -CommandName "Invoke-Command" -MockWith $Global:DockerInspectMockCode -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
@@ -59,10 +59,36 @@ Describe 'Convert absolute path to path on docker host with Convert-ToDockerHost
                 Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
             }
 
+            if ($IsWindows) {
+                It 'returns the path on docker host if folder belongs to mapped volume on Windows' {
+                    Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                    Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
+                    Mock -CommandName "Invoke-Command" -MockWith $Global:DockerInspectMockCodeWindows -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+                    $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
+                    $result | Should -Be $Global:DockerHostAbsolutePath
+                    Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                    Assert-MockCalled -CommandName "hostname" -Times 1
+                    Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
+                }
+            }
+
+            if ($IsLinux) {
+                It 'returns the path on docker host if folder belongs to mapped volume on Linux' {
+                    Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                    Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
+                    Mock -CommandName "Invoke-Command" -MockWith $Global:DockerInspectMockCodeLinux -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+                    $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
+                    $result | Should -Be $Global:DockerHostAbsolutePath
+                    Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                    Assert-MockCalled -CommandName "hostname" -Times 1
+                    Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
+                }
+            }
+
             It 'returns the provided path otherwise' {
                 Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
                 Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
-                Mock -CommandName "Invoke-Command" -MockWith { $result = [CommandResult]::new(); $result.StdOut = ''; $result.ExitCode = 0; return $result } -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable #-ModuleName $Global:ModuleName
+                Mock -CommandName "Invoke-Command" -MockWith $Global:CodeThatReturnsExitCodeZeroAndEmptyStdOut -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
                 $result = Convert-ToDockerHostPath $Global:WorkspaceAbsolutePath
                 $result | Should -Be $Global:WorkspaceAbsolutePath
                 Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 2
