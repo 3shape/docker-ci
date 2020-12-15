@@ -101,7 +101,7 @@ Describe 'Run docker tests using Google Structure' {
             $testResult.Results.Length | Should -Be 2
         }
 
-        It 'Can pick up tests in a nested folder structure' {
+        It 'can pick up tests in a nested folder structure' {
             $allPassingTestsDir = Join-Path $Global:StructureTestsPassDir $Global:DockerOsType
             $result = Invoke-DockerTests -ImageName $imageToTest -ConfigPath $allPassingTestsDir
             $commandResult = $result.CommandResult
@@ -167,6 +167,32 @@ Describe 'Run docker tests using Google Structure' {
         It 'throws if ConfigPath set to a directory with no yaml files.' {
             $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath (New-RandomFolder) }
             $theCode | Should -Throw -ExceptionType 'System.ArgumentException'
+        }
+
+        InModuleScope $Global:ModuleName {
+
+            It 'throws an exception if Convert-ToDockerHostPath fails on docker ps' {
+                $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
+                $configs = @($structureCommandConfig)
+                Mock -CommandName "Invoke-Command" -MockWith $Global:CodeThatReturnsExitCodeOne -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs }
+                $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+            }
+
+            It 'throws an exception if Convert-ToDockerHostPath fails on docker inspect' {
+                $structureCommandConfig = Join-Path $Global:StructureTestsFailDir $Global:DockerOsType 'testshell.yml'
+                $configs = @($structureCommandConfig)
+                Mock -CommandName "Invoke-Command" -MockWith $Global:DockerPsMockCode -ParameterFilter { $CommandArgs.StartsWith('ps') } -Verifiable
+                Mock -CommandName "hostname" -MockWith { return $Global:DockerContainerHostname } -Verifiable
+                Mock -CommandName "Invoke-Command" -MockWith $Global:CodeThatReturnsExitCodeOne -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Verifiable
+
+                $theCode = { Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs }
+                $theCode | Should -Throw -ExceptionType ([System.Exception]) -PassThru
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('ps') } -Times 1
+                Assert-MockCalled -CommandName "hostname" -Times 2
+                Assert-MockCalled -CommandName "Invoke-Command" -ParameterFilter { $CommandArgs.StartsWith('inspect -f') } -Times 1
+            }
         }
     }
 
