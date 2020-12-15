@@ -86,7 +86,7 @@ Set-GlobalVar -Variable DockerInspectOutputLinux -Value @(
     '  /var/lib/docker/volumes/b29f5bbedd3a667ee45f0dde717a2c9b8092af81e0b9da92f9499f5c10a6c12e/_data=/home/jenkins/agent'
 )
 
-Set-GlobalVar -Variable DockerInspectOutput -Value @( $Global:DockerInspectOutputLinux, $Global:DockerInspectOutputWindows )
+Set-GlobalVar -Variable DockerInspectOutput -Value @( $Global:DockerInspectOutputLinux + $Global:DockerInspectOutputWindows )
 
 Set-GlobalVar -Variable DockerInspectMockCode -Value {
     $result = [CommandResult]::new()
