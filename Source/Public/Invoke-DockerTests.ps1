@@ -31,10 +31,12 @@ function Invoke-DockerTests {
     }
 
     $here = Format-AsAbsolutePath (Get-Location)
+    $hereOnDockerHost = Convert-ToDockerHostPath $here
     $absoluteTestReportDir = Format-AsAbsolutePath ($TestReportDir)
     if (!(Test-Path $absoluteTestReportDir -PathType Container)) {
         New-Item $absoluteTestReportDir -ItemType Directory -Force | Out-Null
     }
+    $absoluteTestReportDirOnDockerHost = Convert-ToDockerHostPath $absoluteTestReportDir
     $osType = Find-DockerOSType
     $dockerSocket = Find-DockerSocket -OsType $osType
     if ($osType -ieq 'windows') {
@@ -45,8 +47,8 @@ function Invoke-DockerTests {
         $report = '/report'
     }
     $structureCommand = "run -i" + `
-        " -v `"${here}:${configs}`"" + `
-        " -v `"${absoluteTestReportDir}:${report}`"" + `
+        " -v `"${hereOnDockerHost}:${configs}`"" + `
+        " -v `"${absoluteTestReportDirOnDockerHost}:${report}`"" + `
         " -v `"${dockerSocket}:${dockerSocket}`"" + `
         " 3shape/containerized-structure-test:latest test -i ${ImageName} --test-report ${report}/${TestReportName}"
 
