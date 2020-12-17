@@ -1,0 +1,4 @@
+breaking: ['breaking/*', 'break/*']
+improvement: ['improvement', 'feature/*', 'feat/*', 'features/*']
+bug: ['fix/*', 'bug/*', 'bugfix/*']
+misc: ['misc/']
