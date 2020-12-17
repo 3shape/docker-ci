@@ -1,0 +1,21 @@
+categories:
+  - title: '💣 Breaking changes'
+    labels:
+      - 'breaking'
+  - title: '🚀 Improvement'
+    labels:
+      - 'improvement'
+      - 'feature'
+      - 'features'
+      - 'feat'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bug'
+      - 'fix'
+  - title: '🧰 Misc'
+    label: 'misc'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+template: |
+  ## Changes
+
+  $CHANGES
