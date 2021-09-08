@@ -235,7 +235,7 @@ Describe 'Run docker tests using Google Structure' {
 
             Invoke-DockerTests -ImageName $imageToTest -ConfigPath $configs -Quiet:$false 6> $tempFile
 
-            $result = Get-Content $tempFile
+            $result = Get-Content $tempFile -Raw
             Write-Debug "Result: $result"
             $result | Should -BeLike "*Pass=0; Fail=1; Total=1*"
         }
