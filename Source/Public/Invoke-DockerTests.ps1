@@ -61,10 +61,6 @@ function Invoke-DockerTests {
     )
 
     $commandResult = Invoke-DockerCommand $structureCommand
-    if ($TreatTestFailuresAsExceptions) {
-        Assert-ExitCodeOk $commandResult
-    }
-
     $testReportPath = Join-Path $absoluteTestReportDir $TestReportName
     $testReportExists = Test-Path -Path $testReportPath -PathType Leaf
     if ($testReportExists) {
@@ -79,6 +75,10 @@ function Invoke-DockerTests {
     }
     if (!$Quiet) {
         Write-CommandOuput $($result.TestResult)
+        Write-CommandOuput $($result.TestResult.Results | where { !$_.Pass } | select Name, @{Label = "Error"; Expression = { $_.Errors -join "`r`n" } })
+    }
+    if ($TreatTestFailuresAsExceptions) {
+        Assert-ExitCodeOk $commandResult
     }
     return $result
 }
