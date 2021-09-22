@@ -82,7 +82,7 @@ Task PostPublish {
         throw ("module name not set, cannot publish to slack.")
     }
     $version = "${env:GitVersion_Version}"
-    $slackChannel = 'batcave'
+    $slackChannel = 'cicd'
     $slackMessage = "${module}-${version} has been released`n`n" + `
         "The new version is available from https://www.powershellgallery.com/packages/${module}/${version}"
     $Request = @{
