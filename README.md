@@ -4,7 +4,7 @@
 
 # docker-ci
 
-PowerShell Core script to build and test Docker images.
+PowerShell Core module to build and test Docker images.
 The module comes with CmdLets to perform the most commonly used tasks with regards to building docker images:
 
 - Build
@@ -35,7 +35,8 @@ and so on.
 
 ## Prerequisite
 
-PowerShell core >= 6.0 is needed.
+* PowerShell core >= 6.0 is needed.
+* Docker Engine >= 20.10.0 or Docker Desktop >= 3.0.0 is needed
 
 ## Installation
 
