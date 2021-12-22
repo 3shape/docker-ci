@@ -67,18 +67,12 @@ function Invoke-DockerTests {
         $testResult = $(ConvertFrom-Json $(Get-Content $testReportPath))
     }
 
-    $result = [PSCustomObject]@{
+    Write-TestResults -TestReportPath $testReportPath -CommandResult $commandResult -TreatTestFailuresAsExceptions:$TreatTestFailuresAsExceptions -Quiet:$Quiet
+
+    return [PSCustomObject]@{
         'TestResult'     = $testResult
         'TestReportPath' = $testReportPath
         'CommandResult'  = $commandResult
         'ImageName'      = $ImageName
     }
-    if (!$Quiet) {
-        Write-CommandOuput $($result.TestResult)
-        Write-CommandOuput $($result.TestResult.Results | where { !$_.Pass } | select Name, @{Label = "Error"; Expression = { $_.Errors -join "`r`n" } })
-    }
-    if ($TreatTestFailuresAsExceptions) {
-        Assert-ExitCodeOk $commandResult
-    }
-    return $result
 }
