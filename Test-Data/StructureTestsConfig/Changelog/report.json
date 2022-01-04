@@ -1,0 +1,30 @@
+{
+    "Pass": 4,
+    "Fail": 0,
+    "Total": 4,
+    "Duration": 0,
+    "Results": [
+        {
+            "Name": "Command Test: git cli",
+            "Pass": true,
+            "Stdout": "git version 2.34.0.windows.1\n",
+            "Duration": 0
+        },
+        {
+            "Name": "Command Test: dotnet",
+            "Pass": true,
+            "Stdout": "5.0.100\r\n",
+            "Duration": 0
+        },
+        {
+            "Name": "File Existence Test: nuget.config",
+            "Pass": true,
+            "Duration": 0
+        },
+        {
+            "Name": "Metadata Test",
+            "Pass": true,
+            "Duration": 0
+        }
+    ]
+}
