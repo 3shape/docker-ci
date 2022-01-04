@@ -11,4 +11,11 @@ Foreach ($import in @($Public + $Private)) {
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
+
+# This is an internal, module-wide hashtable used to cache data and objects.
+# Hashtabels are always passed by reference, so we avoid accidental scope issues.
+$script:CachedDockerInformation = @{
+    'OSType' = $null
+}
+
 Export-ModuleMember -Function $Public.Basename
